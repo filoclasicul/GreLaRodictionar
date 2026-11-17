@@ -1,4 +1,4 @@
-0<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ro">
 <head>
   <meta charset="UTF-8">
@@ -640,6 +640,7 @@
 
     .texts-page {
       max-width: 900px;
+      width: 100%;
     }
 
     .texts-intro {
@@ -798,8 +799,9 @@
 
     .texts-directory-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
-      gap: 0.8rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 1.25rem;
+      row-gap: 0.8rem;
     }
 
     .texts-browse-card {
@@ -2243,6 +2245,10 @@
         padding: 0 0.85rem;
       }
 
+      .texts-directory-list {
+        grid-template-columns: 1fr;
+      }
+
       .modes-container,
       .search-section {
         padding: 0.9rem;
@@ -2432,7 +2438,7 @@
               <div class="menu-group">
                 <span class="menu-group-label">Greacă & latină → română</span>
                 <div class="menu-group-buttons">
-                  <button class="mode-chip menu-button active" id="btn-omnia-dir" onclick="setSearchMode('omnia-dir')">Omnia (Gr + Lat)</button>
+                  <button class="mode-chip menu-button active" id="btn-omnia-dir" onclick="setSearchMode('omnia-dir')">Omnia</button>
                   <button class="mode-chip menu-button" id="btn-greek-dir" onclick="setSearchMode('greek-dir')">Greacă veche</button>
                   <button class="mode-chip menu-button" id="btn-latin-dir" onclick="setSearchMode('latin-dir')">Latină</button>
                 </div>
@@ -2440,7 +2446,7 @@
               <div class="menu-group">
                 <span class="menu-group-label">Română → greacă & latină</span>
                 <div class="menu-group-buttons">
-                  <button class="mode-chip menu-button" id="btn-omnia-rev" onclick="setSearchMode('omnia-rev')">Omnia (toate)</button>
+                  <button class="mode-chip menu-button" id="btn-omnia-rev" onclick="setSearchMode('omnia-rev')">Omnia</button>
                   <button class="mode-chip menu-button" id="btn-greek-rev" onclick="setSearchMode('greek-rev')">Greacă veche</button>
                   <button class="mode-chip menu-button" id="btn-latin-rev" onclick="setSearchMode('latin-rev')">Latină</button>
                 </div>
@@ -2523,7 +2529,6 @@
 
   <main class="texts-page" id="textsPage" hidden>
     <section class="texts-intro" aria-labelledby="textsPageTitle">
-      <span class="texts-eyebrow">Colecție separată</span>
       <h1 class="texts-title" id="textsPageTitle">Texte clasice</h1>
       <p>Caută în texte după cuvinte, autori sau titluri.</p>
     </section>
@@ -3058,11 +3063,9 @@
     function getTextVolumes(records) {
       const volumes = new Map();
       records.forEach(record => {
-        const key = `${record.collectionTitle}\u0000${record.volume}`;
+        const key = record.volume;
         if (!volumes.has(key)) {
-          const label = record.collectionTitle
-            ? `${record.collectionTitle} · Volumul ${record.volume}`
-            : `Volumul ${record.volume}`;
+          const label = `Volumul ${record.volume}`;
           volumes.set(key, { key, label, records: [] });
         }
         volumes.get(key).records.push(record);
@@ -3371,7 +3374,7 @@
       })));
       const workTitle = document.createElement('p');
       workTitle.className = 'texts-chapter-meta';
-      workTitle.textContent = [record.title, record.author, record.collectionTitle, `Volumul ${record.volume}`]
+      workTitle.textContent = [record.title, record.author, `Volumul ${record.volume}`]
         .filter(Boolean).join(' · ');
       textsChapterView.append(heading, workTitle);
 
@@ -3489,7 +3492,6 @@
         getTextWorks(textNavigation.author, textNavigation.languageGroup).forEach(work => {
           const volumeCount = getTextVolumes(work.records).length;
           const detail = [
-            work.records[0].collectionTitle,
             work.records[0].language,
             `${volumeCount} ${volumeCount === 1 ? 'volum' : 'volume'}`
           ].filter(Boolean).join(' · ');
@@ -3813,12 +3815,12 @@
 
     function getRecentSearchModeLabel(mode) {
       return ({
-        'omnia-dir': 'Dicționar',
-        'greek-dir': 'Greacă',
+        'omnia-dir': 'Omnia',
+        'greek-dir': 'Greacă veche',
         'latin-dir': 'Latină',
-        'omnia-rev': 'Română',
-        'greek-rev': 'Română · greacă',
-        'latin-rev': 'Română · latină'
+        'omnia-rev': 'Omnia',
+        'greek-rev': 'Greacă veche',
+        'latin-rev': 'Latină'
       })[mode];
     }
 
@@ -3890,7 +3892,7 @@
       input.value = item.query;
 
       if (item.mode.endsWith('-rev')) submitSearch();
-      else handleSearchInput(item.query);
+      else submitSearch();
     }
 
     function loadFavoriteWords() {
@@ -4032,7 +4034,7 @@
       input.value = '';
       setSearchMode(item.lang === 'Greacă Veche' ? 'greek-dir' : 'latin-dir');
       input.value = item.word;
-      handleSearchInput(item.word);
+      submitSearch();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -4388,13 +4390,11 @@
 
       const requestId = ++searchRequestId;
       updateLiveSuggestions(query);
-      handleSearch(query);
       if (!query.trim()) return;
 
       loadRemoteDictionary(query).then(() => {
         if (requestId !== searchRequestId || currentMode.endsWith('-rev')) return;
         updateLiveSuggestions(query);
-        handleSearch(query);
       }).catch(error => {
         if (requestId !== searchRequestId || currentMode.endsWith('-rev')) return;
         const display = document.getElementById('dictionaryDisplay');
@@ -4405,15 +4405,44 @@
       });
     }
 
-    function submitSearch() {
-      if (!currentMode.endsWith('-rev')) return;
+    async function submitSearch() {
       document.getElementById('autocompleteDropdown').classList.remove('active');
       const query = document.getElementById('searchInput').value;
-      runReverseSearch(query);
+      if (!query.trim()) return;
+
+      if (currentMode.endsWith('-rev')) {
+        runReverseSearch(query);
+        return;
+      }
+
+      try {
+        await loadRemoteDictionary(query);
+        const raw = query.trim();
+        let matchedLemma = null;
+        for (const lemma in lexiconData) {
+          const item = lexiconData[lemma];
+          if (currentMode === 'greek-dir' && item.lang !== 'Greacă Veche') continue;
+          if (currentMode === 'latin-dir' && item.lang !== 'Latină') continue;
+
+          const matchesForm = item.searchForms?.some(form => matchesSearchText(form, raw));
+          if (lemma === raw || matchesSearchText(lemma, raw) || matchesForm) {
+            matchedLemma = lemma;
+            break;
+          }
+        }
+        if (matchedLemma) selectSuggestion(matchedLemma);
+        else runDirectSearch(raw);
+      } catch (error) {
+        const display = document.getElementById('dictionaryDisplay');
+        const message = document.createElement('p');
+        message.className = 'dictionary-load-error';
+        message.textContent = error.message;
+        display.replaceChildren(message);
+      }
     }
 
     function handleSearchKeydown(event) {
-      if (event.key === 'Enter' && currentMode.endsWith('-rev')) {
+      if (event.key === 'Enter') {
         event.preventDefault();
         submitSearch();
       }
@@ -4456,7 +4485,7 @@
         title.innerText = `Recomandări pentru „${raw}” (${matches.length})`;
         const suggestions = matches.slice(0, 5);
         list.innerHTML = suggestions.map(item => `
-          <div class="dropdown-item">
+          <div class="dropdown-item" role="button" tabindex="0">
             <div>
               <span class="dropdown-lemma${item.lang === 'Greacă Veche' ? ' greek-text' : ''}">${item.id}</span>
               <span class="dropdown-desc">${item.defs[0] || item.pos}</span>
@@ -4466,6 +4495,12 @@
         list.querySelectorAll('.dropdown-item').forEach((element, index) => {
           element.addEventListener('click', () => {
             selectSuggestion(suggestions[index].lemmaKey ?? suggestions[index].id);
+          });
+          element.addEventListener('keydown', event => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              selectSuggestion(suggestions[index].lemmaKey ?? suggestions[index].id);
+            }
           });
         });
       } else {
