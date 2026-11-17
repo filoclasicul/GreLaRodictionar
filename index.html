@@ -2782,8 +2782,9 @@
           };
         })
         .filter(chapter => chapter.text);
+      let chapters = numberedDivisions;
       if (!chapters.length && paragraphs.length) {
-        chapters.push({ number: '1', heading: '', paragraphs, text: paragraphs.join('\n\n') });
+        chapters = [{ number: '1', heading: '', paragraphs, text: paragraphs.join('\n\n') }];
       }
       const text = chapters.map(chapter => chapter.text).join('\n\n')
         || body.textContent.replace(/\s+/g, ' ').trim();
@@ -3714,7 +3715,19 @@
             if (!manifestResponse.ok) throw new Error(`Răspuns HTTP ${manifestResponse.status}`);
             references = validateTextDatabase(await manifestResponse.json());
           }
-          textDatabase = await Promise.all(references.map(loadTextDocument));
+          const loadedDocuments = await Promise.allSettled(references.map(loadTextDocument));
+          textDatabase = loadedDocuments
+            .filter(result => result.status === 'fulfilled')
+            .map(result => result.value);
+          const failedDocuments = loadedDocuments
+            .filter(result => result.status === 'rejected')
+            .map(result => result.reason);
+          if (failedDocuments.length) {
+            console.error('Unele documente nu au putut fi încărcate.', failedDocuments);
+          }
+          if (!textDatabase.length) {
+            throw new Error(failedDocuments[0]?.message || 'Nu s-a putut încărca niciun document.');
+          }
           if (showingTextFavoritesPage) {
             renderTextFavoritesPage();
             setTextsSearchStatus('');
