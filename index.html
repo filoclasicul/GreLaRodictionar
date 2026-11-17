@@ -4081,7 +4081,9 @@
 
       return fileLetters.map(fileLetter => ({
         language,
-        path: `data/${language}/${encodeURIComponent(fileLetter)}.json`
+        path: language === 'gr'
+          ? 'data/litere/gr/dictionar_ALPHA.jsonl'
+          : `data/litere/lat/${encodeURIComponent(fileLetter)}.json`
       }));
     }
 
@@ -4127,8 +4129,8 @@
           trans: escape(citation.trans),
           author: escape(citation.author)
         })) : [],
-        paradigm: Array.isArray(entry.paradigm)
-          ? entry.paradigm.map(row => Array.isArray(row) ? row.map(escape) : [])
+        paradigm: Array.isArray(entry.paradigm ?? entry.paradigma)
+          ? (entry.paradigm ?? entry.paradigma).map(row => Array.isArray(row) ? row.map(escape) : [])
           : []
       };
     }
@@ -4143,7 +4145,21 @@
           }
           const body = await response.text();
           try {
-            return JSON.parse(body);
+            if (target.path.endsWith('.jsonl')) {
+              return body.split(/\r?\n/).filter(line => line.trim()).map((line, index) => {
+                let entry;
+                try {
+                  entry = JSON.parse(line);
+                } catch (error) {
+                  throw new Error(`rândul ${index + 1} nu este JSON valid: ${error.message}`);
+                }
+                if (!entry || typeof entry.lema !== 'string' || !entry.lema) {
+                  throw new TypeError(`rândul ${index + 1} nu conține o lemă validă.`);
+                }
+                return [entry.lema, entry];
+              });
+            }
+            return Object.entries(JSON.parse(body));
           } catch (error) {
             if (body.trimStart().startsWith('<')) {
               throw new Error('serverul a returnat o pagină HTML, nu fișierul JSON cerut');
@@ -4156,10 +4172,10 @@
 
       try {
         const entries = await remoteDictionaryCache.get(target.path);
-        if (!entries || typeof entries !== 'object' || Array.isArray(entries)) {
-          throw new TypeError('Fișierul JSON trebuie să conțină un obiect cu intrări indexate după lemă.');
+        if (!Array.isArray(entries)) {
+          throw new TypeError('Fișierul dicționarului nu conține intrări valide.');
         }
-        for (const [lemma, entry] of Object.entries(entries)) {
+        for (const [lemma, entry] of entries) {
           if (!Object.prototype.hasOwnProperty.call(lexiconData, lemma)) {
             lexiconData[lemma] = normalizeRemoteEntry(lemma, entry, target.language);
           }
@@ -4219,10 +4235,9 @@
         index >= 0 && index < alphabet.length;
         index += direction) {
         const letter = alphabet[index];
-        const loaded = await loadDictionaryTarget({
-          language,
-          path: `data/${language}/${encodeURIComponent(letter)}.json`
-        }, true);
+        const target = buildDictionaryTargets(letter, language)[0];
+        if (!target) continue;
+        const loaded = await loadDictionaryTarget(target, true);
         if (!loaded) continue;
 
         const entries = entriesForLetter(letter);
