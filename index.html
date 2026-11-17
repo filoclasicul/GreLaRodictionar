@@ -851,7 +851,7 @@
 
     .texts-directory-list {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       column-gap: 1.25rem;
       row-gap: 0.8rem;
     }
@@ -929,11 +929,50 @@
     }
 
     .texts-author-card {
-      min-height: 6rem;
+      min-height: 0;
+      overflow: hidden;
     }
 
     .texts-author-card .texts-browse-card-open {
-      padding: 1.25rem 1.4rem;
+      display: block;
+      padding: 0;
+    }
+
+    .texts-author-card .texts-browse-card-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+      width: 100%;
+    }
+
+    .texts-author-card .texts-browse-card-image {
+      width: 100%;
+      height: clamp(11rem, 25vw, 18rem);
+      border: 0;
+      border-bottom: 1px solid var(--border-color);
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .texts-author-card .texts-browse-card-copy {
+      align-items: center;
+      padding: 0.9rem 0.75rem 0.25rem;
+      text-align: center;
+    }
+
+    .texts-author-card .texts-browse-card-detail {
+      text-align: center;
+    }
+
+    .texts-author-card .texts-browse-card-favorite {
+      position: absolute;
+      right: 0.35rem;
+      bottom: 0.35rem;
+      margin: 0;
+    }
+
+    .texts-author-card {
+      position: relative;
     }
 
     .texts-browse-card-inner {
@@ -978,6 +1017,71 @@
 
     .texts-author-card .texts-browse-card-title {
       font-size: 1.2rem;
+    }
+
+    .texts-author-profile {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 5.5rem minmax(0, 1fr);
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.35rem;
+      padding: 1.1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      background: linear-gradient(145deg, var(--bg-card), var(--gold-light));
+    }
+
+    .texts-author-profile-icon,
+    .texts-author-profile-image {
+      width: 5.5rem;
+      height: 5.5rem;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      background: var(--gold-light);
+    }
+
+    .texts-author-profile-icon {
+      display: grid;
+      place-items: center;
+      font-size: 2.35rem;
+    }
+
+    .texts-author-profile-image {
+      object-fit: cover;
+    }
+
+    .texts-author-profile-copy h3 {
+      margin: 0;
+      color: var(--crimson);
+      font: 700 1.3rem/1.25 var(--font-title);
+    }
+
+    .texts-author-profile-years {
+      margin-top: 0.15rem;
+      color: var(--gold);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .texts-author-profile-description {
+      margin-top: 0.45rem;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 640px) {
+      .texts-author-profile {
+        grid-template-columns: 4.5rem minmax(0, 1fr);
+        padding: 0.9rem;
+      }
+
+      .texts-author-profile-icon,
+      .texts-author-profile-image {
+        width: 4.5rem;
+        height: 4.5rem;
+      }
     }
 
     .texts-collection-card {
@@ -2275,6 +2379,16 @@
       opacity: 0.8;
     }
 
+    @media (max-width: 900px) {
+      .texts-directory-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .texts-author-card .texts-browse-card-image {
+        height: clamp(10rem, 42vw, 16rem);
+      }
+    }
+
     @media (max-width: 640px) {
       body {
         font-size: 16px;
@@ -2915,7 +3029,7 @@
       }
     ];
     let textNavigation = { level: 'collections', languageGroup: '', author: '', work: '', volume: '' };
-    const authorProfiles = {
+    let authorProfiles = {
       Cicero: {
         name: 'M. Tullius Cicero',
         image: 'assets/authors/cicero.jpg',
@@ -2938,6 +3052,20 @@
       }
     };
     let activeTextChapter = null;
+
+    async function loadAuthorProfiles() {
+      try {
+        const response = await fetch('data/authors/authors.json', { cache: 'force-cache' });
+        if (!response.ok) throw new Error(`Răspuns HTTP ${response.status}`);
+        const profiles = await response.json();
+        if (!profiles || typeof profiles !== 'object' || Array.isArray(profiles)) {
+          throw new TypeError('Profilurile autorilor nu au formatul așteptat.');
+        }
+        authorProfiles = { ...authorProfiles, ...profiles };
+      } catch (error) {
+        console.warn('Nu s-au putut încărca profilurile externe ale autorilor.', error);
+      }
+    }
 
     function syncSitePageFromLocation() {
       const showingTexts = window.location.hash === '#texte';
@@ -3013,6 +3141,13 @@
           .filter(element => element.localName === localName || element.tagName === localName);
       const firstElement = (root, localName) => allElements(root, localName)[0] || null;
       const elementText = element => element?.textContent?.replace(/\s+/g, ' ').trim() || '';
+      const cleanTextContent = element => {
+        if (!element) return '';
+        const clone = element.cloneNode(true);
+        clone.querySelectorAll('note, app, pb, milestone, gap')
+          .forEach(unwanted => unwanted.remove());
+        return clone.textContent.replace(/\s+/g, ' ').trim();
+      };
 
       const textElement = firstElement(xml, 'text');
       const body = firstElement(xml, 'body');
@@ -3021,10 +3156,10 @@
       }
 
       const paragraphs = allElements(body, 'p')
-        .map(paragraph => paragraph.textContent.replace(/\s+/g, ' ').trim())
+        .map(cleanTextContent)
         .filter(Boolean);
       const lines = allElements(body, 'l')
-        .map(line => line.textContent.replace(/\s+/g, ' ').trim())
+        .map(cleanTextContent)
         .filter(Boolean);
       const title = elementText(firstElement(xml, 'title'));
       const author = elementText(firstElement(xml, 'author'));
@@ -3053,19 +3188,20 @@
         })
         .map(section => {
           const chapterParagraphs = allElements(section, 'p')
-            .map(paragraph => paragraph.textContent.replace(/\s+/g, ' ').trim())
+            .map(cleanTextContent)
             .filter(Boolean);
           const chapterLines = chapterParagraphs.length
             ? []
             : allElements(section, 'l')
-              .map(line => line.textContent.replace(/\s+/g, ' ').trim())
+              .map(cleanTextContent)
               .filter(Boolean);
           const heading = Array.from(section.children)
-            .find(child => child.localName === 'head')?.textContent?.replace(/\s+/g, ' ').trim() || '';
+            .find(child => child.localName === 'head');
+          const headingText = heading ? cleanTextContent(heading) : '';
           const chapterText = (chapterParagraphs.length ? chapterParagraphs : chapterLines);
           return {
             number: section.getAttribute('n'),
-            heading,
+            heading: headingText,
             paragraphs: chapterText,
             text: chapterText.join('\n\n')
           };
@@ -3077,7 +3213,7 @@
         chapters = [{ number: '1', heading: '', paragraphs: fallbackContent, text: fallbackContent.join('\n\n') }];
       }
       const text = chapters.map(chapter => chapter.text).join('\n\n')
-        || body.textContent.replace(/\s+/g, ' ').trim();
+        || cleanTextContent(body);
 
       if (!title || !text) {
         throw new TypeError(`Fișierul ${reference.path} nu conține titlu sau text.`);
@@ -3268,6 +3404,13 @@
         image.alt = options.alt || title;
         imageWrap.appendChild(image);
         cardInner.appendChild(imageWrap);
+      } else if (options.icon) {
+        const iconWrap = document.createElement('div');
+        iconWrap.className = 'texts-browse-card-image';
+        iconWrap.style.display = 'grid';
+        iconWrap.style.placeItems = 'center';
+        iconWrap.textContent = options.icon;
+        cardInner.appendChild(iconWrap);
       }
 
       const textContent = document.createElement('div');
@@ -3745,7 +3888,8 @@
                 ...(profile ? {
                   imageUrl: profile.image,
                   alt: profile.alt,
-                  years: profile.years
+                  years: profile.years,
+                  icon: profile.image ? undefined : (profile.icon || '🏛️')
                 } : {}),
                 favorite
               }
@@ -3758,6 +3902,51 @@
 
       if (textNavigation.level === 'works') {
         textsDirectoryTitle.textContent = `Opere — ${textNavigation.author}`;
+        const profile = authorProfiles[textNavigation.author === 'Julius Caesar'
+          ? 'Caesar'
+          : Object.keys(authorProfiles).find(key =>
+            authorProfiles[key].name === textNavigation.author
+              || authorProfiles[key].name.includes(textNavigation.author)
+              || textNavigation.author.includes(authorProfiles[key].name))]
+          || authorProfiles[textNavigation.author];
+        if (profile) {
+          const profileCard = document.createElement('article');
+          profileCard.className = 'texts-author-profile';
+
+          if (profile.image) {
+            const image = document.createElement('img');
+            image.className = 'texts-author-profile-image';
+            image.src = profile.image;
+            image.alt = profile.alt || profile.name;
+            profileCard.appendChild(image);
+          } else {
+            const icon = document.createElement('div');
+            icon.className = 'texts-author-profile-icon';
+            icon.setAttribute('aria-hidden', 'true');
+            icon.textContent = profile.icon || '🏛️';
+            profileCard.appendChild(icon);
+          }
+
+          const copy = document.createElement('div');
+          copy.className = 'texts-author-profile-copy';
+          const name = document.createElement('h3');
+          name.textContent = profile.name;
+          copy.appendChild(name);
+          if (profile.years) {
+            const years = document.createElement('p');
+            years.className = 'texts-author-profile-years';
+            years.textContent = profile.years;
+            copy.appendChild(years);
+          }
+          if (profile.description) {
+            const description = document.createElement('p');
+            description.className = 'texts-author-profile-description';
+            description.textContent = profile.description;
+            copy.appendChild(description);
+          }
+          profileCard.appendChild(copy);
+          textsDirectoryList.appendChild(profileCard);
+        }
         getTextWorks(textNavigation.author, textNavigation.languageGroup).forEach(work => {
           const volumeCount = getTextVolumes(work.records).length;
           const detail = [
@@ -4069,6 +4258,7 @@
       setTextsSearchStatus('Se încarcă textele…');
       textDatabaseLoadPromise = (async () => {
         try {
+          await loadAuthorProfiles();
           let references = [];
           try {
             const discoveryResponse = await fetch('/api/texts');
