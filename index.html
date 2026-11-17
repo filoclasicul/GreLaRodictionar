@@ -3332,6 +3332,44 @@
         };
       }).filter(chapter => chapter.text);
 
+      const sectionDivisions = allElements(body, 'div')
+        .filter(section => {
+          if (section.getAttribute('subtype') !== 'section') return false;
+          if (!/^\d+(?:[.:]\d+)*$/.test(section.getAttribute('n') || '')) return false;
+          let parent = section.parentElement;
+          let nestedInDivision = false;
+          while (parent && parent !== body) {
+            if ((parent.localName === 'div' || parent.tagName === 'div')
+              && ['chapter', 'section', 'book'].includes(parent.getAttribute('subtype'))) {
+              nestedInDivision = true;
+              break;
+            }
+            parent = parent.parentElement;
+          }
+          return !nestedInDivision
+            && (allElements(section, 'p').length > 0 || allElements(section, 'l').length > 0);
+        })
+        .map(section => {
+          const sectionParagraphs = allElements(section, 'p')
+            .map(cleanTextContent)
+            .filter(Boolean);
+          const sectionLines = sectionParagraphs.length
+            ? []
+            : allElements(section, 'l')
+              .map(cleanTextContent)
+              .filter(Boolean);
+          const heading = Array.from(section.children)
+            .find(child => child.localName === 'head');
+          const chapterText = sectionParagraphs.length ? sectionParagraphs : sectionLines;
+          return {
+            number: section.getAttribute('n'),
+            heading: heading ? cleanTextContent(heading) : '',
+            paragraphs: chapterText,
+            text: chapterText.join('\n\n')
+          };
+        })
+        .filter(chapter => chapter.text);
+
       const numberedDivisions = allElements(body, 'div')
         .filter(section => {
           const number = section.getAttribute('n');
@@ -3367,9 +3405,11 @@
         .filter(chapter => chapter.text);
       let chapters = chapterDivisions.length
         ? chapterDivisions
-        : milestoneDivisions.length
-          ? milestoneDivisions
-          : numberedDivisions;
+        : sectionDivisions.length
+          ? sectionDivisions
+          : milestoneDivisions.length
+            ? milestoneDivisions
+            : numberedDivisions;
       const fallbackContent = paragraphs.length ? paragraphs : lines;
       if (!chapters.length && fallbackContent.length) {
         chapters = [{ number: '1', heading: '', paragraphs: fallbackContent, text: fallbackContent.join('\n\n') }];
