@@ -3182,8 +3182,23 @@
       const cleanTextContent = element => {
         if (!element) return '';
         const clone = element.cloneNode(true);
-        clone.querySelectorAll('note, app, pb, milestone, gap')
+        clone.querySelectorAll('note, pb, milestone, gap, del, ref, bibl, label, desc')
           .forEach(unwanted => unwanted.remove());
+        clone.querySelectorAll('app')
+          .forEach(appElement => {
+            appElement.querySelectorAll('rdg, wit')
+              .forEach(child => child.remove());
+          });
+        clone.querySelectorAll('choice')
+          .forEach(choice => {
+            choice.querySelectorAll('abbr, ex')
+              .forEach(child => child.remove());
+          });
+        clone.querySelectorAll('foreign')
+          .forEach(foreign => {
+            const language = foreign.getAttribute('xml:lang') || foreign.getAttribute('lang');
+            if (language === 'grc' || language === 'gr') foreign.remove();
+          });
         return clone.textContent.replace(/\s+/g, ' ').trim();
       };
 
