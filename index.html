@@ -3051,6 +3051,11 @@
     let textDatabase = [];
     let textDatabaseLoaded = false;
     let textDatabaseLoadPromise = null;
+    let textCatalog = [];
+    let textCatalogLoaded = false;
+    let textCatalogLoadPromise = null;
+    const textDocumentCache = new Map();
+    const textDocumentLoadPromises = new Map();
     let textAutocompleteLoading = false;
     const textLanguageGroups = [
       {
@@ -3116,7 +3121,7 @@
       pageNavigationLabel.textContent = showingTexts ? '📖 Dicționar' : '📖 Texte';
       document.title = showingTexts ? 'Texte clasice — GreLaRo' : dictionaryPageTitle;
 
-      if (showingTexts && !textDatabaseLoaded) loadTextDatabase();
+      if (showingTexts && !textCatalogLoaded) loadTextCatalog();
     }
 
     function navigateToSitePage(page) {
@@ -3674,7 +3679,7 @@
       renderTextBrowser();
     }
 
-    function showAuthorWorks(author) {
+    async function showAuthorWorks(author) {
       textNavigation = {
         level: 'works',
         languageGroup: textNavigation.languageGroup,
@@ -3683,14 +3688,20 @@
         volume: ''
       };
       activeTextChapter = null;
+      await loadTextDocumentsForAuthor(author, textNavigation.languageGroup);
       renderTextBrowser();
     }
 
-    function showWorkVolumes(work) {
+    async function showWorkVolumes(work) {
       textNavigation.work = work;
       textNavigation.volume = '';
       textNavigation.level = 'volumes';
       activeTextChapter = null;
+      const workRecords = textCatalog.filter(entry =>
+        entry.languageGroup === textNavigation.languageGroup
+        && entry.author === textNavigation.author
+      );
+      await loadTextDocuments(workRecords);
       renderTextBrowser();
     }
 
@@ -3886,7 +3897,7 @@
 
       if (textNavigation.level === 'collections') {
         textLanguageGroups.forEach(group => {
-          const authors = new Set(textDatabase
+          const authors = new Set(textCatalog
             .filter(entry => entry.languageGroup === group.id)
             .map(entry => entry.author));
           const authorCount = authors.size;
@@ -3902,7 +3913,7 @@
       }
 
       const group = textLanguageGroups.find(item => item.id === textNavigation.languageGroup);
-      const groupRecords = textDatabase.filter(entry => entry.languageGroup === textNavigation.languageGroup);
+      const groupRecords = textCatalog.filter(entry => entry.languageGroup === textNavigation.languageGroup);
       if (!group || !groupRecords.length) {
         textsDirectoryTitle.textContent = group ? group.label : 'Autori';
         const empty = document.createElement('p');
@@ -4146,11 +4157,12 @@
       showingTextFavoritesPage = false;
       navigateToSitePage('texts');
       setTextsSearchStatus('Se încarcă textele…');
-      if (!await loadTextDatabase()) {
+      if (!await loadTextCatalog()) {
         showingTextFavoritesPage = true;
         renderTextFavoritesPage();
         return;
       }
+      await loadTextDocumentsForAuthor(favorite.author, favorite.languageGroup);
 
       const work = getTextWorks(favorite.author, favorite.languageGroup)
         .find(item => item.title === favorite.work);
@@ -4207,16 +4219,16 @@
         return;
       }
 
-      if (!textDatabaseLoaded) {
+      if (!textCatalogLoaded) {
         textAutocompleteLoading = true;
-        await loadTextDatabase();
+        await loadTextCatalog();
         textAutocompleteLoading = false;
       }
       if (textsSearchInput.value !== query) return;
 
       const suggestions = [];
       const seen = new Set();
-      textDatabase.forEach(entry => {
+      textCatalog.forEach(entry => {
         const author = entry.author?.trim();
         const work = entry.title?.trim();
 
@@ -4281,7 +4293,7 @@
       else showWorkVolumes(suggestion.label);
     }
 
-    function renderTextsSearchResults(query) {
+    async function renderTextsSearchResults(query) {
       textsSearchResults.replaceChildren();
       textsAutocomplete.classList.remove('active');
       if (showingTextFavoritesPage) {
@@ -4300,6 +4312,10 @@
 
       textsBrowser.hidden = true;
       textsSearchResults.hidden = false;
+      if (!textDatabaseLoaded) {
+        setTextsSearchStatus('Se caută în textele accesate…');
+        await loadTextDatabase();
+      }
       const matches = textDatabase.filter(entry => {
         const searchableContent = [entry.title, entry.author || '', entry.language || '', entry.text].join(' ');
         return normalizeTextSearch(searchableContent).includes(normalizedQuery);
@@ -4312,6 +4328,104 @@
 
       matches.forEach(entry => textsSearchResults.appendChild(createTextResultCard(entry, query)));
       setTextsSearchStatus(`${matches.length} ${matches.length === 1 ? 'rezultat găsit' : 'rezultate găsite'}.`);
+    }
+
+    function getTextCatalogEntry(reference) {
+      const pathParts = reference.path.split('/');
+      const languageGroup = pathParts[0];
+      const folderAuthor = pathParts[1] || '';
+      const profile = authorProfiles[folderAuthor];
+      const author = profile?.name || folderAuthor;
+      const filename = pathParts[pathParts.length - 1].replace(/\.(xml|json)$/i, '');
+      const title = reference.title || filename
+        .replace(/[._-]+/g, ' ')
+        .replace(/\b\w/g, character => character.toUpper())
+        .trim();
+      return {
+        ...reference,
+        title,
+        author,
+        language: getTextLanguage(undefined, languageGroup),
+        languageGroup,
+        chapters: [],
+        text: ''
+      };
+    }
+
+    async function loadTextCatalog() {
+      if (textCatalogLoadPromise) return textCatalogLoadPromise;
+      if (textCatalogLoaded) return true;
+
+      textCatalogLoadPromise = (async () => {
+        try {
+          await loadAuthorProfiles();
+          let references = [];
+          try {
+            const discoveryResponse = await fetch('/api/texts');
+            if (discoveryResponse.ok) {
+              references = validateTextDatabase(await discoveryResponse.json());
+            }
+          } catch (error) {
+            console.info('Descoperirea dinamică a textelor nu este disponibilă; se folosește manifestul local.', error);
+          }
+
+          if (!references.length) {
+            const manifestResponse = await fetch('data/texte/texte.json');
+            if (!manifestResponse.ok) throw new Error(`Răspuns HTTP ${manifestResponse.status}`);
+            references = validateTextDatabase(await manifestResponse.json());
+          }
+
+          textCatalog = references.map(getTextCatalogEntry);
+          textCatalogLoaded = true;
+          if (!textCatalog.length) throw new Error('Manifestul de texte nu conține documente.');
+          renderTextsSearchResults(textsSearchInput.value);
+          return true;
+        } catch (error) {
+          textCatalogLoaded = false;
+          console.error('Nu s-a putut încărca catalogul de texte.', error);
+          setTextsSearchStatus('Nu s-a putut încărca lista de texte. Verifică manifestul și reîncearcă.', 'error');
+          return false;
+        } finally {
+          textCatalogLoadPromise = null;
+        }
+      })();
+      return textCatalogLoadPromise;
+    }
+
+    async function loadTextDocuments(references) {
+      const pending = references
+        .filter(reference => !textDocumentCache.has(reference.path))
+        .filter((reference, index, list) =>
+          list.findIndex(item => item.path === reference.path) === index);
+
+      await Promise.allSettled(pending.map(reference => {
+        if (textDocumentLoadPromises.has(reference.path)) {
+          return textDocumentLoadPromises.get(reference.path);
+        }
+        const promise = loadTextDocument(reference).then(document => {
+          textDocumentCache.set(reference.path, document);
+          if (!textDatabase.some(entry => entry.path === document.path)) textDatabase.push(document);
+          return document;
+        }).finally(() => textDocumentLoadPromises.delete(reference.path));
+        textDocumentLoadPromises.set(reference.path, promise);
+        return promise;
+      }));
+
+      return references
+        .map(reference => textDocumentCache.get(reference.path))
+        .filter(Boolean);
+    }
+
+    async function loadTextDocumentsForAuthor(author, languageGroup) {
+      const references = textCatalog.filter(entry =>
+        entry.languageGroup === languageGroup
+        && entry.author === author
+      );
+      if (!references.length) return [];
+      setTextsSearchStatus('Se încarcă textele acestui autor…');
+      const documents = await loadTextDocuments(references);
+      setTextsSearchStatus('');
+      return documents;
     }
 
     async function loadTextDatabase() {
@@ -5828,9 +5942,9 @@
       }
     });
 
-    textsSearchForm.addEventListener('submit', event => {
+    textsSearchForm.addEventListener('submit', async event => {
       event.preventDefault();
-      renderTextsSearchResults(textsSearchInput.value);
+      await renderTextsSearchResults(textsSearchInput.value);
     });
 
     textsSearchInput.addEventListener('input', () => {
