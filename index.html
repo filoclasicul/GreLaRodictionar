@@ -2450,7 +2450,23 @@
       }
 
       .texts-directory-list {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 0.75rem;
+        row-gap: 0.75rem;
+      }
+
+      .texts-author-card .texts-browse-card-inner {
+        grid-template-rows: clamp(9rem, 38vw, 12.5rem) 1fr;
+      }
+
+      .texts-author-card .texts-browse-card-image {
+        height: clamp(9rem, 38vw, 12.5rem);
+      }
+
+      .texts-author-card .texts-browse-card-title {
+        font-size: clamp(0.86rem, 4vw, 1rem);
+        line-height: 1.25;
+        overflow-wrap: anywhere;
       }
 
       .texts-directory-heading {
@@ -2479,7 +2495,8 @@
       }
 
       .texts-author-card .texts-browse-card-copy {
-        padding-right: 2.8rem;
+        min-height: 6.2rem;
+        padding: 0.7rem 0.45rem 2.35rem;
       }
 
       .modes-container,
@@ -2521,6 +2538,23 @@
     }
 
     @media (max-width: 430px) {
+      .texts-directory-list {
+        column-gap: 0.55rem;
+        row-gap: 0.55rem;
+      }
+
+      .texts-author-card .texts-browse-card-inner {
+        grid-template-rows: clamp(8.5rem, 38vw, 10rem) 1fr;
+      }
+
+      .texts-author-card .texts-browse-card-image {
+        height: clamp(8.5rem, 38vw, 10rem);
+      }
+
+      .texts-author-card .texts-browse-card-copy {
+        min-height: 6.5rem;
+      }
+
       .site-title {
         font-size: 1.05rem;
       }
