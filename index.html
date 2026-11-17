@@ -667,11 +667,63 @@
     }
 
     .texts-search-panel {
+      position: relative;
       padding: clamp(1rem, 4vw, 1.6rem);
       border: 1px solid var(--border-color);
       border-radius: 18px;
       background: var(--bg-card);
       box-shadow: var(--shadow-md);
+    }
+
+    .texts-autocomplete {
+      display: none;
+      position: absolute;
+      left: clamp(1rem, 4vw, 1.6rem);
+      right: clamp(1rem, 4vw, 1.6rem);
+      top: calc(100% - 0.45rem);
+      z-index: 160;
+      max-height: 260px;
+      overflow-y: auto;
+      border: 1px solid var(--border-accent);
+      border-radius: 12px;
+      background: var(--bg-card);
+      box-shadow: var(--shadow-md);
+    }
+
+    .texts-autocomplete.active {
+      display: block;
+    }
+
+    .texts-autocomplete-header {
+      padding: 0.45rem 0.8rem;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--gold-light);
+      color: var(--text-muted);
+      font: 700 0.75rem var(--font-title);
+    }
+
+    .texts-autocomplete-item {
+      width: 100%;
+      display: block;
+      padding: 0.75rem 0.8rem;
+      border: 0;
+      border-bottom: 1px solid var(--border-color);
+      background: transparent;
+      color: var(--text-main);
+      font: 700 1rem var(--font-title);
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .texts-autocomplete-item:last-child {
+      border-bottom: 0;
+    }
+
+    .texts-autocomplete-item:hover,
+    .texts-autocomplete-item:focus-visible {
+      outline: none;
+      background: var(--gold-light);
+      color: var(--crimson);
     }
 
     .texts-search-label {
@@ -2358,6 +2410,174 @@
         animation-duration: 0.01ms !important;
       }
     }
+
+    /* Soft editorial palette and surfaces */
+    :root {
+      --bg-page: #f5f7f3;
+      --bg-card: #fffefa;
+      --border-color: #dde5dd;
+      --border-accent: #9db4a6;
+      --text-main: #26352f;
+      --text-muted: #718078;
+      --crimson: #55756a;
+      --crimson-hover: #46665b;
+      --gold: #a88a5b;
+      --gold-light: #edf2ec;
+      --morph-bg: #f0f4ef;
+      --morph-border: #bdcbbf;
+      --highlight: #e3ebe4;
+      --page-glow: rgba(99, 139, 119, 0.10);
+      --shadow-sm: 0 5px 18px rgba(49, 78, 64, 0.055);
+      --shadow-md: 0 16px 42px rgba(49, 78, 64, 0.08);
+    }
+
+    body {
+      background-image:
+        radial-gradient(circle at 8% 2%, rgba(166, 189, 174, 0.14), transparent 26rem),
+        radial-gradient(circle at 92% 18%, rgba(205, 184, 145, 0.10), transparent 22rem);
+    }
+
+    header {
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(255, 254, 250, 0.94);
+      backdrop-filter: blur(14px);
+    }
+
+    [data-theme="dark"] header {
+      background: rgba(17, 26, 45, 0.94);
+    }
+
+    .site-title {
+      color: var(--crimson);
+      letter-spacing: 0.06em;
+    }
+
+    .site-subtitle,
+    .texts-eyebrow {
+      color: var(--gold);
+    }
+
+    .search-section,
+    .texts-search-panel,
+    .entry-card,
+    .texts-chapter-view,
+    .texts-result-card,
+    .reverse-item-card,
+    .favorites-page,
+    .texts-browse-card {
+      border-radius: 18px;
+      border-color: var(--border-color);
+    }
+
+    .search-section {
+      background: linear-gradient(145deg, var(--bg-card), var(--morph-bg));
+    }
+
+    .search-input,
+    .texts-search-input {
+      border-radius: 12px;
+      border-width: 1px;
+    }
+
+    .search-input:focus,
+    .texts-search-input:focus {
+      border-color: var(--crimson);
+      box-shadow: 0 0 0 4px var(--gold-light);
+    }
+
+    .mode-chip,
+    .icon-btn,
+    .theme-toggle,
+    .site-menu-trigger,
+    .site-page-link,
+    .texts-back-button,
+    .texts-chapter-nav-button {
+      border-radius: 11px;
+    }
+
+    .mode-chip.active,
+    .texts-search-submit,
+    .badge-lang,
+    .feedback-submit {
+      background: var(--crimson);
+      border-color: var(--crimson);
+      color: #fff;
+    }
+
+    .mode-chip.active:hover,
+    .texts-search-submit:hover,
+    .feedback-submit:hover {
+      background: var(--crimson-hover);
+    }
+
+    .texts-browse-card,
+    .entry-card,
+    .reverse-item-card,
+    .texts-result-card {
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    }
+
+    .texts-browse-card:hover,
+    .reverse-item-card:hover,
+    .texts-result-card:hover {
+      border-color: var(--border-accent);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-3px);
+    }
+
+    .texts-browse-card-image,
+    .texts-browse-card-favorite,
+    .entry-favorite-button {
+      border-radius: 12px;
+    }
+
+    .texts-author-card .texts-browse-card-title,
+    .lemma-title,
+    .reverse-lemma,
+    .texts-title {
+      color: var(--crimson);
+    }
+
+    .section-title,
+    .texts-directory-title,
+    .favorite-open-button {
+      color: var(--crimson);
+    }
+
+    .autocomplete-dropdown,
+    .texts-autocomplete,
+    .recent-search-dropdown,
+    .site-menu-panel {
+      border-radius: 14px;
+      border-color: var(--border-accent);
+    }
+
+    .dropdown-header,
+    .texts-autocomplete-header,
+    .recent-search-header {
+      background: linear-gradient(90deg, var(--gold-light), var(--bg-card));
+    }
+
+    .dropdown-item:hover,
+    .texts-autocomplete-item:hover,
+    .recent-search-item:hover {
+      background: var(--gold-light);
+    }
+
+    .entry-favorite-button[aria-pressed="true"],
+    .texts-browse-card-favorite[aria-pressed="true"] {
+      color: #a87552;
+      border-color: #d6bd9d;
+      background: #fbf4e8;
+    }
+
+    [data-theme="dark"] .entry-favorite-button[aria-pressed="true"],
+    [data-theme="dark"] .texts-browse-card-favorite[aria-pressed="true"] {
+      color: #f0c98f;
+      border-color: #80684c;
+      background: #3a3328;
+    }
   </style>
 </head>
 <body>
@@ -2371,7 +2591,7 @@
       <div class="header-controls">
         <a class="site-page-link" id="pageNavigationLink" href="#texte">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22z"></path><path d="M4 5.5v16M8 7h8M8 11h8"></path></svg>
-          <span id="pageNavigationLabel">Texte</span>
+          <span id="pageNavigationLabel">📖 Texte</span>
         </a>
         <button
           class="theme-toggle"
@@ -2380,7 +2600,7 @@
           aria-label="Activează modul nocturn"
           title="Activează modul nocturn"
           onclick="toggleTheme()"
-        ><span class="theme-toggle-icon" id="themeToggleIcon" aria-hidden="true">☾</span></button>
+        ><span class="theme-toggle-icon" id="themeToggleIcon" aria-hidden="true">🌙</span></button>
         <div class="site-menu">
           <button
             class="site-menu-trigger"
@@ -2397,13 +2617,13 @@
             <div class="site-menu-content" id="siteMenuMain">
               <div class="site-menu-heading">Setări</div>
               <button class="site-menu-item" type="button" onclick="showAppearanceMenu()">
-                <span>Aspect</span><span aria-hidden="true">›</span>
+                <span>🎨 Aspect</span><span aria-hidden="true">›</span>
               </button>
               <button class="site-menu-item" type="button" onclick="showFavoritesPage()">
-                <span>Cuvinte favorite</span><span aria-hidden="true">›</span>
+                <span>⭐ Cuvinte favorite</span><span aria-hidden="true">›</span>
               </button>
               <button class="site-menu-item" type="button" onclick="showTextFavoritesPage()">
-                <span>Texte favorite</span><span aria-hidden="true">›</span>
+                <span>📚 Texte favorite</span><span aria-hidden="true">›</span>
               </button>
             </div>
             <div class="site-menu-content" id="appearanceMenu" hidden>
@@ -2438,17 +2658,17 @@
               <div class="menu-group">
                 <span class="menu-group-label">Greacă & latină → română</span>
                 <div class="menu-group-buttons">
-                  <button class="mode-chip menu-button active" id="btn-omnia-dir" onclick="setSearchMode('omnia-dir')">Omnia</button>
-                  <button class="mode-chip menu-button" id="btn-greek-dir" onclick="setSearchMode('greek-dir')">Greacă veche</button>
-                  <button class="mode-chip menu-button" id="btn-latin-dir" onclick="setSearchMode('latin-dir')">Latină</button>
+                  <button class="mode-chip menu-button active" id="btn-omnia-dir" onclick="setSearchMode('omnia-dir')">📚 Omnia</button>
+                  <button class="mode-chip menu-button" id="btn-greek-dir" onclick="setSearchMode('greek-dir')">🏛️ Greacă veche</button>
+                  <button class="mode-chip menu-button" id="btn-latin-dir" onclick="setSearchMode('latin-dir')">🏺 Latină</button>
                 </div>
               </div>
               <div class="menu-group">
                 <span class="menu-group-label">Română → greacă & latină</span>
                 <div class="menu-group-buttons">
-                  <button class="mode-chip menu-button" id="btn-omnia-rev" onclick="setSearchMode('omnia-rev')">Omnia</button>
-                  <button class="mode-chip menu-button" id="btn-greek-rev" onclick="setSearchMode('greek-rev')">Greacă veche</button>
-                  <button class="mode-chip menu-button" id="btn-latin-rev" onclick="setSearchMode('latin-rev')">Latină</button>
+                  <button class="mode-chip menu-button" id="btn-omnia-rev" onclick="setSearchMode('omnia-rev')">📚 Omnia</button>
+                  <button class="mode-chip menu-button" id="btn-greek-rev" onclick="setSearchMode('greek-rev')">🏛️ Greacă veche</button>
+                  <button class="mode-chip menu-button" id="btn-latin-rev" onclick="setSearchMode('latin-rev')">🏺 Latină</button>
                 </div>
               </div>
             </div>
@@ -2464,8 +2684,8 @@
               onkeydown="handleSearchKeydown(event)"
             >
             <div class="search-actions">
-              <button class="icon-btn" id="searchSubmitBtn" onclick="submitSearch()" title="Caută" aria-label="Caută" style="display:none;">🔍</button>
-              <button class="icon-btn" type="button" onclick="clearSearch()" title="Șterge textul" aria-label="Șterge textul">✕</button>
+              <button class="icon-btn" id="searchSubmitBtn" onclick="submitSearch()" title="Caută" aria-label="Caută" style="display:none;">🔎</button>
+              <button class="icon-btn" type="button" onclick="clearSearch()" title="Șterge textul" aria-label="Șterge textul">⌫</button>
               <div class="recent-search-wrap">
                 <button
                   class="icon-btn"
@@ -2476,7 +2696,7 @@
                   aria-expanded="false"
                   aria-controls="recentSearchDropdown"
                   onclick="toggleRecentSearches()"
-                >◷</button>
+                >🕰️</button>
                 <div class="recent-search-dropdown" id="recentSearchDropdown" hidden>
                   <div class="recent-search-header">
                     <span>Căutări recente</span>
@@ -2537,8 +2757,12 @@
       <label class="texts-search-label" for="textsSearchInput">Caută în colecția de texte</label>
       <form class="texts-search-row" id="textsSearchForm" role="search">
         <input class="texts-search-input" id="textsSearchInput" name="q" type="search" autocomplete="off" placeholder="De exemplu, un cuvânt sau un autor">
-        <button class="texts-search-submit" type="submit">Caută</button>
+        <button class="texts-search-submit" type="submit">🔎 Caută</button>
       </form>
+      <div class="texts-autocomplete" id="textsAutocomplete" role="listbox" aria-label="Recomandări în texte">
+        <div class="texts-autocomplete-header" id="textsAutocompleteTitle">Recomandări</div>
+        <div id="textsAutocompleteList"></div>
+      </div>
       <p class="texts-search-status" id="textsSearchStatus" role="status" aria-live="polite" hidden></p>
     </section>
     <section class="texts-browser" id="textsBrowser" aria-label="Navigare în texte">
@@ -2554,7 +2778,7 @@
   </main>
 
   <footer id="textsFooter" hidden>
-    Baza de texte este separată de baza de date a dicționarului.
+    O colecție de texte clasice grecești și latine.
   </footer>
 
   <button
@@ -2619,6 +2843,9 @@
     const textsSearchForm = document.getElementById('textsSearchForm');
     const textsSearchInput = document.getElementById('textsSearchInput');
     const textsSearchStatus = document.getElementById('textsSearchStatus');
+    const textsAutocomplete = document.getElementById('textsAutocomplete');
+    const textsAutocompleteTitle = document.getElementById('textsAutocompleteTitle');
+    const textsAutocompleteList = document.getElementById('textsAutocompleteList');
     const textsSearchResults = document.getElementById('textsSearchResults');
     const textsBrowser = document.getElementById('textsBrowser');
     const textsBreadcrumbs = document.getElementById('textsBreadcrumbs');
@@ -2631,6 +2858,7 @@
     let textDatabase = [];
     let textDatabaseLoaded = false;
     let textDatabaseLoadPromise = null;
+    let textAutocompleteLoading = false;
     const textLanguageGroups = [
       {
         id: 'gr',
@@ -2678,7 +2906,7 @@
       textsPage.hidden = !showingTexts;
       textsFooter.hidden = !showingTexts;
       pageNavigationLink.href = showingTexts ? '#dictionar' : '#texte';
-      pageNavigationLabel.textContent = showingTexts ? 'Dicționar' : 'Texte';
+      pageNavigationLabel.textContent = showingTexts ? '📖 Dicționar' : '📖 Texte';
       document.title = showingTexts ? 'Texte clasice — GreLaRo' : dictionaryPageTitle;
 
       if (showingTexts && !textDatabaseLoaded) loadTextDatabase();
@@ -3677,8 +3905,91 @@
       showTextChapter(record, chapter);
     }
 
+    async function updateTextAutocomplete(query) {
+      const normalizedQuery = normalizeTextSearch(query);
+      textsAutocompleteList.replaceChildren();
+      if (!normalizedQuery) {
+        textsAutocomplete.classList.remove('active');
+        return;
+      }
+
+      if (!textDatabaseLoaded) {
+        textAutocompleteLoading = true;
+        await loadTextDatabase();
+        textAutocompleteLoading = false;
+      }
+      if (textsSearchInput.value !== query) return;
+
+      const suggestions = [];
+      const seen = new Set();
+      textDatabase.forEach(entry => {
+        const author = entry.author?.trim();
+        const work = entry.title?.trim();
+
+        if (author && normalizeTextSearch(author).includes(normalizedQuery)) {
+          const key = `author\0${entry.languageGroup}\0${author}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            suggestions.push({ type: 'author', label: author, languageGroup: entry.languageGroup });
+          }
+        }
+
+        if (work && normalizeTextSearch(work).includes(normalizedQuery)) {
+          const key = `work\0${entry.languageGroup}\0${author}\0${work}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            suggestions.push({
+              type: 'work',
+              label: work,
+              languageGroup: entry.languageGroup,
+              author
+            });
+          }
+        }
+      });
+
+      suggestions.sort((left, right) => {
+        const leftStarts = normalizeTextSearch(left.label).startsWith(normalizedQuery) ? 0 : 1;
+        const rightStarts = normalizeTextSearch(right.label).startsWith(normalizedQuery) ? 0 : 1;
+        return leftStarts - rightStarts || left.label.localeCompare(right.label, 'ro');
+      });
+
+      const visibleSuggestions = suggestions.slice(0, 5);
+      if (!visibleSuggestions.length) {
+        textsAutocomplete.classList.remove('active');
+        return;
+      }
+
+      textsAutocompleteTitle.textContent = `Recomandări pentru „${query.trim()}” (${visibleSuggestions.length})`;
+      visibleSuggestions.forEach(suggestion => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'texts-autocomplete-item';
+        button.textContent = suggestion.label;
+        button.addEventListener('click', () => openTextSuggestion(suggestion));
+        textsAutocompleteList.appendChild(button);
+      });
+      textsAutocomplete.classList.add('active');
+    }
+
+    function openTextSuggestion(suggestion) {
+      textsAutocomplete.classList.remove('active');
+      textsSearchInput.value = suggestion.label;
+      textNavigation = {
+        level: suggestion.type === 'author' ? 'works' : 'volumes',
+        languageGroup: suggestion.languageGroup,
+        author: suggestion.author || suggestion.label,
+        work: suggestion.type === 'work' ? suggestion.label : '',
+        volume: ''
+      };
+      activeTextChapter = null;
+      if (suggestion.type === 'author') showAuthorWorks(suggestion.label);
+      else showWorkVolumes(suggestion.label);
+    }
+
     function renderTextsSearchResults(query) {
       textsSearchResults.replaceChildren();
+      textsAutocomplete.classList.remove('active');
       if (showingTextFavoritesPage) {
         renderTextFavoritesPage();
         setTextsSearchStatus('');
@@ -3749,7 +4060,7 @@
           if (showingTextFavoritesPage) {
             renderTextFavoritesPage();
             setTextsSearchStatus('');
-          } else {
+          } else if (!textAutocompleteLoading) {
             renderTextsSearchResults(textsSearchInput.value);
           }
           return true;
@@ -5082,7 +5393,7 @@
       else document.documentElement.classList.remove('dark');
       const themeToggle = document.getElementById('themeToggleBtn');
       const actionLabel = target === 'dark' ? 'Activează modul luminos' : 'Activează modul nocturn';
-      document.getElementById('themeToggleIcon').textContent = target === 'dark' ? '☀' : '☾';
+      document.getElementById('themeToggleIcon').textContent = target === 'dark' ? '☀️' : '🌙';
       themeToggle.setAttribute('aria-label', actionLabel);
       themeToggle.title = actionLabel;
     }
@@ -5200,6 +5511,9 @@
       if (!e.target.closest('.search-section')) {
         document.getElementById('autocompleteDropdown').classList.remove('active');
       }
+      if (!e.target.closest('.texts-search-panel')) {
+        textsAutocomplete.classList.remove('active');
+      }
       if (!e.target.closest('.recent-search-wrap') && !document.getElementById('recentSearchDropdown').hidden) {
         closeRecentSearches();
       }
@@ -5225,7 +5539,13 @@
     });
 
     textsSearchInput.addEventListener('input', () => {
-      renderTextsSearchResults(textsSearchInput.value);
+      updateTextAutocomplete(textsSearchInput.value);
+    });
+
+    textsSearchInput.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        textsAutocomplete.classList.remove('active');
+      }
     });
 
     textsBackButton.addEventListener('click', goBackInTextHierarchy);
