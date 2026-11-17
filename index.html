@@ -2734,33 +2734,42 @@
         throw new TypeError(`Fișierul ${reference.path} nu conține XML valid.`);
       }
 
-      const teiNamespace = 'http://www.tei-c.org/ns/1.0';
-      const textElement = xml.getElementsByTagNameNS(teiNamespace, 'text')[0];
-      const body = xml.getElementsByTagNameNS(teiNamespace, 'body')[0];
+      const allElements = (root, localName) =>
+        Array.from(root.getElementsByTagName('*'))
+          .filter(element => element.localName === localName || element.tagName === localName);
+      const firstElement = (root, localName) => allElements(root, localName)[0] || null;
+      const elementText = element => element?.textContent?.replace(/\s+/g, ' ').trim() || '';
+
+      const textElement = firstElement(xml, 'text');
+      const body = firstElement(xml, 'body');
       if (!textElement || !body) {
         throw new TypeError(`Fișierul ${reference.path} nu conține un text TEI complet.`);
       }
 
-      const paragraphs = Array.from(body.getElementsByTagNameNS(teiNamespace, 'p'))
+      const paragraphs = allElements(body, 'p')
         .map(paragraph => paragraph.textContent.replace(/\s+/g, ' ').trim())
         .filter(Boolean);
-      const title = xml.getElementsByTagNameNS(teiNamespace, 'title')[0]?.textContent?.trim();
-      const author = xml.getElementsByTagNameNS(teiNamespace, 'author')[0]?.textContent?.trim();
-      const source = xml.getElementsByTagNameNS(teiNamespace, 'authority')[0]?.textContent?.trim();
-      const licenseElement = xml.getElementsByTagNameNS(teiNamespace, 'licence')[0];
-      const monograph = xml.getElementsByTagNameNS(teiNamespace, 'monogr')[0];
-      const collectionTitle = monograph?.getElementsByTagNameNS(teiNamespace, 'title')[0]?.textContent?.trim() || '';
-      const volumeElement = Array.from(xml.getElementsByTagNameNS(teiNamespace, 'biblScope'))
+      const title = elementText(firstElement(xml, 'title'));
+      const author = elementText(firstElement(xml, 'author'));
+      const source = elementText(firstElement(xml, 'authority'));
+      const licenseElement = firstElement(xml, 'licence');
+      const monograph = firstElement(xml, 'monogr');
+      const collectionTitle = monograph ? elementText(firstElement(monograph, 'title')) : '';
+      const volumeElement = allElements(xml, 'biblScope')
         .find(scope => scope.getAttribute('unit') === 'volume');
       const volume = volumeElement?.textContent?.trim() || '1';
       const languageCode = textElement.getAttributeNS('http://www.w3.org/XML/1998/namespace', 'lang');
       const languageGroup = reference.path.split('/')[0];
       const language = getTextLanguage(languageCode, languageGroup);
       const authorProfile = getTextAuthorProfile(reference);
-      const chapters = Array.from(body.getElementsByTagNameNS(teiNamespace, 'div'))
-        .filter(section => section.getAttribute('subtype') === 'section' && section.getAttribute('n'))
+      const numberedDivisions = allElements(body, 'div')
+        .filter(section => {
+          const number = section.getAttribute('n');
+          return section.getAttribute('subtype') === 'section'
+            || (number && /^\d+(?:[.:]\d+)*$/.test(number));
+        })
         .map(section => {
-          const chapterParagraphs = Array.from(section.getElementsByTagNameNS(teiNamespace, 'p'))
+          const chapterParagraphs = allElements(section, 'p')
             .map(paragraph => paragraph.textContent.replace(/\s+/g, ' ').trim())
             .filter(Boolean);
           const heading = Array.from(section.children)
@@ -3689,9 +3698,22 @@
       setTextsSearchStatus('Se încarcă textele…');
       textDatabaseLoadPromise = (async () => {
         try {
-          const response = await fetch('data/texte/texte.json');
-          if (!response.ok) throw new Error(`Răspuns HTTP ${response.status}`);
-          const references = validateTextDatabase(await response.json());
+          let references = [];
+          try {
+            const discoveryResponse = await fetch('/api/texts');
+            if (discoveryResponse.ok) {
+              const discovered = await discoveryResponse.json();
+              references = validateTextDatabase(discovered);
+            }
+          } catch (error) {
+            console.info('Descoperirea dinamică a textelor nu este disponibilă; se folosește manifestul local.', error);
+          }
+
+          if (!references.length) {
+            const manifestResponse = await fetch('data/texte/texte.json');
+            if (!manifestResponse.ok) throw new Error(`Răspuns HTTP ${manifestResponse.status}`);
+            references = validateTextDatabase(await manifestResponse.json());
+          }
           textDatabase = await Promise.all(references.map(loadTextDocument));
           if (showingTextFavoritesPage) {
             renderTextFavoritesPage();

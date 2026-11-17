@@ -1,6 +1,12 @@
 # Baza de texte
 
-Adaugă fișierele în `lat/<autor>/` sau `gr/<autor>/`, apoi adaugă fiecare cale relativă în `texte.json`:
+Adaugă fișierele în `lat/<autor>/` sau `gr/<autor>/` și regenerează lista cu:
+
+```bash
+node scripts/build-text-manifest.mjs
+```
+
+Lista automată este scrisă în `texte.json`; puteți adăuga și manual orice cale relativă:
 
 ```json
 [
