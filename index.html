@@ -3182,22 +3182,32 @@
       const cleanTextContent = element => {
         if (!element) return '';
         const clone = element.cloneNode(true);
-        clone.querySelectorAll('note, pb, milestone, gap, del, ref, bibl, label, desc')
+        clone.querySelectorAll('note, pb, milestone, gap, del, ref, bibl, desc')
           .forEach(unwanted => unwanted.remove());
         clone.querySelectorAll('app')
           .forEach(appElement => {
-            appElement.querySelectorAll('rdg, wit')
-              .forEach(child => child.remove());
+            const lem = appElement.querySelector('lem');
+            if (lem) appElement.replaceChildren(lem.cloneNode(true));
+            else appElement.querySelectorAll('rdg, wit').forEach(child => child.remove());
           });
         clone.querySelectorAll('choice')
           .forEach(choice => {
-            choice.querySelectorAll('abbr, ex')
-              .forEach(child => child.remove());
+            const preferred = choice.querySelector('corr, expan, reg');
+            if (preferred) choice.replaceChildren(preferred.cloneNode(true));
+            else choice.querySelectorAll('abbr, ex, orig, sic').forEach(child => child.remove());
           });
         clone.querySelectorAll('foreign')
           .forEach(foreign => {
             const language = foreign.getAttribute('xml:lang') || foreign.getAttribute('lang');
             if (language === 'grc' || language === 'gr') foreign.remove();
+          });
+        clone.querySelectorAll('num')
+          .forEach(number => {
+            const value = number.getAttribute('n');
+            const rendered = number.textContent || '';
+            if (value && /[^A-Za-zÀ-ÖØ-öø-ÿ0-9.,\s]/.test(rendered)) {
+              number.replaceWith(document.createTextNode(value));
+            }
           });
         return clone.textContent.replace(/\s+/g, ' ').trim();
       };
