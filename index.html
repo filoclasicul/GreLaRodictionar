@@ -1133,6 +1133,108 @@
       font-size: 1.15rem;
     }
 
+    .daily-selections {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .daily-section-container {
+      margin: 0 0 1.5rem;
+    }
+
+    .daily-section-title {
+      margin: 0 0 0.8rem;
+      font: 700 1.2rem var(--font-title);
+    }
+
+    .daily-selection-card {
+      min-width: 0;
+      padding: 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      background: var(--bg-card);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .daily-selection-card h3 {
+      margin: 0 0 0.75rem;
+      color: var(--crimson);
+      font: 700 1rem var(--font-title);
+    }
+
+    .daily-selection-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .daily-selection-table caption {
+      padding-bottom: 0.55rem;
+      color: var(--text-main);
+      font: 700 1.05rem var(--font-title);
+      text-align: left;
+    }
+
+    .daily-selection-table th,
+    .daily-selection-table td {
+      padding: 0.5rem 0.35rem;
+      border-top: 1px solid var(--border-color);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .daily-selection-table th {
+      width: 6rem;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .daily-word-link {
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--crimson);
+      font: 700 1rem var(--font-title);
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .daily-word-link:hover,
+    .daily-word-link:focus-visible {
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }
+
+    .daily-selection-quote {
+      margin: 0;
+      color: var(--text-main);
+      font: 1rem/1.7 var(--font-title);
+    }
+
+    .daily-selection-attribution {
+      margin: 0.8rem 0 0;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      text-align: right;
+    }
+
+    .daily-selection-status {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .daily-selection-status[data-state="error"] {
+      color: var(--crimson);
+    }
+
+    .texts-daily-selections {
+      margin-top: 1.25rem;
+    }
+
     .texts-browse-card-detail {
       margin-top: 0.25rem;
       color: var(--text-muted);
@@ -1216,6 +1318,17 @@
 
     .texts-chapter-text p + p {
       margin-top: 1rem;
+    }
+
+    .text-word-link {
+      color: inherit;
+      text-decoration: none;
+      border-radius: 3px;
+    }
+
+    .text-word-link:hover,
+    .text-word-link:focus-visible {
+      color: var(--crimson);
     }
 
     .texts-empty-state {
@@ -2144,6 +2257,57 @@
       stroke-width: 1.8;
     }
 
+    .feature-refresh-button {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 5.1rem;
+      z-index: 150;
+      width: 3.25rem;
+      height: 3.25rem;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      background: var(--bg-card);
+      color: var(--crimson);
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .feature-refresh-button:hover {
+      transform: translateY(-2px);
+      background: var(--gold-light);
+    }
+
+    .feature-refresh-button:disabled {
+      cursor: wait;
+      opacity: 0.75;
+    }
+
+    .feature-refresh-button svg {
+      width: 1.45rem;
+      height: 1.45rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 2;
+    }
+
+    .feature-refresh-button.is-loading svg {
+      animation: feature-refresh-spin 0.8s linear infinite;
+    }
+
+    .feature-refresh-button[hidden],
+    .daily-section-container[hidden] {
+      display: none;
+    }
+
+    @keyframes feature-refresh-spin {
+      to { transform: rotate(360deg); }
+    }
+
     .feedback-dialog {
       width: min(27rem, calc(100vw - 2rem));
       max-height: min(90vh, 42rem);
@@ -2459,6 +2623,10 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
         column-gap: 0.75rem;
         row-gap: 0.75rem;
+      }
+
+      .daily-selections {
+        grid-template-columns: minmax(0, 1fr);
       }
 
       .texts-author-card .texts-browse-card-inner {
@@ -3003,6 +3171,11 @@
           </div>
         </div>
 
+        <section class="daily-section-container" id="dictionaryDailySection" aria-label="Cuvintele zilei" hidden>
+          <h2 class="daily-section-title">Cuvintele zilei</h2>
+          <div class="daily-selections" id="dictionaryDailyCards" aria-live="polite"></div>
+        </section>
+
         <div id="dictionaryDisplay" aria-live="polite"></div>
       </section>
 
@@ -3038,6 +3211,15 @@
         <h2 class="texts-directory-title" id="textsDirectoryTitle">Autori</h2>
       </div>
       <div class="texts-directory-list" id="textsDirectoryList"></div>
+      <section
+        class="daily-section-container texts-daily-selections"
+        id="textsDailySection"
+        aria-label="Fragmente aleatorii din texte"
+        hidden
+      >
+        <h2 class="daily-section-title">Fragmente din texte</h2>
+        <div class="daily-selections" id="textsDailyCards" aria-live="polite"></div>
+      </section>
       <article class="texts-chapter-view" id="textsChapterView" hidden></article>
     </section>
     <section class="texts-results" id="textsSearchResults" aria-label="Rezultatele căutării" hidden></section>
@@ -3057,6 +3239,21 @@
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-5.5A7.5 7.5 0 1 1 20 11.5Z"></path>
       <path d="M8 11h.01M12 11h.01M16 11h.01"></path>
+    </svg>
+  </button>
+
+  <button
+    class="feature-refresh-button"
+    id="featureRefreshButton"
+    type="button"
+    aria-label="Reîmprospătează selecțiile aleatorii"
+    title="Reîmprospătează selecțiile aleatorii"
+    onclick="refreshFeaturedContent()"
+    hidden
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20 7v5h-5M4 17v-5h5"></path>
+      <path d="M5.6 9a7 7 0 0 1 11.6-2L20 12M4 12l2.8 5a7 7 0 0 0 11.6-2"></path>
     </svg>
   </button>
 
@@ -3086,6 +3283,11 @@
     let currentMode = 'omnia-dir';
     const remoteDictionaryCache = new Map();
     const loadedDictionaryTargets = new Set();
+    let dictionaryCatalog = null;
+    let dictionaryCatalogLoadPromise = null;
+    let dictionaryDailyLoadPromise = null;
+    let dictionaryDailyLoaded = false;
+    const previousDailyLemmas = { gr: '', lat: '' };
     let searchRequestId = 0;
     const lexiconData = Object.create(null);
     const recentSearchStorageKey = 'dic-ionar-online-recent-searches';
@@ -3106,6 +3308,11 @@
     const textsFooter = document.getElementById('textsFooter');
     const pageNavigationLink = document.getElementById('pageNavigationLink');
     const pageNavigationLabel = document.getElementById('pageNavigationLabel');
+    const dictionaryDailySection = document.getElementById('dictionaryDailySection');
+    const dictionaryDailyCards = document.getElementById('dictionaryDailyCards');
+    const textsDailySection = document.getElementById('textsDailySection');
+    const textsDailyCards = document.getElementById('textsDailyCards');
+    const featureRefreshButton = document.getElementById('featureRefreshButton');
     const textsSearchForm = document.getElementById('textsSearchForm');
     const textsSearchInput = document.getElementById('textsSearchInput');
     const textsSearchStatus = document.getElementById('textsSearchStatus');
@@ -3129,6 +3336,9 @@
     let textCatalogLoadPromise = null;
     const textDocumentCache = new Map();
     const textDocumentLoadPromises = new Map();
+    let textsDailyLoadPromise = null;
+    let textsDailyLoaded = false;
+    const previousTextSelections = { gr: '', lat: '' };
     let textAutocompleteLoading = false;
     const textLanguageGroups = [
       {
@@ -3195,12 +3405,221 @@
       document.title = showingTexts ? 'Texte clasice — GrecLaRo' : 'GrecLaRo — Dicționar Latin-Român și Greacă Veche-Român';
 
       if (showingTexts && !textCatalogLoaded) loadTextCatalog();
+      if (!showingTexts && !showingFavoritesPage && !document.getElementById('searchInput').value.trim()) {
+        ensureDictionaryHighlights();
+      }
+      updateFeatureRefreshVisibility();
     }
 
     function navigateToSitePage(page) {
       const targetHash = page === 'texts' ? '#texte' : '#dictionar';
       if (window.location.hash !== targetHash) window.location.hash = targetHash;
       syncSitePageFromLocation();
+    }
+
+    function updateFeatureRefreshVisibility() {
+      const showingTexts = window.location.hash === '#texte';
+      const visible = showingTexts
+        ? !showingTextFavoritesPage
+          && textNavigation.level === 'collections'
+          && textsSearchResults.hidden
+        : !showingFavoritesPage
+          && !document.getElementById('searchInput').value.trim();
+      featureRefreshButton.hidden = !visible;
+    }
+
+    function randomItem(items) {
+      if (!items.length) return null;
+      return items[Math.floor(Math.random() * items.length)];
+    }
+
+    function truncateFeaturedText(value, limit = 320) {
+      const text = String(value ?? '').replace(/\s+/g, ' ').trim();
+      const characters = Array.from(text);
+      if (characters.length <= limit) return text;
+      const excerpt = characters.slice(0, limit).join('');
+      const lastSpace = excerpt.lastIndexOf(' ');
+      return `${excerpt.slice(0, lastSpace > limit * 0.65 ? lastSpace : limit).trimEnd()}…`;
+    }
+
+    function decodeDictionaryText(value) {
+      const decoder = document.createElement('div');
+      decoder.innerHTML = String(value ?? '');
+      return decoder.textContent.replace(/<br\s*\/?>/gi, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    async function loadDictionaryCatalog() {
+      if (dictionaryCatalog) return dictionaryCatalog;
+      if (!dictionaryCatalogLoadPromise) {
+        dictionaryCatalogLoadPromise = (async () => {
+          const response = await fetch('data/litere/catalog.json', { cache: 'force-cache' });
+          if (!response.ok) throw new Error(`Catalogul dicționarelor: HTTP ${response.status}`);
+          const catalog = await response.json();
+          for (const language of ['lat', 'gr']) {
+            if (!Array.isArray(catalog?.[language])
+              || !catalog[language].length
+              || catalog[language].some(letter => typeof letter !== 'string' || !/^\p{L}+$/u.test(letter))) {
+              throw new TypeError(`Catalogul nu conține litere valide pentru ${language}.`);
+            }
+          }
+          dictionaryCatalog = catalog;
+          return catalog;
+        })();
+      }
+
+      try {
+        return await dictionaryCatalogLoadPromise;
+      } catch (error) {
+        dictionaryCatalogLoadPromise = null;
+        throw error;
+      }
+    }
+
+    async function chooseRandomDictionaryEntry(language, catalog) {
+      const letter = randomItem(catalog[language]);
+      const target = buildDictionaryTargets(letter, language)[0];
+      if (!target) throw new Error(`Nu există un fișier de dicționar pentru litera ${letter}.`);
+      await loadDictionaryTarget(target);
+
+      const languageName = language === 'gr' ? 'Greacă Veche' : 'Latină';
+      const entries = Object.values(lexiconData).filter(entry =>
+        entry.lang === languageName
+        && getDictionaryFileLetter(entry.lemmaKey) === letter
+        && entry.defs?.some(definition => decodeDictionaryText(definition))
+      );
+      if (!entries.length) throw new Error(`Nu există definiții disponibile pentru litera ${letter}.`);
+
+      const freshEntries = entries.filter(entry => entry.lemmaKey !== previousDailyLemmas[language]);
+      const selected = randomItem(freshEntries.length ? freshEntries : entries);
+      previousDailyLemmas[language] = selected.lemmaKey;
+      return selected;
+    }
+
+    function createDailyMessageCard(title, message, isError = false) {
+      const card = document.createElement('article');
+      card.className = 'daily-selection-card';
+      const heading = document.createElement('h3');
+      heading.textContent = title;
+      const status = document.createElement('p');
+      status.className = 'daily-selection-status';
+      status.textContent = message;
+      status.setAttribute('role', 'status');
+      if (isError) status.dataset.state = 'error';
+      card.append(heading, status);
+      return card;
+    }
+
+    function createDailyWordCard(language, entry) {
+      const card = document.createElement('article');
+      card.className = 'daily-selection-card';
+      const table = document.createElement('table');
+      table.className = 'daily-selection-table';
+      const caption = document.createElement('caption');
+      caption.textContent = `Cuvântul ${language === 'gr' ? 'grecesc' : 'latin'} al zilei`;
+      table.appendChild(caption);
+      const body = document.createElement('tbody');
+      const addRow = (label, value) => {
+        if (!value) return;
+        const row = document.createElement('tr');
+        const heading = document.createElement('th');
+        heading.scope = 'row';
+        heading.textContent = label;
+        const cell = document.createElement('td');
+        cell.textContent = value;
+        row.append(heading, cell);
+        body.appendChild(row);
+      };
+      const wordRow = document.createElement('tr');
+      const wordHeading = document.createElement('th');
+      wordHeading.scope = 'row';
+      wordHeading.textContent = 'Cuvânt';
+      const wordCell = document.createElement('td');
+      const wordButton = document.createElement('button');
+      wordButton.className = 'daily-word-link';
+      wordButton.type = 'button';
+      wordButton.textContent = entry.lemmaKey;
+      wordButton.addEventListener('click', () => openDailyDictionaryEntry(entry.lemmaKey, language));
+      wordCell.appendChild(wordButton);
+      wordRow.append(wordHeading, wordCell);
+      body.appendChild(wordRow);
+
+      addRow('Definiție', truncateFeaturedText(decodeDictionaryText(entry.defs?.[0]), 220));
+      addRow('Etimologie', truncateFeaturedText(decodeDictionaryText(entry.etym), 180));
+      table.appendChild(body);
+      card.appendChild(table);
+      return card;
+    }
+
+    function openDailyDictionaryEntry(lemma, language) {
+      navigateToSitePage('dictionary');
+      const input = document.getElementById('searchInput');
+      input.value = lemma;
+      setSearchMode(language === 'gr' ? 'greek-dir' : 'latin-dir');
+      document.getElementById('autocompleteDropdown').classList.remove('active');
+      updateHomeView(lemma);
+      renderEntry(lemma);
+    }
+
+    async function refreshDictionaryHighlights(force = false) {
+      if (dictionaryDailyLoadPromise) return dictionaryDailyLoadPromise;
+      if (dictionaryDailyLoaded && !force) return;
+
+      dictionaryDailySection.hidden = false;
+      dictionaryDailyCards.replaceChildren(
+        createDailyMessageCard('Greacă veche', 'Se alege un cuvânt…'),
+        createDailyMessageCard('Latină', 'Se alege un cuvânt…')
+      );
+      const request = (async () => {
+        let results;
+        try {
+          const catalog = await loadDictionaryCatalog();
+          results = await Promise.all(['gr', 'lat'].map(async language => {
+            try {
+              return { language, entry: await chooseRandomDictionaryEntry(language, catalog) };
+            } catch (error) {
+              console.error(`Nu s-a putut alege cuvântul zilei pentru ${language}.`, error);
+              return { language, error };
+            }
+          }));
+        } catch (error) {
+          console.error('Nu s-au putut încărca selecțiile din dicționar.', error);
+          results = ['gr', 'lat'].map(language => ({ language, error }));
+        }
+
+        dictionaryDailyCards.replaceChildren(...results.map(result =>
+          result.entry
+            ? createDailyWordCard(result.language, result.entry)
+            : createDailyMessageCard(
+              result.language === 'gr' ? 'Greacă veche' : 'Latină',
+              'Nu s-a putut încărca un cuvânt. Reîncearcă.',
+              true
+            )
+        ));
+        dictionaryDailyLoaded = results.every(result => Boolean(result.entry));
+      })();
+      dictionaryDailyLoadPromise = request;
+      try {
+        await request;
+      } finally {
+        if (dictionaryDailyLoadPromise === request) dictionaryDailyLoadPromise = null;
+      }
+    }
+
+    function ensureDictionaryHighlights() {
+      if (!dictionaryDailyLoaded) refreshDictionaryHighlights();
+    }
+
+    async function refreshFeaturedContent() {
+      if (featureRefreshButton.disabled) return;
+      featureRefreshButton.disabled = true;
+      featureRefreshButton.classList.add('is-loading');
+      try {
+        if (window.location.hash === '#texte') await refreshTextHighlights(true);
+        else await refreshDictionaryHighlights(true);
+      } finally {
+        featureRefreshButton.disabled = false;
+        featureRefreshButton.classList.remove('is-loading');
+      }
     }
 
     function normalizeTextSearch(value) {
@@ -4030,6 +4449,88 @@
       }
     }
 
+    function normalizeDictionaryWord(word) {
+      return String(word)
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[’']/g, '')
+        .trim()
+        .toLocaleLowerCase('la');
+    }
+
+    function findTextDictionaryLemma(word, languageGroup) {
+      const normalizedWord = normalizeDictionaryWord(word);
+      const wantedLanguage = languageGroup === 'gr' ? 'Greacă Veche' : 'Latină';
+
+      for (const lemma in lexiconData) {
+        const entry = lexiconData[lemma];
+        if (entry.lang !== wantedLanguage) continue;
+        const normalizedLemma = normalizeDictionaryWord(lemma);
+        const lemmaMatches = languageGroup === 'gr'
+          ? matchesSearchText(lemma, word)
+          : normalizedLemma === normalizedWord;
+        if (lemmaMatches) return lemma;
+
+        const formMatches = entry.searchForms?.some(form =>
+          languageGroup === 'gr'
+            ? matchesSearchText(form, word)
+            : normalizeDictionaryWord(form) === normalizedWord
+        );
+        if (formMatches) return lemma;
+      }
+      return null;
+    }
+
+    async function openTextDictionaryWord(word, languageGroup) {
+      try {
+        await loadRemoteDictionary(word, languageGroup);
+        let lemma = findTextDictionaryLemma(word, languageGroup);
+        if (lemma) {
+          const redirect = lexiconData[lemma]?.redirect?.trim();
+          if (redirect) {
+            const redirected = Object.prototype.hasOwnProperty.call(lexiconData, redirect)
+              ? redirect
+              : findTextDictionaryLemma(redirect, languageGroup);
+            if (redirected) lemma = redirected;
+          }
+          navigateToSitePage('dictionary');
+          setSearchMode(languageGroup === 'gr' ? 'greek-dir' : 'latin-dir');
+          const input = document.getElementById('searchInput');
+          input.value = word;
+          updateHomeView(word);
+          renderEntry(lemma);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          setTextsSearchStatus(`Cuvântul „${word}” nu este în dicționar.`, 'error');
+        }
+      } catch (error) {
+        setTextsSearchStatus(`Nu s-a putut verifica „${word}” în dicționar.`, 'error');
+      }
+    }
+
+    function linkifyTextWords(container, languageGroup) {
+      const tokenPattern = /[\p{L}\p{M}]+(?:[’'][\p{L}\p{M}]+)*|[^\p{L}\p{M}]+/gu;
+      const originalText = container.textContent;
+      container.replaceChildren();
+
+      for (const match of originalText.matchAll(tokenPattern)) {
+        const token = match[0];
+        if (/^[\p{L}\p{M}]+(?:[’'][\p{L}\p{M}]+)*$/u.test(token)) {
+          const link = document.createElement('a');
+          link.className = 'text-word-link';
+          link.href = '#dictionar';
+          link.textContent = token;
+          link.addEventListener('click', event => {
+            event.preventDefault();
+            openTextDictionaryWord(token, languageGroup);
+          });
+          container.appendChild(link);
+        } else {
+          container.appendChild(document.createTextNode(token));
+        }
+      }
+    }
+
     function renderTextChapter() {
       if (!activeTextChapter) return;
       const { record, chapter } = activeTextChapter;
@@ -4074,6 +4575,7 @@
       chapter.paragraphs.forEach(text => {
         const paragraph = document.createElement('p');
         paragraph.textContent = text;
+        linkifyTextWords(paragraph, record.languageGroup);
         chapterText.appendChild(paragraph);
       });
       textsChapterView.append(chapterText, createTextChapterNavigation(chapters, currentIndex));
@@ -4093,9 +4595,11 @@
       textsBreadcrumbs.hidden = textNavigation.level === 'collections';
       textsDirectoryHeading.hidden = textNavigation.level === 'collections' || textNavigation.level === 'chapter';
       textsBackButton.hidden = textNavigation.level === 'collections' || textNavigation.level === 'chapter';
+      textsDailySection.hidden = textNavigation.level !== 'collections';
       textsBackButton.textContent = '← Înapoi';
       textsBackButton.setAttribute('aria-label', 'Înapoi la nivelul anterior');
       renderTextBreadcrumbs();
+      updateFeatureRefreshVisibility();
 
       if (textNavigation.level === 'collections') {
         textsDirectoryList.dataset.level = 'collections';
@@ -4112,6 +4616,7 @@
           card.classList.add('texts-collection-card');
           textsDirectoryList.appendChild(card);
         });
+        ensureTextHighlights();
         return;
       }
 
@@ -4322,6 +4827,7 @@
     function renderTextFavoritesPage() {
       textsBrowser.hidden = false;
       textsSearchResults.hidden = true;
+      textsDailySection.hidden = true;
       textsDirectoryList.replaceChildren();
       textsChapterView.replaceChildren();
       textsChapterView.hidden = true;
@@ -4331,6 +4837,7 @@
       textsBackButton.hidden = false;
       textsBackButton.textContent = '← Înapoi la texte';
       textsBackButton.setAttribute('aria-label', 'Înapoi la texte');
+      updateFeatureRefreshVisibility();
 
       if (textFavoriteStorageError) {
         const warning = document.createElement('p');
@@ -4525,6 +5032,7 @@
 
       textsBrowser.hidden = true;
       textsSearchResults.hidden = false;
+      updateFeatureRefreshVisibility();
       if (!textDatabaseLoaded) {
         setTextsSearchStatus('Se caută în textele accesate…');
         await loadTextDatabase();
@@ -4605,24 +5113,30 @@
       return textCatalogLoadPromise;
     }
 
+    function loadAndCacheTextDocument(reference) {
+      if (textDocumentCache.has(reference.path)) {
+        return Promise.resolve(textDocumentCache.get(reference.path));
+      }
+      if (textDocumentLoadPromises.has(reference.path)) {
+        return textDocumentLoadPromises.get(reference.path);
+      }
+
+      const promise = loadTextDocument(reference).then(document => {
+        textDocumentCache.set(reference.path, document);
+        if (!textDatabase.some(entry => entry.path === document.path)) textDatabase.push(document);
+        return document;
+      }).finally(() => textDocumentLoadPromises.delete(reference.path));
+      textDocumentLoadPromises.set(reference.path, promise);
+      return promise;
+    }
+
     async function loadTextDocuments(references) {
       const pending = references
         .filter(reference => !textDocumentCache.has(reference.path))
         .filter((reference, index, list) =>
           list.findIndex(item => item.path === reference.path) === index);
 
-      await Promise.allSettled(pending.map(reference => {
-        if (textDocumentLoadPromises.has(reference.path)) {
-          return textDocumentLoadPromises.get(reference.path);
-        }
-        const promise = loadTextDocument(reference).then(document => {
-          textDocumentCache.set(reference.path, document);
-          if (!textDatabase.some(entry => entry.path === document.path)) textDatabase.push(document);
-          return document;
-        }).finally(() => textDocumentLoadPromises.delete(reference.path));
-        textDocumentLoadPromises.set(reference.path, promise);
-        return promise;
-      }));
+      await Promise.allSettled(pending.map(loadAndCacheTextDocument));
 
       return references
         .map(reference => textDocumentCache.get(reference.path))
@@ -4639,6 +5153,116 @@
       const documents = await loadTextDocuments(references);
       setTextsSearchStatus('');
       return documents;
+    }
+
+    async function chooseRandomTextExcerpt(languageGroup) {
+      if (!textCatalogLoaded && !await loadTextCatalog()) {
+        throw new Error('Catalogul textelor nu este disponibil.');
+      }
+      const references = textCatalog.filter(entry => entry.languageGroup === languageGroup);
+      if (!references.length) throw new Error('Nu există texte pentru această limbă.');
+
+      let lastError = null;
+      const remainingReferences = [...references];
+      while (remainingReferences.length) {
+        const reference = randomItem(remainingReferences);
+        remainingReferences.splice(remainingReferences.indexOf(reference), 1);
+        let document;
+        try {
+          document = await loadAndCacheTextDocument(reference);
+        } catch (error) {
+          lastError = error;
+          console.warn(`Nu s-a putut încărca fragmentul din ${reference.path}.`, error);
+          continue;
+        }
+
+        const paragraphs = document.chapters.flatMap(chapter =>
+          chapter.paragraphs
+            .filter(paragraph => paragraph.trim())
+            .map(paragraph => ({ paragraph, chapter }))
+        );
+        if (!paragraphs.length) continue;
+
+        const options = paragraphs.filter(({ paragraph, chapter }) =>
+          `${document.path}:${chapter.number}:${paragraph}` !== previousTextSelections[languageGroup]
+        );
+        const selected = randomItem(options.length ? options : paragraphs);
+        previousTextSelections[languageGroup] =
+          `${document.path}:${selected.chapter.number}:${selected.paragraph}`;
+        return {
+          text: truncateFeaturedText(selected.paragraph),
+          author: document.author,
+          title: document.title,
+          chapter: selected.chapter
+        };
+      }
+
+      if (lastError) {
+        throw new Error(`Nu s-a putut încărca niciun text: ${lastError.message}`, { cause: lastError });
+      }
+      throw new Error('Nu există paragrafe disponibile în textele acestei limbi.');
+    }
+
+    function createTextHighlightCard(languageGroup, selection) {
+      const card = document.createElement('article');
+      card.className = 'daily-selection-card';
+      const heading = document.createElement('h3');
+      heading.textContent = languageGroup === 'gr' ? 'Greacă veche' : 'Latină';
+      const quote = document.createElement('blockquote');
+      quote.className = 'daily-selection-quote';
+      quote.textContent = selection.text;
+      const attribution = document.createElement('p');
+      attribution.className = 'daily-selection-attribution';
+      const chapterLabel = selection.chapter.heading
+        ? ` — ${selection.chapter.heading}`
+        : ` — capitolul ${selection.chapter.number}`;
+      attribution.textContent = [selection.author, selection.title].filter(Boolean).join(' · ')
+        + chapterLabel;
+      card.append(heading, quote, attribution);
+      return card;
+    }
+
+    async function refreshTextHighlights(force = false) {
+      if (textsDailyLoadPromise) return textsDailyLoadPromise;
+      if (textsDailyLoaded && !force) return;
+
+      textsDailySection.hidden = textNavigation.level !== 'collections' || showingTextFavoritesPage;
+      textsDailyCards.replaceChildren(
+        createDailyMessageCard('Greacă veche', 'Se caută un fragment…'),
+        createDailyMessageCard('Latină', 'Se caută un fragment…')
+      );
+      const request = (async () => {
+        const results = await Promise.all(['gr', 'lat'].map(async languageGroup => {
+          try {
+            return { languageGroup, selection: await chooseRandomTextExcerpt(languageGroup) };
+          } catch (error) {
+            console.error(`Nu s-a putut alege fragmentul pentru ${languageGroup}.`, error);
+            return { languageGroup, error };
+          }
+        }));
+
+        textsDailyCards.replaceChildren(...results.map(result =>
+          result.selection
+            ? createTextHighlightCard(result.languageGroup, result.selection)
+            : createDailyMessageCard(
+              result.languageGroup === 'gr' ? 'Greacă veche' : 'Latină',
+              'Nu s-a putut încărca un fragment. Reîncearcă.',
+              true
+            )
+        ));
+        textsDailyLoaded = results.every(result => Boolean(result.selection));
+        updateFeatureRefreshVisibility();
+      })();
+      textsDailyLoadPromise = request;
+      try {
+        await request;
+      } finally {
+        if (textsDailyLoadPromise === request) textsDailyLoadPromise = null;
+      }
+    }
+
+    function ensureTextHighlights() {
+      if (!textsDailyLoaded) refreshTextHighlights();
     }
 
     async function loadTextDatabase() {
@@ -4909,6 +5533,8 @@
 
     function renderFavoritesPage() {
       const display = document.getElementById('dictionaryDisplay');
+      dictionaryDailySection.hidden = true;
+      updateFeatureRefreshVisibility();
       display.innerHTML = `
         <section class="favorites-page" aria-labelledby="favoritesPageTitle">
           <div class="favorites-page-header">
@@ -4926,6 +5552,8 @@
         if (input.value.trim()) {
           if (currentMode.endsWith('-rev')) submitSearch();
           else handleSearchInput(input.value);
+        } else {
+          updateHomeView('');
         }
       });
 
@@ -5114,7 +5742,7 @@
         synonyms: normalizeRelatedWords(entry.sinonime ?? entry.synonyms ?? entry.sinonim),
         antonyms: normalizeRelatedWords(entry.antonime ?? entry.antonyms ?? entry.antonim),
         searchForms,
-        etym: escape(entry.etym ?? entry.etimologie ?? ''),
+        etym: escape(entry.etym ?? entry.etimologie ?? entry.etimologia ?? entry.etymology ?? ''),
         defs: definitions.map(escape),
         citations: Array.isArray(entry.citations) ? entry.citations.map(citation => ({
           text: escape(citation.text),
@@ -5314,10 +5942,10 @@
 
     function handleSearchInput(query) {
       showingFavoritesPage = false;
+      updateHomeView(query);
       if (currentMode.endsWith('-rev')) {
         document.getElementById('autocompleteDropdown').classList.remove('active');
         document.getElementById('dictionaryDisplay').innerHTML = '';
-        updateHomeView(query);
         return;
       }
 
@@ -5384,6 +6012,8 @@
     function updateHomeView(query) {
       document.querySelector('.search-section').classList.toggle('has-active-search', Boolean(query.trim()));
       document.querySelector('.page-layout').classList.toggle('has-active-search', Boolean(query.trim()));
+      dictionaryDailySection.hidden = Boolean(query.trim()) || showingFavoritesPage;
+      updateFeatureRefreshVisibility();
     }
 
     function updateLiveSuggestions(query) {
@@ -5835,6 +6465,8 @@
     }
 
     function resetToHome() {
+      showingFavoritesPage = false;
+      showingTextFavoritesPage = false;
       navigateToSitePage('dictionary');
       setSearchMode('omnia-dir');
       clearSearch();
@@ -6046,7 +6678,6 @@
       document.getElementById('siteMenuMain').hidden = false;
       document.getElementById('appearanceMenu').hidden = true;
     }
-acp
     function setColorTheme(color) {
       const root = document.documentElement;
       if (color === 'default') root.removeAttribute('data-color-theme');
