@@ -852,6 +852,7 @@
     .texts-directory-list {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: stretch;
       column-gap: 1.25rem;
       row-gap: 0.8rem;
     }
@@ -931,18 +932,22 @@
     .texts-author-card {
       min-height: 0;
       overflow: hidden;
+      height: 100%;
     }
 
     .texts-author-card .texts-browse-card-open {
       display: block;
+      height: 100%;
       padding: 0;
     }
 
     .texts-author-card .texts-browse-card-inner {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: clamp(11rem, 25vw, 18rem) 1fr;
       gap: 0;
       width: 100%;
+      height: 100%;
     }
 
     .texts-author-card .texts-browse-card-image {
@@ -954,8 +959,37 @@
       box-shadow: none;
     }
 
+    .texts-author-card .texts-browse-card-image img {
+      object-fit: cover;
+      object-position: 50% 26%;
+    }
+
+    .texts-author-card[data-author="Cicero"] .texts-browse-card-image img {
+      object-position: 50% 22%;
+    }
+
+    .texts-author-card[data-author="Caesar"] .texts-browse-card-image img,
+    .texts-author-card[data-author="Gaius Iulius Caesar"] .texts-browse-card-image img {
+      object-position: 50% 24%;
+    }
+
+    .texts-author-card[data-author="Plato"] .texts-browse-card-image img,
+    .texts-author-card[data-author="Platon"] .texts-browse-card-image img {
+      object-position: 50% 23%;
+    }
+
+    .texts-author-card[data-author="Aristotel"] .texts-browse-card-image img {
+      object-position: 50% 18%;
+    }
+
+    .texts-author-card[data-author="Ovidiu"] .texts-browse-card-image img {
+      object-position: 50% 28%;
+    }
+
     .texts-author-card .texts-browse-card-copy {
       align-items: center;
+      justify-content: center;
+      min-height: 5.25rem;
       padding: 0.9rem 0.75rem 0.25rem;
       text-align: center;
     }
@@ -2386,6 +2420,10 @@
 
       .texts-author-card .texts-browse-card-image {
         height: clamp(10rem, 42vw, 16rem);
+      }
+
+      .texts-author-card .texts-browse-card-inner {
+        grid-template-rows: clamp(10rem, 42vw, 16rem) 1fr;
       }
     }
 
@@ -3895,6 +3933,7 @@
               }
             );
             authorCard.classList.add('texts-author-card');
+            authorCard.dataset.author = profile?.name || author;
             textsDirectoryList.appendChild(authorCard);
           });
         return;

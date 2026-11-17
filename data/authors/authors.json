@@ -31,9 +31,8 @@
   },
   "Ovidiu": {
     "name": "Ovidiu",
-    "image": null,
-    "alt": "",
-    "icon": "📜",
+    "image": "assets/authors/ovid.jpg",
+    "alt": "Gravură cu Ovidiu",
     "years": "43 î.Hr.–17/18 d.Hr.",
     "description": "Poet roman cunoscut pentru elegiile sale, Ars amatoria și poemul mitologic Metamorfoze."
   }
