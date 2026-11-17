@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="ro" data-theme="dark" data-color-theme="blue">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2453,6 +2453,35 @@
         grid-template-columns: 1fr;
       }
 
+      .texts-directory-heading {
+        align-items: stretch;
+      }
+
+      .texts-directory-heading .texts-back-button {
+        min-height: 2.35rem;
+      }
+
+      .texts-chapter-heading {
+        align-items: flex-start;
+      }
+
+      .texts-chapter-heading h2 {
+        flex-basis: calc(100% - 3.3rem);
+      }
+
+      .texts-chapter-navigation {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      }
+
+      .texts-chapter-nav-button {
+        width: 100%;
+      }
+
+      .texts-author-card .texts-browse-card-copy {
+        padding-right: 2.8rem;
+      }
+
       .modes-container,
       .search-section {
         padding: 0.9rem;
@@ -2550,6 +2579,10 @@
 
       .texts-search-row {
         flex-direction: column;
+      }
+
+      .texts-search-submit {
+        width: 100%;
       }
     }
 
@@ -2826,9 +2859,9 @@
               </div>
               <p class="palette-label">Alege tema de culoare</p>
               <div class="theme-swatches" role="group" aria-label="Teme de culoare">
-                <button class="theme-swatch" type="button" data-color-theme="default" aria-label="Violet, implicit" aria-pressed="true" onclick="setColorTheme('default')"><span class="theme-swatch-dot default" aria-hidden="true"></span></button>
+                <button class="theme-swatch" type="button" data-color-theme="default" aria-label="Implicit" aria-pressed="false" onclick="setColorTheme('default')"><span class="theme-swatch-dot default" aria-hidden="true"></span></button>
                 <button class="theme-swatch" type="button" data-color-theme="green" aria-label="Verde" aria-pressed="false" onclick="setColorTheme('green')"><span class="theme-swatch-dot green" aria-hidden="true"></span></button>
-                <button class="theme-swatch" type="button" data-color-theme="blue" aria-label="Albastru" aria-pressed="false" onclick="setColorTheme('blue')"><span class="theme-swatch-dot blue" aria-hidden="true"></span></button>
+                <button class="theme-swatch" type="button" data-color-theme="blue" aria-label="Albastru" aria-pressed="true" onclick="setColorTheme('blue')"><span class="theme-swatch-dot blue" aria-hidden="true"></span></button>
                 <button class="theme-swatch" type="button" data-color-theme="yellow" aria-label="Galben" aria-pressed="false" onclick="setColorTheme('yellow')"><span class="theme-swatch-dot yellow" aria-hidden="true"></span></button>
                 <button class="theme-swatch" type="button" data-color-theme="red" aria-label="Roșu" aria-pressed="false" onclick="setColorTheme('red')"><span class="theme-swatch-dot red" aria-hidden="true"></span></button>
                 <button class="theme-swatch" type="button" data-color-theme="purple" aria-label="Mov" aria-pressed="false" onclick="setColorTheme('purple')"><span class="theme-swatch-dot purple" aria-hidden="true"></span></button>
@@ -3242,6 +3275,63 @@
       const languageGroup = reference.path.split('/')[0];
       const language = getTextLanguage(languageCode, languageGroup);
       const authorProfile = getTextAuthorProfile(reference);
+      const chapterDivisions = allElements(body, 'div')
+        .filter(section => {
+          const subtype = section.getAttribute('subtype');
+          const number = section.getAttribute('n');
+          const hasChildChapter = Array.from(section.children)
+            .some(child => (child.localName === 'div' || child.tagName === 'div')
+              && child.getAttribute('subtype') === 'chapter');
+          const hasTextContent = allElements(section, 'p').length > 0
+            || allElements(section, 'l').length > 0;
+          return subtype === 'chapter' && number && hasTextContent && !hasChildChapter;
+        })
+        .map((section, index) => {
+          const chapterParagraphs = allElements(section, 'p')
+            .map(cleanTextContent)
+            .filter(Boolean);
+          const chapterLines = chapterParagraphs.length
+            ? []
+            : allElements(section, 'l')
+              .map(cleanTextContent)
+              .filter(Boolean);
+          const heading = Array.from(section.children)
+            .find(child => child.localName === 'head');
+          const chapterText = chapterParagraphs.length ? chapterParagraphs : chapterLines;
+          return {
+            number: String(index + 1),
+            heading: heading ? cleanTextContent(heading) : '',
+            paragraphs: chapterText,
+            text: chapterText.join('\n\n')
+          };
+        })
+        .filter(chapter => chapter.text);
+
+      const paragraphElements = allElements(body, 'p');
+      const milestones = allElements(body, 'milestone')
+        .filter(milestone =>
+          milestone.getAttribute('unit') === 'chapter'
+          && /^\d+(?:[.:]\d+)*$/.test(milestone.getAttribute('n') || '')
+        );
+      const milestoneDivisions = milestones.map((milestone, index) => {
+        const number = milestone.getAttribute('n');
+        const startParagraph = paragraphElements.findIndex(paragraph => paragraph.contains(milestone));
+        const nextMilestone = milestones[index + 1];
+        const endParagraph = nextMilestone
+          ? paragraphElements.findIndex(paragraph => paragraph.contains(nextMilestone))
+          : paragraphElements.length;
+        const paragraphs = paragraphElements
+          .slice(startParagraph >= 0 ? startParagraph : 0, endParagraph > startParagraph ? endParagraph : paragraphElements.length)
+          .map(cleanTextContent)
+          .filter(Boolean);
+        return {
+          number,
+          heading: '',
+          paragraphs,
+          text: paragraphs.join('\n\n')
+        };
+      }).filter(chapter => chapter.text);
+
       const numberedDivisions = allElements(body, 'div')
         .filter(section => {
           const number = section.getAttribute('n');
@@ -3275,7 +3365,11 @@
           };
         })
         .filter(chapter => chapter.text);
-      let chapters = numberedDivisions;
+      let chapters = chapterDivisions.length
+        ? chapterDivisions
+        : milestoneDivisions.length
+          ? milestoneDivisions
+          : numberedDivisions;
       const fallbackContent = paragraphs.length ? paragraphs : lines;
       if (!chapters.length && fallbackContent.length) {
         chapters = [{ number: '1', heading: '', paragraphs: fallbackContent, text: fallbackContent.join('\n\n') }];
@@ -3470,6 +3564,15 @@
         const image = document.createElement('img');
         image.src = options.imageUrl;
         image.alt = options.alt || title;
+        image.loading = 'lazy';
+        image.decoding = 'async';
+        image.addEventListener('error', () => {
+          imageWrap.replaceChildren();
+          imageWrap.textContent = '🏛️';
+          imageWrap.style.display = 'grid';
+          imageWrap.style.placeItems = 'center';
+          imageWrap.setAttribute('aria-label', 'Imagine indisponibilă');
+        }, { once: true });
         imageWrap.appendChild(image);
         cardInner.appendChild(imageWrap);
       } else if (options.icon) {
@@ -3993,6 +4096,15 @@
             image.className = 'texts-author-profile-image';
             image.src = profile.image;
             image.alt = profile.alt || profile.name;
+            image.loading = 'lazy';
+            image.decoding = 'async';
+            image.addEventListener('error', () => {
+              const fallback = document.createElement('div');
+              fallback.className = 'texts-author-profile-icon';
+              fallback.setAttribute('aria-label', 'Imagine indisponibilă');
+              fallback.textContent = '🏛️';
+              image.replaceWith(fallback);
+            }, { once: true });
             profileCard.appendChild(image);
           } else {
             const icon = document.createElement('div');
@@ -4339,7 +4451,7 @@
       const filename = pathParts[pathParts.length - 1].replace(/\.(xml|json)$/i, '');
       const title = reference.title || filename
         .replace(/[._-]+/g, ' ')
-        .replace(/\b\w/g, character => character.toUpper())
+        .replace(/\b\w/g, character => character.toUpperCase())
         .trim();
       return {
         ...reference,
@@ -5800,6 +5912,11 @@
       document.documentElement.setAttribute('data-theme', target);
       if (target === 'dark') document.documentElement.classList.add('dark');
       else document.documentElement.classList.remove('dark');
+      try {
+        localStorage.setItem('grelaro-theme-mode', target);
+      } catch (error) {
+        console.warn('Nu s-a putut salva tema.', error);
+      }
       const themeToggle = document.getElementById('themeToggleBtn');
       const actionLabel = target === 'dark' ? 'Activează modul luminos' : 'Activează modul nocturn';
       document.getElementById('themeToggleIcon').textContent = target === 'dark' ? '☀️' : '🌙';
@@ -5833,6 +5950,11 @@
       const root = document.documentElement;
       if (color === 'default') root.removeAttribute('data-color-theme');
       else root.setAttribute('data-color-theme', color);
+      try {
+        localStorage.setItem('grelaro-color-theme', color);
+      } catch (error) {
+        console.warn('Nu s-a putut salva culoarea temei.', error);
+      }
 
       document.querySelectorAll('.theme-swatch').forEach((swatch) => {
         swatch.setAttribute('aria-pressed', String(swatch.dataset.colorTheme === color));
@@ -5962,6 +6084,26 @@
     window.addEventListener('hashchange', syncSitePageFromLocation);
 
     window.addEventListener('DOMContentLoaded', () => {
+      let savedMode = 'dark';
+      let savedColor = 'blue';
+      try {
+        savedMode = localStorage.getItem('grelaro-theme-mode') || 'dark';
+        savedColor = localStorage.getItem('grelaro-color-theme') || 'blue';
+      } catch (error) {
+        console.warn('Nu s-au putut încărca preferințele de temă.', error);
+      }
+      document.documentElement.setAttribute('data-theme', savedMode);
+      document.documentElement.classList.toggle('dark', savedMode === 'dark');
+      if (savedColor === 'default') document.documentElement.removeAttribute('data-color-theme');
+      else document.documentElement.setAttribute('data-color-theme', savedColor);
+      document.querySelectorAll('.theme-swatch').forEach(swatch => {
+        swatch.setAttribute('aria-pressed', String(swatch.dataset.colorTheme === savedColor));
+      });
+      const themeToggle = document.getElementById('themeToggleBtn');
+      const actionLabel = savedMode === 'dark' ? 'Activează modul luminos' : 'Activează modul nocturn';
+      document.getElementById('themeToggleIcon').textContent = savedMode === 'dark' ? '☀️' : '🌙';
+      themeToggle.setAttribute('aria-label', actionLabel);
+      themeToggle.title = actionLabel;
       setSearchMode('omnia-dir');
       syncSitePageFromLocation();
     });
