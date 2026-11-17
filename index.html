@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Logotheca — Dicționar Latin-Român și Greacă Veche-Român</title>
+  <title>GreLaRo — Dicționar Latin-Român și Greacă Veche-Român</title>
   <meta name="description" content="Dicționar clasic de latină-română și greacă veche-română, cu forme flexionare, citate din autori clasici, trimiteri filologice și căutare automată.">
   <meta name="keywords" content="dicționar latin român, dicționar greacă veche, filologie clasică, Gaffiot, LSJ, traduceri latină, greacă veche">
 
-  <meta property="og:title" content="Logotheca — Dicționar online">
+  <meta property="og:title" content="GreLaRo — Dicționar online">
   <meta property="og:description" content="Lexicon clasic cu citate, trimiteri și definiții în limba română.">
   <meta property="og:type" content="website">
   
@@ -416,14 +416,15 @@
     .entry-favorite-button {
       display: grid;
       place-items: center;
-      width: 2.7rem;
-      height: 2.7rem;
+      width: 2.55rem;
+      height: 2.55rem;
       flex: 0 0 auto;
       border: 1px solid var(--border-color);
       border-radius: 10px;
       background: var(--bg-page);
       color: var(--text-muted);
-      font: 700 1.55rem/1 var(--font-body);
+      font: 400 1.35rem/1 "Segoe UI Symbol", "Arial Unicode MS", serif;
+      -webkit-text-stroke: 0.35px currentColor;
       cursor: pointer;
     }
 
@@ -432,6 +433,7 @@
       border-color: var(--border-accent);
       color: var(--crimson);
       background: var(--gold-light);
+      text-shadow: 0 1px 3px color-mix(in srgb, var(--crimson) 18%, transparent);
     }
 
     .entry-header-actions {
@@ -841,8 +843,8 @@
     .texts-browse-card-favorite {
       display: grid;
       place-items: center;
-      width: 2.5rem;
-      height: 2.5rem;
+      width: 2.35rem;
+      height: 2.35rem;
       flex: 0 0 auto;
       align-self: center;
       margin: 0 0.65rem 0 0.25rem;
@@ -850,7 +852,8 @@
       border-radius: 10px;
       background: var(--bg-page);
       color: var(--text-muted);
-      font: 700 1.45rem/1 var(--font-body);
+      font: 400 1.28rem/1 "Segoe UI Symbol", "Arial Unicode MS", serif;
+      -webkit-text-stroke: 0.35px currentColor;
       cursor: pointer;
     }
 
@@ -859,6 +862,7 @@
       border-color: var(--border-accent);
       background: var(--gold-light);
       color: var(--crimson);
+      text-shadow: 0 1px 3px color-mix(in srgb, var(--crimson) 18%, transparent);
     }
 
     .texts-browse-card-title,
@@ -2355,7 +2359,7 @@
   <header>
     <div class="header-inner">
       <div class="logo-block" onclick="resetToHome()">
-        <span class="site-title">LOGOTHECA</span>
+        <span class="site-title">GreLaRo</span>
         <span class="site-subtitle">Dicționar · Texte</span>
       </div>
       <div class="header-controls">
@@ -2586,6 +2590,7 @@
   <script>
     let currentMode = 'omnia-dir';
     const remoteDictionaryCache = new Map();
+    const loadedDictionaryTargets = new Set();
     let searchRequestId = 0;
     const lexiconData = Object.create(null);
     const recentSearchStorageKey = 'dic-ionar-online-recent-searches';
@@ -2669,7 +2674,7 @@
       textsFooter.hidden = !showingTexts;
       pageNavigationLink.href = showingTexts ? '#dictionar' : '#texte';
       pageNavigationLabel.textContent = showingTexts ? 'Dicționar' : 'Texte';
-      document.title = showingTexts ? 'Texte clasice — Logotheca' : dictionaryPageTitle;
+      document.title = showingTexts ? 'Texte clasice — GreLaRo' : dictionaryPageTitle;
 
       if (showingTexts && !textDatabaseLoaded) loadTextDatabase();
     }
@@ -4081,8 +4086,9 @@
 
       return fileLetters.map(fileLetter => ({
         language,
+        fileLetter,
         path: language === 'gr'
-          ? 'data/litere/gr/dictionar_ALPHA.jsonl'
+          ? `data/litere/gr/${encodeURIComponent(fileLetter)}.jsonl`
           : `data/litere/lat/${encodeURIComponent(fileLetter)}.json`
       }));
     }
@@ -4175,11 +4181,13 @@
         if (!Array.isArray(entries)) {
           throw new TypeError('Fișierul dicționarului nu conține intrări valide.');
         }
+        if (loadedDictionaryTargets.has(target.path)) return true;
         for (const [lemma, entry] of entries) {
           if (!Object.prototype.hasOwnProperty.call(lexiconData, lemma)) {
             lexiconData[lemma] = normalizeRemoteEntry(lemma, entry, target.language);
           }
         }
+        loadedDictionaryTargets.add(target.path);
         return true;
       } catch (error) {
         remoteDictionaryCache.delete(target.path);
