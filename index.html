@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GreLaRo — Dicționar Latin-Român și Greacă Veche-Român</title>
+  <title>GrecLaRo — Dicționar Latin-Român și Greacă Veche-Român</title>
   <meta name="description" content="Dicționar clasic de latină-română și greacă veche-română, cu forme flexionare, citate din autori clasici, trimiteri filologice și căutare automată.">
   <meta name="keywords" content="dicționar latin român, dicționar greacă veche, filologie clasică, Gaffiot, LSJ, traduceri latină, greacă veche">
 
-  <meta property="og:title" content="GreLaRo — Dicționar online">
+  <meta property="og:title" content="GrecLaRo — Dicționar online">
   <meta property="og:description" content="Lexicon clasic cu citate, trimiteri și definiții în limba română.">
   <meta property="og:type" content="website">
   
@@ -1119,8 +1119,14 @@
     }
 
     .texts-collection-card {
-      min-height: 5.5rem;
+      min-height: 6.25rem;
       border-color: var(--border-accent);
+      grid-column: auto;
+    }
+
+    .texts-directory-list[data-level="collections"] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 1.25rem;
     }
 
     .texts-collection-card .texts-browse-card-title {
@@ -2845,7 +2851,7 @@
   <header>
     <div class="header-inner">
       <div class="logo-block" onclick="resetToHome()">
-        <span class="site-title">GreLaRo</span>
+        <span class="site-title">GrecLaRo</span>
         <span class="site-subtitle">Dicționar · Texte</span>
       </div>
       <div class="header-controls">
@@ -3186,7 +3192,7 @@
       textsFooter.hidden = !showingTexts;
       pageNavigationLink.href = showingTexts ? '#dictionar' : '#texte';
       pageNavigationLabel.textContent = showingTexts ? '📖 Dicționar' : '📖 Texte';
-      document.title = showingTexts ? 'Texte clasice — GreLaRo' : dictionaryPageTitle;
+      document.title = showingTexts ? 'Texte clasice — GrecLaRo' : 'GrecLaRo — Dicționar Latin-Român și Greacă Veche-Român';
 
       if (showingTexts && !textCatalogLoaded) loadTextCatalog();
     }
@@ -3404,7 +3410,7 @@
         })
         .filter(chapter => chapter.text);
 
-      const numberedDivisions = allElements(body, 'div')
+      const numberedCandidates = allElements(body, 'div')
         .filter(section => {
           const number = section.getAttribute('n');
           const hasChildDivision = Array.from(section.children)
@@ -3415,8 +3421,14 @@
             && (section.getAttribute('subtype') === 'section'
               || section.getAttribute('subtype') === 'poem'
               || /^\d+(?:[.:]\d+)*$/.test(number));
-        })
-        .map(section => {
+        });
+      const numberedLabelCounts = numberedCandidates.reduce((counts, section) => {
+        const number = section.getAttribute('n');
+        counts.set(number, (counts.get(number) || 0) + 1);
+        return counts;
+      }, new Map());
+      const numberedDivisions = numberedCandidates
+        .map((section, index) => {
           const chapterParagraphs = allElements(section, 'p')
             .map(cleanTextContent)
             .filter(Boolean);
@@ -3429,8 +3441,11 @@
             .find(child => child.localName === 'head');
           const headingText = heading ? cleanTextContent(heading) : '';
           const chapterText = (chapterParagraphs.length ? chapterParagraphs : chapterLines);
+          const sourceNumber = section.getAttribute('n');
           return {
-            number: section.getAttribute('n'),
+            number: numberedLabelCounts.get(sourceNumber) > 1
+              ? String(index + 1)
+              : sourceNumber,
             heading: headingText,
             paragraphs: chapterText,
             text: chapterText.join('\n\n')
@@ -3438,15 +3453,25 @@
         })
         .filter(chapter => chapter.text);
       let chapters = chapterDivisions.length
-        ? chapterDivisions
-        : sectionDivisions.length
-          ? sectionDivisions
+          ? chapterDivisions
           : milestoneDivisions.length
             ? milestoneDivisions
-            : numberedDivisions;
+            : sectionDivisions.length
+              ? sectionDivisions
+              : numberedDivisions;
       const fallbackContent = paragraphs.length ? paragraphs : lines;
       if (!chapters.length && fallbackContent.length) {
         chapters = [{ number: '1', heading: '', paragraphs: fallbackContent, text: fallbackContent.join('\n\n') }];
+      }
+      const chapterNumberCounts = chapters.reduce((counts, chapter) => {
+        counts.set(chapter.number, (counts.get(chapter.number) || 0) + 1);
+        return counts;
+      }, new Map());
+      if ([...chapterNumberCounts.values()].some(count => count > 1)) {
+        chapters = chapters.map((chapter, index) => ({
+          ...chapter,
+          number: String(index + 1)
+        }));
       }
       const text = chapters.map(chapter => chapter.text).join('\n\n')
         || cleanTextContent(body);
@@ -4073,6 +4098,7 @@
       renderTextBreadcrumbs();
 
       if (textNavigation.level === 'collections') {
+        textsDirectoryList.dataset.level = 'collections';
         textLanguageGroups.forEach(group => {
           const authors = new Set(textCatalog
             .filter(entry => entry.languageGroup === group.id)
@@ -4089,6 +4115,7 @@
         return;
       }
 
+      textsDirectoryList.dataset.level = textNavigation.level;
       const group = textLanguageGroups.find(item => item.id === textNavigation.languageGroup);
       const groupRecords = textCatalog.filter(entry => entry.languageGroup === textNavigation.languageGroup);
       if (!group || !groupRecords.length) {
@@ -6019,7 +6046,7 @@
       document.getElementById('siteMenuMain').hidden = false;
       document.getElementById('appearanceMenu').hidden = true;
     }
-
+acp
     function setColorTheme(color) {
       const root = document.documentElement;
       if (color === 'default') root.removeAttribute('data-color-theme');
