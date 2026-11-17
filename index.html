@@ -2749,6 +2749,9 @@
       const paragraphs = allElements(body, 'p')
         .map(paragraph => paragraph.textContent.replace(/\s+/g, ' ').trim())
         .filter(Boolean);
+      const lines = allElements(body, 'l')
+        .map(line => line.textContent.replace(/\s+/g, ' ').trim())
+        .filter(Boolean);
       const title = elementText(firstElement(xml, 'title'));
       const author = elementText(firstElement(xml, 'author'));
       const source = elementText(firstElement(xml, 'authority'));
@@ -2765,26 +2768,39 @@
       const numberedDivisions = allElements(body, 'div')
         .filter(section => {
           const number = section.getAttribute('n');
-          return section.getAttribute('subtype') === 'section'
-            || (number && /^\d+(?:[.:]\d+)*$/.test(number));
+          const hasChildDivision = Array.from(section.children)
+            .some(child => child.localName === 'div' || child.tagName === 'div');
+          const hasTextContent = allElements(section, 'p').length > 0
+            || allElements(section, 'l').length > 0;
+          return number && hasTextContent && !hasChildDivision
+            && (section.getAttribute('subtype') === 'section'
+              || section.getAttribute('subtype') === 'poem'
+              || /^\d+(?:[.:]\d+)*$/.test(number));
         })
         .map(section => {
           const chapterParagraphs = allElements(section, 'p')
             .map(paragraph => paragraph.textContent.replace(/\s+/g, ' ').trim())
             .filter(Boolean);
+          const chapterLines = chapterParagraphs.length
+            ? []
+            : allElements(section, 'l')
+              .map(line => line.textContent.replace(/\s+/g, ' ').trim())
+              .filter(Boolean);
           const heading = Array.from(section.children)
             .find(child => child.localName === 'head')?.textContent?.replace(/\s+/g, ' ').trim() || '';
+          const chapterText = (chapterParagraphs.length ? chapterParagraphs : chapterLines);
           return {
             number: section.getAttribute('n'),
             heading,
-            paragraphs: chapterParagraphs,
-            text: chapterParagraphs.join('\n\n')
+            paragraphs: chapterText,
+            text: chapterText.join('\n\n')
           };
         })
         .filter(chapter => chapter.text);
       let chapters = numberedDivisions;
-      if (!chapters.length && paragraphs.length) {
-        chapters = [{ number: '1', heading: '', paragraphs, text: paragraphs.join('\n\n') }];
+      const fallbackContent = paragraphs.length ? paragraphs : lines;
+      if (!chapters.length && fallbackContent.length) {
+        chapters = [{ number: '1', heading: '', paragraphs: fallbackContent, text: fallbackContent.join('\n\n') }];
       }
       const text = chapters.map(chapter => chapter.text).join('\n\n')
         || body.textContent.replace(/\s+/g, ' ').trim();
