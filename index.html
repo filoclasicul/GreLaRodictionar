@@ -3538,8 +3538,17 @@
         name: 'Aristotel',
         years: '384–322 î.Hr.'
       },
+      Aristofan: {
+        name: 'Aristofan',
+        image: 'assets/authors/aristophanes.jpg',
+        alt: 'Bustul lui Aristofan',
+        years: 'c. 446–386 î.Hr.',
+        description: 'Dramaturg atenian, cel mai cunoscut reprezentant al comediei vechi grecești. Comediile sale satirizează viața politică, societatea și cultura Atenei.'
+      },
       Ovidiu: {
         name: 'Ovidiu',
+        image: 'assets/authors/ovid.jpg',
+        alt: 'Gravură cu Ovidiu',
         years: '43 î.Hr.–17/18 d.Hr.'
       }
     };
@@ -3553,7 +3562,16 @@
         if (!profiles || typeof profiles !== 'object' || Array.isArray(profiles)) {
           throw new TypeError('Profilurile autorilor nu au formatul așteptat.');
         }
-        authorProfiles = { ...authorProfiles, ...profiles };
+        const fallbackProfiles = authorProfiles;
+        authorProfiles = { ...fallbackProfiles, ...profiles };
+        Object.entries(profiles).forEach(([key, profile]) => {
+          if (!profile?.image && fallbackProfiles[key]?.image) {
+            authorProfiles[key] = {
+              ...authorProfiles[key],
+              image: fallbackProfiles[key].image
+            };
+          }
+        });
       } catch (error) {
         console.warn('Nu s-au putut încărca profilurile externe ale autorilor.', error);
       }
