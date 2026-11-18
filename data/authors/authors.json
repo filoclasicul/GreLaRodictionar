@@ -29,6 +29,13 @@
     "years": "384–322 î.Hr.",
     "description": "Filosof și cercetător grec, discipol al lui Platon și fondator al școlii peripatetice."
   },
+  "Aristofan": {
+    "name": "Aristofan",
+    "image": "assets/authors/aristophanes.jpg",
+    "alt": "Bustul lui Aristofan",
+    "years": "c. 446–386 î.Hr.",
+    "description": "Dramaturg atenian, cel mai cunoscut reprezentant al comediei vechi grecești. Comediile sale satirizează viața politică, societatea și cultura Atenei."
+  },
   "Ovidiu": {
     "name": "Ovidiu",
     "image": "assets/authors/ovid.jpg",
