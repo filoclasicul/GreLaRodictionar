@@ -1149,12 +1149,23 @@
     }
 
     .daily-selection-card {
+      position: relative;
       min-width: 0;
-      padding: 1rem;
+      min-height: 12rem;
+      display: flex;
+      flex-direction: column;
+      padding: 1.15rem 1.15rem 3.25rem;
       border: 1px solid var(--border-color);
-      border-radius: 14px;
+      border-radius: 16px;
       background: var(--bg-card);
-      box-shadow: var(--shadow-sm);
+      box-shadow: 0 8px 24px rgba(30, 38, 58, 0.08);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .daily-selection-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-accent);
+      box-shadow: 0 12px 28px rgba(30, 38, 58, 0.12);
     }
 
     .daily-selection-card h3 {
@@ -1214,11 +1225,49 @@
       font: 1rem/1.7 var(--font-title);
     }
 
+    .daily-text-link {
+      width: 100%;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      line-height: inherit;
+      text-align: left;
+      cursor: pointer;
+      transition: color 0.18s ease;
+    }
+
+    .daily-text-link:hover,
+    .daily-text-link:focus-visible {
+      color: var(--crimson);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.18em;
+      outline: none;
+    }
+
     .daily-selection-attribution {
       margin: 0.8rem 0 0;
       color: var(--text-muted);
       font-size: 0.82rem;
       text-align: right;
+    }
+
+    .daily-attribution-link {
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--crimson);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .daily-attribution-link:hover,
+    .daily-attribution-link:focus-visible {
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+      outline: none;
     }
 
     .daily-selection-status {
@@ -1233,6 +1282,41 @@
 
     .texts-daily-selections {
       margin-top: 1.25rem;
+    }
+
+    .daily-card-refresh {
+      position: absolute;
+      right: 0.85rem;
+      bottom: 0.75rem;
+      width: 2.35rem;
+      height: 2.35rem;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border-accent);
+      border-radius: 50%;
+      background: var(--gold-light);
+      color: var(--crimson);
+      box-shadow: 0 4px 12px rgba(30, 38, 58, 0.12);
+      cursor: pointer;
+      font-size: 1.05rem;
+      line-height: 1;
+      transition: transform 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .daily-card-refresh:hover {
+      transform: rotate(-12deg) translateY(-1px);
+      background: var(--bg-card);
+      box-shadow: 0 6px 16px rgba(30, 38, 58, 0.16);
+    }
+
+    .daily-card-refresh:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+
+    .daily-card-refresh.is-loading span {
+      display: inline-block;
+      animation: feature-refresh-spin 0.8s linear infinite;
     }
 
     .texts-browse-card-detail {
@@ -2258,21 +2342,7 @@
     }
 
     .feature-refresh-button {
-      position: fixed;
-      right: 1.25rem;
-      bottom: 5.1rem;
-      z-index: 150;
-      width: 3.25rem;
-      height: 3.25rem;
-      display: grid;
-      place-items: center;
-      border: 1px solid var(--border-color);
-      border-radius: 50%;
-      background: var(--bg-card);
-      color: var(--crimson);
-      box-shadow: var(--shadow-md);
-      cursor: pointer;
-      transition: transform 0.2s, background-color 0.2s;
+      display: none;
     }
 
     .feature-refresh-button:hover {
@@ -3242,21 +3312,6 @@
     </svg>
   </button>
 
-  <button
-    class="feature-refresh-button"
-    id="featureRefreshButton"
-    type="button"
-    aria-label="Reîmprospătează selecțiile aleatorii"
-    title="Reîmprospătează selecțiile aleatorii"
-    onclick="refreshFeaturedContent()"
-    hidden
-  >
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M20 7v5h-5M4 17v-5h5"></path>
-      <path d="M5.6 9a7 7 0 0 1 11.6-2L20 12M4 12l2.8 5a7 7 0 0 0 11.6-2"></path>
-    </svg>
-  </button>
-
   <dialog class="feedback-dialog" id="feedbackDialog" aria-labelledby="feedbackTitle">
     <div class="feedback-header">
       <div>
@@ -3312,7 +3367,6 @@
     const dictionaryDailyCards = document.getElementById('dictionaryDailyCards');
     const textsDailySection = document.getElementById('textsDailySection');
     const textsDailyCards = document.getElementById('textsDailyCards');
-    const featureRefreshButton = document.getElementById('featureRefreshButton');
     const textsSearchForm = document.getElementById('textsSearchForm');
     const textsSearchInput = document.getElementById('textsSearchInput');
     const textsSearchStatus = document.getElementById('textsSearchStatus');
@@ -3405,10 +3459,6 @@
       document.title = showingTexts ? 'Texte clasice — GrecLaRo' : 'GrecLaRo — Dicționar Latin-Român și Greacă Veche-Român';
 
       if (showingTexts && !textCatalogLoaded) loadTextCatalog();
-      if (!showingTexts && !showingFavoritesPage && !document.getElementById('searchInput').value.trim()) {
-        ensureDictionaryHighlights();
-      }
-      updateFeatureRefreshVisibility();
     }
 
     function navigateToSitePage(page) {
@@ -3418,14 +3468,7 @@
     }
 
     function updateFeatureRefreshVisibility() {
-      const showingTexts = window.location.hash === '#texte';
-      const visible = showingTexts
-        ? !showingTextFavoritesPage
-          && textNavigation.level === 'collections'
-          && textsSearchResults.hidden
-        : !showingFavoritesPage
-          && !document.getElementById('searchInput').value.trim();
-      featureRefreshButton.hidden = !visible;
+      return;
     }
 
     function randomItem(items) {
@@ -3440,6 +3483,31 @@
       const excerpt = characters.slice(0, limit).join('');
       const lastSpace = excerpt.lastIndexOf(' ');
       return `${excerpt.slice(0, lastSpace > limit * 0.65 ? lastSpace : limit).trimEnd()}…`;
+    }
+
+    function completeTextExcerpt(value, preferredLimit = 220, maximumLimit = 480) {
+      const text = String(value ?? '').replace(/\s+/g, ' ').trim();
+      if (!text) return '';
+      if (Array.from(text).length <= preferredLimit) return text;
+
+      const punctuation = /[.!?;··](?:["”»'\)]*)?(?:\s|$)/gu;
+      let match;
+      let preferredMatch = null;
+      let firstLaterMatch = null;
+
+      while ((match = punctuation.exec(text)) !== null) {
+        const end = punctuation.lastIndex;
+        if (end <= preferredLimit) preferredMatch = end;
+        if (!firstLaterMatch && end > preferredLimit && end <= maximumLimit) firstLaterMatch = end;
+        if (end > maximumLimit) break;
+      }
+
+      if (preferredMatch) return text.slice(0, preferredMatch).trim();
+      if (firstLaterMatch) return text.slice(0, firstLaterMatch).trim();
+
+      const excerpt = Array.from(text).slice(0, preferredLimit).join('');
+      const lastSpace = excerpt.lastIndexOf(' ');
+      return `${excerpt.slice(0, lastSpace > preferredLimit * 0.65 ? lastSpace : preferredLimit).trimEnd()}…`;
     }
 
     function decodeDictionaryText(value) {
@@ -3495,9 +3563,35 @@
       return selected;
     }
 
-    function createDailyMessageCard(title, message, isError = false) {
+    function createDailyCardRefreshButton(label, refreshAction) {
+      const button = document.createElement('button');
+      button.className = 'daily-card-refresh';
+      button.type = 'button';
+      button.setAttribute('aria-label', label);
+      button.title = label;
+      const emoji = document.createElement('span');
+      emoji.setAttribute('aria-hidden', 'true');
+      emoji.textContent = '🔄';
+      button.appendChild(emoji);
+      button.addEventListener('click', async event => {
+        event.stopPropagation();
+        if (button.disabled) return;
+        button.disabled = true;
+        button.classList.add('is-loading');
+        try {
+          await refreshAction();
+        } finally {
+          button.disabled = false;
+          button.classList.remove('is-loading');
+        }
+      });
+      return button;
+    }
+
+    function createDailyMessageCard(title, message, isError = false, refreshAction = null, dataLanguage = null) {
       const card = document.createElement('article');
       card.className = 'daily-selection-card';
+      if (dataLanguage) card.dataset.dailyLanguage = dataLanguage;
       const heading = document.createElement('h3');
       heading.textContent = title;
       const status = document.createElement('p');
@@ -3506,12 +3600,16 @@
       status.setAttribute('role', 'status');
       if (isError) status.dataset.state = 'error';
       card.append(heading, status);
+      if (refreshAction) {
+        card.appendChild(createDailyCardRefreshButton(`Reîmprospătează ${title}`, refreshAction));
+      }
       return card;
     }
 
     function createDailyWordCard(language, entry) {
       const card = document.createElement('article');
       card.className = 'daily-selection-card';
+      card.dataset.dailyLanguage = language;
       const table = document.createElement('table');
       table.className = 'daily-selection-table';
       const caption = document.createElement('caption');
@@ -3547,6 +3645,10 @@
       addRow('Etimologie', truncateFeaturedText(decodeDictionaryText(entry.etym), 180));
       table.appendChild(body);
       card.appendChild(table);
+      card.appendChild(createDailyCardRefreshButton(
+        `Reîmprospătează cuvântul ${language === 'gr' ? 'grecesc' : 'latin'}`,
+        () => refreshDictionaryHighlight(language)
+      ));
       return card;
     }
 
@@ -3560,14 +3662,37 @@
       renderEntry(lemma);
     }
 
+    async function refreshDictionaryHighlight(language) {
+      const currentCard = dictionaryDailyCards.querySelector(`[data-daily-language="${language}"]`);
+      try {
+        const catalog = await loadDictionaryCatalog();
+        const entry = await chooseRandomDictionaryEntry(language, catalog);
+        const nextCard = createDailyWordCard(language, entry);
+        if (currentCard?.isConnected) currentCard.replaceWith(nextCard);
+        else dictionaryDailyCards.appendChild(nextCard);
+      } catch (error) {
+        console.error(`Nu s-a putut reîmprospăta cuvântul pentru ${language}.`, error);
+        const title = language === 'gr' ? 'Greacă veche' : 'Latină';
+        const nextCard = createDailyMessageCard(
+          title,
+          'Nu s-a putut încărca un cuvânt. Reîncearcă.',
+          true,
+          () => refreshDictionaryHighlight(language),
+          language
+        );
+        if (currentCard?.isConnected) currentCard.replaceWith(nextCard);
+        else dictionaryDailyCards.appendChild(nextCard);
+      }
+    }
+
     async function refreshDictionaryHighlights(force = false) {
       if (dictionaryDailyLoadPromise) return dictionaryDailyLoadPromise;
       if (dictionaryDailyLoaded && !force) return;
 
       dictionaryDailySection.hidden = false;
       dictionaryDailyCards.replaceChildren(
-        createDailyMessageCard('Greacă veche', 'Se alege un cuvânt…'),
-        createDailyMessageCard('Latină', 'Se alege un cuvânt…')
+        createDailyMessageCard('Greacă veche', 'Se alege un cuvânt…', false, () => refreshDictionaryHighlight('gr'), 'gr'),
+        createDailyMessageCard('Latină', 'Se alege un cuvânt…', false, () => refreshDictionaryHighlight('lat'), 'lat')
       );
       const request = (async () => {
         let results;
@@ -3592,7 +3717,9 @@
             : createDailyMessageCard(
               result.language === 'gr' ? 'Greacă veche' : 'Latină',
               'Nu s-a putut încărca un cuvânt. Reîncearcă.',
-              true
+              true,
+              () => refreshDictionaryHighlight(result.language),
+              result.language
             )
         ));
         dictionaryDailyLoaded = results.every(result => Boolean(result.entry));
@@ -3602,23 +3729,6 @@
         await request;
       } finally {
         if (dictionaryDailyLoadPromise === request) dictionaryDailyLoadPromise = null;
-      }
-    }
-
-    function ensureDictionaryHighlights() {
-      if (!dictionaryDailyLoaded) refreshDictionaryHighlights();
-    }
-
-    async function refreshFeaturedContent() {
-      if (featureRefreshButton.disabled) return;
-      featureRefreshButton.disabled = true;
-      featureRefreshButton.classList.add('is-loading');
-      try {
-        if (window.location.hash === '#texte') await refreshTextHighlights(true);
-        else await refreshDictionaryHighlights(true);
-      } finally {
-        featureRefreshButton.disabled = false;
-        featureRefreshButton.classList.remove('is-loading');
       }
     }
 
@@ -4042,10 +4152,12 @@
       const normalizedText = normalizeTextSearch(entry.text);
       const matchPosition = query ? normalizedText.indexOf(normalizeTextSearch(query)) : -1;
       const start = matchPosition > 120 ? matchPosition - 120 : 0;
-      const end = Math.min(entry.text.length, start + 320);
+      const end = Math.min(entry.text.length, start + 480);
+      const excerptText = entry.text.slice(start, end);
       const excerpt = document.createElement('p');
       excerpt.className = 'texts-result-excerpt';
-      excerpt.textContent = `${start > 0 ? '…' : ''}${entry.text.slice(start, end)}${end < entry.text.length ? '…' : ''}`;
+      const completeExcerpt = completeTextExcerpt(excerptText);
+      excerpt.textContent = `${start > 0 ? '…' : ''}${completeExcerpt}${end < entry.text.length && !/[.!?;··]\s*$/.test(completeExcerpt) ? '…' : ''}`;
       card.append(title, meta);
       if (attribution) card.appendChild(attribution);
       card.appendChild(excerpt);
@@ -4616,7 +4728,6 @@
           card.classList.add('texts-collection-card');
           textsDirectoryList.appendChild(card);
         });
-        ensureTextHighlights();
         return;
       }
 
@@ -5190,10 +5301,11 @@
         previousTextSelections[languageGroup] =
           `${document.path}:${selected.chapter.number}:${selected.paragraph}`;
         return {
-          text: truncateFeaturedText(selected.paragraph),
+          text: completeTextExcerpt(selected.paragraph),
           author: document.author,
           title: document.title,
-          chapter: selected.chapter
+          chapter: selected.chapter,
+          record: document
         };
       }
 
@@ -5206,20 +5318,83 @@
     function createTextHighlightCard(languageGroup, selection) {
       const card = document.createElement('article');
       card.className = 'daily-selection-card';
+      card.dataset.dailyLanguage = languageGroup;
       const heading = document.createElement('h3');
       heading.textContent = languageGroup === 'gr' ? 'Greacă veche' : 'Latină';
       const quote = document.createElement('blockquote');
       quote.className = 'daily-selection-quote';
-      quote.textContent = selection.text;
+      const quoteLink = document.createElement('button');
+      quoteLink.type = 'button';
+      quoteLink.className = 'daily-text-link';
+      quoteLink.textContent = selection.text;
+      quoteLink.setAttribute('aria-label', `Deschide textul „${selection.title}”, ${selection.chapter.heading || `capitolul ${selection.chapter.number}`}`);
+      quoteLink.addEventListener('click', () => openHighlightedText(selection));
+      quote.appendChild(quoteLink);
       const attribution = document.createElement('p');
       attribution.className = 'daily-selection-attribution';
       const chapterLabel = selection.chapter.heading
         ? ` — ${selection.chapter.heading}`
         : ` — capitolul ${selection.chapter.number}`;
-      attribution.textContent = [selection.author, selection.title].filter(Boolean).join(' · ')
-        + chapterLabel;
+      const attributionText = [selection.author, selection.title].filter(Boolean).join(' · ');
+      if (attributionText) {
+        const attributionLink = document.createElement('button');
+        attributionLink.type = 'button';
+        attributionLink.className = 'daily-attribution-link';
+        attributionLink.textContent = attributionText;
+        attributionLink.setAttribute('aria-label', `Deschide textul de bază „${selection.title}”`);
+        attributionLink.addEventListener('click', () => openHighlightedText(selection));
+        attribution.append(attributionLink);
+      }
+      attribution.append(document.createTextNode(chapterLabel));
       card.append(heading, quote, attribution);
+      card.appendChild(createDailyCardRefreshButton(
+        `Reîmprospătează fragmentul din ${languageGroup === 'gr' ? 'greacă veche' : 'latină'}`,
+        () => refreshTextHighlight(languageGroup)
+      ));
       return card;
+    }
+
+    function openHighlightedText(selection) {
+      const record = selection.record;
+      if (!record?.chapters?.length) return;
+
+      showingTextFavoritesPage = false;
+      navigateToSitePage('texts');
+      textNavigation = {
+        level: 'chapter',
+        languageGroup: record.languageGroup,
+        author: record.author,
+        work: record.title,
+        volume: String(record.volume)
+      };
+      activeTextChapter = { record, chapter: selection.chapter };
+      renderTextBrowser();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function refreshTextHighlight(languageGroup) {
+      const currentCard = textsDailyCards.querySelector(`[data-daily-language="${languageGroup}"]`);
+      try {
+        if (!textCatalogLoaded && !await loadTextCatalog()) {
+          throw new Error('Catalogul textelor nu este disponibil.');
+        }
+        const selection = await chooseRandomTextExcerpt(languageGroup);
+        const nextCard = createTextHighlightCard(languageGroup, selection);
+        if (currentCard?.isConnected) currentCard.replaceWith(nextCard);
+        else textsDailyCards.appendChild(nextCard);
+      } catch (error) {
+        console.error(`Nu s-a putut reîmprospăta fragmentul pentru ${languageGroup}.`, error);
+        const title = languageGroup === 'gr' ? 'Greacă veche' : 'Latină';
+        const nextCard = createDailyMessageCard(
+          title,
+          'Nu s-a putut încărca un fragment. Reîncearcă.',
+          true,
+          () => refreshTextHighlight(languageGroup),
+          languageGroup
+        );
+        if (currentCard?.isConnected) currentCard.replaceWith(nextCard);
+        else textsDailyCards.appendChild(nextCard);
+      }
     }
 
     async function refreshTextHighlights(force = false) {
@@ -5228,8 +5403,8 @@
 
       textsDailySection.hidden = textNavigation.level !== 'collections' || showingTextFavoritesPage;
       textsDailyCards.replaceChildren(
-        createDailyMessageCard('Greacă veche', 'Se caută un fragment…'),
-        createDailyMessageCard('Latină', 'Se caută un fragment…')
+        createDailyMessageCard('Greacă veche', 'Se caută un fragment…', false, () => refreshTextHighlight('gr'), 'gr'),
+        createDailyMessageCard('Latină', 'Se caută un fragment…', false, () => refreshTextHighlight('lat'), 'lat')
       );
       const request = (async () => {
         const results = await Promise.all(['gr', 'lat'].map(async languageGroup => {
@@ -5247,7 +5422,9 @@
             : createDailyMessageCard(
               result.languageGroup === 'gr' ? 'Greacă veche' : 'Latină',
               'Nu s-a putut încărca un fragment. Reîncearcă.',
-              true
+              true,
+              () => refreshTextHighlight(result.languageGroup),
+              result.languageGroup
             )
         ));
         textsDailyLoaded = results.every(result => Boolean(result.selection));
@@ -5259,10 +5436,6 @@
       } finally {
         if (textsDailyLoadPromise === request) textsDailyLoadPromise = null;
       }
-    }
-
-    function ensureTextHighlights() {
-      if (!textsDailyLoaded) refreshTextHighlights();
     }
 
     async function loadTextDatabase() {
@@ -6838,6 +7011,8 @@
       themeToggle.title = actionLabel;
       setSearchMode('omnia-dir');
       syncSitePageFromLocation();
+      refreshDictionaryHighlights();
+      if (textNavigation.level === 'collections') refreshTextHighlights();
     });
   </script>
 </body>
