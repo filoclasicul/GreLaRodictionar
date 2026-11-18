@@ -1197,29 +1197,41 @@
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
+      border: 2px solid var(--border-accent);
+      border-radius: 12px;
+      background: var(--bg-card);
       font-size: 0.92rem;
       line-height: 1.55;
       overflow-wrap: anywhere;
+      box-shadow: 0 5px 16px rgba(30, 38, 58, 0.07);
+      overflow: hidden;
     }
 
     .daily-selection-table caption {
-      padding: 0 0 0.65rem;
+      padding: 0.12rem 0.15rem 0.68rem;
       color: var(--text-main);
       font: 700 1.12rem/1.25 var(--font-title);
       text-align: left;
+      caption-side: top;
     }
 
     .daily-selection-table th,
     .daily-selection-table td {
       padding: 0.58rem 0.6rem;
+      border-right: 1px solid var(--border-color);
       border-top: 1px solid var(--border-color);
       text-align: left;
       vertical-align: top;
     }
 
+    .daily-selection-table th:last-child,
+    .daily-selection-table td:last-child {
+      border-right: 0;
+    }
+
     .daily-selection-table tbody tr:last-child th,
     .daily-selection-table tbody tr:last-child td {
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 0;
     }
 
     .daily-selection-table th {
@@ -1227,6 +1239,26 @@
       background: var(--bg-page);
       color: var(--text-muted);
       font-weight: 700;
+    }
+
+    .daily-selection-table tbody tr:first-child th {
+      border-top-left-radius: 8px;
+    }
+
+    .daily-selection-table tbody tr:first-child td {
+      border-top-right-radius: 8px;
+    }
+
+    .daily-selection-table tbody tr:last-child th {
+      border-bottom-left-radius: 8px;
+    }
+
+    .daily-selection-table tbody tr:last-child td {
+      border-bottom-right-radius: 8px;
+    }
+
+    .daily-selection-table tbody tr:nth-child(even) td {
+      background: color-mix(in srgb, var(--gold-light) 22%, transparent);
     }
 
     .daily-word-link {
@@ -1275,10 +1307,32 @@
     }
 
     .daily-selection-attribution {
-      margin: 0.8rem 0 0;
+      margin: 0;
       color: var(--text-muted);
       font-size: 0.82rem;
-      text-align: right;
+      line-height: 1.35;
+      text-align: left;
+    }
+
+    .daily-text-footer {
+      position: absolute;
+      right: 0.85rem;
+      bottom: 0.72rem;
+      left: 1.2rem;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .daily-text-footer .daily-selection-attribution {
+      min-width: 0;
+      max-width: calc(100% - 7.5rem);
+    }
+
+    .daily-text-footer .daily-card-refresh {
+      position: static;
+      flex: 0 0 auto;
     }
 
     .daily-attribution-link {
@@ -2752,6 +2806,11 @@
         width: 4.7rem;
       }
 
+      .daily-text-footer {
+        right: 1rem;
+        left: 1rem;
+      }
+
       .texts-author-card .texts-browse-card-inner {
         grid-template-rows: clamp(9rem, 38vw, 12.5rem) 1fr;
       }
@@ -3318,7 +3377,7 @@
     <section class="texts-search-panel" aria-label="Căutare în texte">
       <label class="texts-search-label" for="textsSearchInput">Caută în colecția de texte</label>
       <form class="texts-search-row" id="textsSearchForm" role="search">
-        <input class="texts-search-input" id="textsSearchInput" name="q" type="search" autocomplete="off" placeholder="De exemplu, un cuvânt sau un autor">
+        <input class="texts-search-input" id="textsSearchInput" name="q" type="search" autocomplete="off" placeholder="Caută după autor, operă sau cuvânt">
         <button class="texts-search-submit" type="submit">🔎 Caută</button>
       </form>
       <div class="texts-autocomplete" id="textsAutocomplete" role="listbox" aria-label="Recomandări în texte">
@@ -5232,11 +5291,7 @@
       const folderAuthor = pathParts[1] || '';
       const profile = authorProfiles[folderAuthor];
       const author = profile?.name || folderAuthor;
-      const filename = pathParts[pathParts.length - 1].replace(/\.(xml|json)$/i, '');
-      const title = reference.title || filename
-        .replace(/[._-]+/g, ' ')
-        .replace(/\b\w/g, character => character.toUpperCase())
-        .trim();
+      const title = typeof reference.title === 'string' ? reference.title.trim() : '';
       return {
         ...reference,
         title,
@@ -5272,6 +5327,22 @@
           }
 
           textCatalog = references.map(getTextCatalogEntry);
+          const hydratedDocuments = await Promise.allSettled(
+            references.map(reference => loadAndCacheTextDocument(reference))
+          );
+          hydratedDocuments.forEach((result, index) => {
+            if (result.status !== 'fulfilled') return;
+            const document = result.value;
+            textCatalog[index] = {
+              ...textCatalog[index],
+              title: document.title,
+              author: document.author || textCatalog[index].author,
+              language: document.language,
+              chapters: document.chapters,
+              text: document.text
+            };
+          });
+          textCatalog = textCatalog.filter(entry => entry.title);
           textCatalogLoaded = true;
           if (!textCatalog.length) throw new Error('Manifestul de texte nu conține documente.');
           renderTextsSearchResults(textsSearchInput.value);
@@ -5410,11 +5481,13 @@
         attribution.append(attributionLink);
       }
       attribution.append(document.createTextNode(chapterLabel));
-      card.append(heading, quote, attribution);
-      card.appendChild(createDailyCardRefreshButton(
+      const footer = document.createElement('div');
+      footer.className = 'daily-text-footer';
+      footer.append(attribution, createDailyCardRefreshButton(
         `Reîmprospătează fragmentul din ${languageGroup === 'gr' ? 'greacă veche' : 'latină'}`,
         () => refreshTextHighlight(languageGroup)
       ));
+      card.append(heading, quote, footer);
       return card;
     }
 
