@@ -685,7 +685,10 @@ main {
 
 .texts-autocomplete-item {
   width: 100%;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   padding: 0.75rem 0.8rem;
   border: 0;
   border-bottom: 1px solid var(--border-color);
@@ -694,6 +697,17 @@ main {
   font: 700 1rem var(--font-title);
   text-align: left;
   cursor: pointer;
+}
+
+.texts-autocomplete-label {
+  min-width: 0;
+}
+
+.texts-autocomplete-type {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  font: 500 0.75rem var(--font-body);
+  white-space: nowrap;
 }
 
 .texts-autocomplete-item:last-child {

@@ -66,6 +66,14 @@ function matchesTextTitleSearch(title, query, languageGroup) {
     && normalizedTitle.includes(normalizeTextSearch(transliterateGreekInput(query).text));
 }
 
+function matchesTextTitlePrefix(title, query, languageGroup) {
+  const normalizedTitle = normalizeTextSearch(title);
+  const normalizedQuery = normalizeTextSearch(query);
+  if (normalizedTitle.startsWith(normalizedQuery)) return true;
+  return languageGroup === 'gr'
+    && normalizedTitle.startsWith(normalizeTextSearch(transliterateGreekInput(query).text));
+}
+
 function validateTextDatabase(data) {
   if (!Array.isArray(data)) {
     throw new TypeError('Baza de texte trebuie să fie o listă.');
@@ -1365,7 +1373,7 @@ async function updateTextAutocomplete(query) {
     const author = entry.author?.trim();
     const work = entry.title?.trim();
 
-    if (author && normalizeTextSearch(author).includes(normalizedQuery)) {
+    if (author && normalizeTextSearch(author).startsWith(normalizedQuery)) {
       const key = `author\0${entry.languageGroup}\0${author}`;
       if (!seen.has(key)) {
         seen.add(key);
@@ -1373,7 +1381,7 @@ async function updateTextAutocomplete(query) {
       }
     }
 
-    if (work && matchesTextTitleSearch(work, query, entry.languageGroup)) {
+    if (work && matchesTextTitlePrefix(work, query, entry.languageGroup)) {
       const key = `work\0${entry.languageGroup}\0${author}\0${work}`;
       if (!seen.has(key)) {
         seen.add(key);
@@ -1387,11 +1395,7 @@ async function updateTextAutocomplete(query) {
     }
   });
 
-  suggestions.sort((left, right) => {
-    const leftStarts = normalizeTextSearch(left.label).startsWith(normalizedQuery) ? 0 : 1;
-    const rightStarts = normalizeTextSearch(right.label).startsWith(normalizedQuery) ? 0 : 1;
-    return leftStarts - rightStarts || left.label.localeCompare(right.label, 'ro');
-  });
+  suggestions.sort((left, right) => left.label.localeCompare(right.label, 'ro'));
 
   const visibleSuggestions = suggestions.slice(0, 5);
   if (!visibleSuggestions.length) {
@@ -1404,7 +1408,13 @@ async function updateTextAutocomplete(query) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'texts-autocomplete-item';
-    button.textContent = suggestion.label;
+    const label = document.createElement('span');
+    label.className = 'texts-autocomplete-label';
+    label.textContent = suggestion.label;
+    const type = document.createElement('span');
+    type.className = 'texts-autocomplete-type';
+    type.textContent = suggestion.type === 'author' ? 'Autor' : 'Text';
+    button.append(label, type);
     button.addEventListener('click', () => openTextSuggestion(suggestion));
     textsAutocompleteList.appendChild(button);
   });
