@@ -2,6 +2,7 @@ let currentMode = 'latin-dir';
 const dictionaryTextDecoder = document.createElement('div');
 let greekTypingSource = '';
 let greekOutputToSource = [0];
+let pendingGreekInput = null;
 const greekTransliterationMap = {
   th: 'θ', q: 'θ', ph: 'φ', ch: 'χ', kh: 'χ', ps: 'ψ', ks: 'ξ',
   h: 'η', a: 'α', b: 'β', g: 'γ', d: 'δ', e: 'ε', z: 'ζ',
@@ -349,6 +350,7 @@ function showTextFavoritesPage() {
 
 function clearSearch() {
   searchRequestId++;
+  pendingGreekInput = null;
   const input = document.getElementById('searchInput');
   input.value = '';
   document.getElementById('autocompleteDropdown').classList.remove('active');
@@ -523,6 +525,7 @@ function setKeyboardLanguage(language) {
 
 function insertChar(char) {
   const input = document.getElementById('searchInput');
+  pendingGreekInput = null;
   const start = input.selectionStart;
   const end = input.selectionEnd;
   input.value = input.value.substring(0, start) + char + input.value.substring(end);
@@ -686,7 +689,10 @@ const clickActions = {
 
 const searchInput = document.getElementById('searchInput');
 searchInput.addEventListener('beforeinput', handleGreekTransliterationInput);
-searchInput.addEventListener('input', () => handleSearchInput(searchInput.value));
+searchInput.addEventListener('input', () => {
+  applyPendingGreekTransliterationInput(searchInput);
+  handleSearchInput(searchInput.value);
+});
 searchInput.addEventListener('keydown', handleSearchKeydown);
 
 textsChapterView.addEventListener('copy', event => {

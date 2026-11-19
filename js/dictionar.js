@@ -814,6 +814,7 @@ async function navigateDictionary(lemmaKey, direction, button) {
 
 function setSearchMode(mode) {
   const previousMode = currentMode;
+  pendingGreekInput = null;
   currentMode = mode;
   const allModeButtons = ['omnia-dir', 'greek-dir', 'latin-dir', 'omnia-rev', 'greek-rev', 'latin-rev'];
   allModeButtons.forEach(m => {
@@ -910,6 +911,58 @@ function synchronizeGreekTypingInput(input) {
   }
 }
 
+function getGreekTypingEdit(inputType, insertedText, selectionStart, selectionEnd, inputLength) {
+  let sourceStart = greekOutputToSource[selectionStart] ?? greekTypingSource.length;
+  let sourceEnd = greekOutputToSource[selectionEnd] ?? greekTypingSource.length;
+
+  if (inputType.startsWith('insert')) {
+    if (insertedText === null || insertedText === undefined) return null;
+  } else if (inputType === 'deleteContentBackward' && selectionStart === selectionEnd) {
+    if (selectionStart === 0) return null;
+    sourceStart = greekOutputToSource[selectionStart - 1] ?? 0;
+  } else if (inputType === 'deleteContentForward' && selectionStart === selectionEnd) {
+    if (selectionEnd >= inputLength) return null;
+    sourceEnd = greekOutputToSource[selectionEnd + 1] ?? greekTypingSource.length;
+  } else if (!inputType.startsWith('delete') || selectionStart === selectionEnd) {
+    return null;
+  }
+
+  const nextSource = greekTypingSource.slice(0, sourceStart)
+    + (insertedText || '')
+    + greekTypingSource.slice(sourceEnd);
+  return {
+    source: nextSource,
+    caretSource: sourceStart + (insertedText || '').length
+  };
+}
+
+function applyGreekTypingEdit(input, edit) {
+  greekTypingSource = edit.source;
+  const convertedInput = transliterateGreekInput(greekTypingSource);
+  greekOutputToSource = convertedInput.outputToSource;
+  input.value = convertedInput.text;
+  const caretPosition = convertedInput.outputToSource.findIndex(offset => offset >= edit.caretSource);
+  const nextCaret = caretPosition < 0 ? input.value.length : caretPosition;
+  input.setSelectionRange(nextCaret, nextCaret);
+}
+
+function applyPendingGreekTransliterationInput(input) {
+  if (!pendingGreekInput) return;
+  const pendingInput = pendingGreekInput;
+  pendingGreekInput = null;
+  if (currentMode !== 'greek-dir') return;
+
+  const edit = getGreekTypingEdit(
+    pendingInput.inputType,
+    pendingInput.insertedText,
+    pendingInput.selectionStart,
+    pendingInput.selectionEnd,
+    pendingInput.inputLength
+  );
+  if (edit) applyGreekTypingEdit(input, edit);
+  else synchronizeGreekTypingInput(input);
+}
+
 function handleGreekTransliterationInput(event) {
   if (currentMode !== 'greek-dir') return;
 
@@ -917,38 +970,31 @@ function handleGreekTransliterationInput(event) {
   synchronizeGreekTypingInput(input);
   if (input.selectionStart === null || input.selectionEnd === null) return;
 
-  let selectionStart = input.selectionStart;
-  let selectionEnd = input.selectionEnd;
-  let sourceStart = greekOutputToSource[selectionStart] ?? greekTypingSource.length;
-  let sourceEnd = greekOutputToSource[selectionEnd] ?? greekTypingSource.length;
-  let insertedText = '';
+  const edit = {
+    inputType: event.inputType,
+    insertedText: event.data ?? event.dataTransfer?.getData('text/plain'),
+    selectionStart: input.selectionStart,
+    selectionEnd: input.selectionEnd,
+    inputLength: input.value.length
+  };
 
-  if (event.inputType.startsWith('insert')) {
-    insertedText = event.data ?? event.dataTransfer?.getData('text/plain');
-    if (insertedText === null || insertedText === undefined) return;
-  } else if (event.inputType === 'deleteContentBackward' && selectionStart === selectionEnd) {
-    if (selectionStart === 0) return;
-    sourceStart = greekOutputToSource[selectionStart - 1] ?? 0;
-  } else if (event.inputType === 'deleteContentForward' && selectionStart === selectionEnd) {
-    if (selectionEnd >= input.value.length) return;
-    sourceEnd = greekOutputToSource[selectionEnd + 1] ?? greekTypingSource.length;
-  } else if (!event.inputType.startsWith('delete') || selectionStart === selectionEnd) {
+  if (!event.cancelable) {
+    pendingGreekInput = edit;
     return;
   }
 
-  event.preventDefault();
-  const nextSource = greekTypingSource.slice(0, sourceStart)
-    + insertedText
-    + greekTypingSource.slice(sourceEnd);
-  const caretSource = sourceStart + insertedText.length;
-  greekTypingSource = nextSource;
+  pendingGreekInput = null;
+  const typingEdit = getGreekTypingEdit(
+    edit.inputType,
+    edit.insertedText,
+    edit.selectionStart,
+    edit.selectionEnd,
+    edit.inputLength
+  );
+  if (!typingEdit) return;
 
-  const convertedInput = transliterateGreekInput(greekTypingSource);
-  greekOutputToSource = convertedInput.outputToSource;
-  input.value = convertedInput.text;
-  const caretPosition = convertedInput.outputToSource.findIndex(offset => offset >= caretSource);
-  const nextCaret = caretPosition < 0 ? input.value.length : caretPosition;
-  input.setSelectionRange(nextCaret, nextCaret);
+  event.preventDefault();
+  applyGreekTypingEdit(input, typingEdit);
   handleSearchInput(input.value);
 }
 
