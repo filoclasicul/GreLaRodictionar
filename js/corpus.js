@@ -58,6 +58,14 @@ function normalizeTextSearch(value) {
     .trim();
 }
 
+function matchesTextTitleSearch(title, query, languageGroup) {
+  const normalizedTitle = normalizeTextSearch(title);
+  const normalizedQuery = normalizeTextSearch(query);
+  if (normalizedTitle.includes(normalizedQuery)) return true;
+  return languageGroup === 'gr'
+    && normalizedTitle.includes(normalizeTextSearch(transliterateGreekInput(query).text));
+}
+
 function validateTextDatabase(data) {
   if (!Array.isArray(data)) {
     throw new TypeError('Baza de texte trebuie să fie o listă.');
@@ -1365,7 +1373,7 @@ async function updateTextAutocomplete(query) {
       }
     }
 
-    if (work && normalizeTextSearch(work).includes(normalizedQuery)) {
+    if (work && matchesTextTitleSearch(work, query, entry.languageGroup)) {
       const key = `work\0${entry.languageGroup}\0${author}\0${work}`;
       if (!seen.has(key)) {
         seen.add(key);
@@ -1443,7 +1451,8 @@ async function renderTextsSearchResults(query) {
   }
   const matches = textDatabase.filter(entry => {
     const searchableContent = [entry.title, entry.author || '', entry.language || '', entry.text].join(' ');
-    return normalizeTextSearch(searchableContent).includes(normalizedQuery);
+    return normalizeTextSearch(searchableContent).includes(normalizedQuery)
+      || matchesTextTitleSearch(entry.title, query, entry.languageGroup);
   });
 
   if (!matches.length) {
