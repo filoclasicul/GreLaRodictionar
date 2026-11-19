@@ -427,10 +427,101 @@
     "volume": "3"
   },
   {
+    "path": "lat/Horatius/phi0893.phi001.perseus-lat2.xml",
+    "title": "Carmina",
+    "author": "Q. Horatius Flaccus",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Horatius/phi0893.phi002.perseus-lat2.xml",
+    "title": "Carmen Saeculare",
+    "author": "Q. Horatius Flaccus",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Horatius/phi0893.phi003.perseus-lat2.xml",
+    "title": "Epodon",
+    "author": "Q. Horatius Flaccus",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Horatius/phi0893.phi004.perseus-lat2.xml",
+    "title": "Satyrarum libri",
+    "author": "Q. Horatius Flaccus",
+    "language": "lat",
+    "volume": "2"
+  },
+  {
+    "path": "lat/Horatius/phi0893.phi005.perseus-lat2.xml",
+    "title": "Epistulae",
+    "author": "Q. Horatius Flaccus",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Horatius/phi0893.phi006.perseus-lat2.xml",
+    "title": "De Arte Poetica liber",
+    "author": "Q. Horatius Flaccus",
+    "language": "lat",
+    "volume": "2"
+  },
+  {
     "path": "lat/Ovidiu/phi0959.phi001.perseus-lat2.xml",
     "title": "Amores",
     "author": "P. Ovidius Naso",
     "language": "lat",
     "volume": "1"
+  },
+  {
+    "path": "lat/Vergilius/phi0690.phi001.perseus-lat2.xml",
+    "title": "Eclogues",
+    "author": "P. Vergilius Maro",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Vergilius/phi0690.phi002.perseus-lat2.xml",
+    "title": "Georgicon",
+    "author": "P. Vergilius Maro",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Vergilius/phi0690.phi003.perseus-lat2.xml",
+    "title": "Aeneid",
+    "author": "P. Vergilius Maro",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Liviu/phi0914.phi001.perseus-lat2.xml",
+    "title": "Ab urbe condita",
+    "author": "Titus Livius (Livy)",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Liviu/phi0914.phi001.perseus-lat3.xml",
+    "title": "Ab urbe condita, books 1-10, 21-30",
+    "author": "Titus Livius (Livy)",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Liviu/phi0914.phi001.perseus-lat4.xml",
+    "title": "Ab Urbe Condita, books 1-5, 8-10, 21-30, 43-45, with periochae 11-20",
+    "author": "Titus Livius (Livy)",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Liviu/phi0914.phi001.perseus-lat5.xml",
+    "title": "Ab urbe condita libri, erklärt von M. Weissenborn, books 31-45",
+    "author": "Titus Livius (Livy)",
+    "language": "lat",
+    "volume": "7.1"
   }
 ]

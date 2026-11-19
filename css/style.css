@@ -1449,6 +1449,8 @@ main {
   color: var(--text-main);
   font: 1rem/1.65 var(--font-title);
   text-wrap: pretty;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .daily-text-link {
@@ -1459,7 +1461,8 @@ main {
   color: inherit;
   font: inherit;
   line-height: inherit;
-  text-align: left;
+  text-align: justify;
+  text-justify: inter-word;
   cursor: pointer;
   transition: color 0.18s ease;
 }
@@ -2452,6 +2455,8 @@ main {
   margin-bottom: 0.6rem;
   font-size: 1.02rem;
   line-height: 1.75;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .definition-text,
@@ -2636,6 +2641,8 @@ main {
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 0.15rem;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .citation-trans {
@@ -2643,6 +2650,8 @@ main {
   font-style: italic;
   font-family: var(--font-quote);
   font-size: 0.95rem;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .citation-source {

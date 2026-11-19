@@ -1,3 +1,8 @@
+const TEXT_CHAPTER_RENDER_BATCH_SIZE = 40;
+let textNavigationLoadId = 0;
+let textDirectoryRenderId = 0;
+let textNavigationLoading = false;
+
 async function loadAuthorProfiles() {
   try {
     const response = await fetch('data/authors/authors.json', { cache: 'force-cache' });
@@ -167,12 +172,6 @@ function loadTeiText(reference, content) {
     throw new TypeError(`Fișierul ${reference.path} nu conține un text TEI complet.`);
   }
 
-  const paragraphs = allElements(body, 'p')
-    .map(cleanTextContent)
-    .filter(Boolean);
-  const lines = allElements(body, 'l')
-    .map(cleanTextContent)
-    .filter(Boolean);
   const title = elementText(firstElement(xml, 'title'));
   const author = elementText(firstElement(xml, 'author'));
   const source = elementText(firstElement(xml, 'authority'));
@@ -186,16 +185,21 @@ function loadTeiText(reference, content) {
   const languageGroup = reference.path.split('/')[0];
   const language = getTextLanguage(languageCode, languageGroup);
   const authorProfile = getTextAuthorProfile(reference);
-  const chapterDivisions = allElements(body, 'div')
+  const bodyDivisions = allElements(body, 'div');
+  const hasTextContent = element =>
+    element.getElementsByTagNameNS('*', 'p').length > 0
+    || element.getElementsByTagNameNS('*', 'l').length > 0
+    || element.getElementsByTagName('p').length > 0
+    || element.getElementsByTagName('l').length > 0;
+  const chapterDivisions = bodyDivisions
     .filter(section => {
       const subtype = section.getAttribute('subtype');
       const number = section.getAttribute('n');
+      if (subtype !== 'chapter' || !number) return false;
       const hasChildChapter = Array.from(section.children)
         .some(child => (child.localName === 'div' || child.tagName === 'div')
           && child.getAttribute('subtype') === 'chapter');
-      const hasTextContent = allElements(section, 'p').length > 0
-        || allElements(section, 'l').length > 0;
-      return subtype === 'chapter' && number && hasTextContent && !hasChildChapter;
+      return !hasChildChapter && hasTextContent(section);
     })
     .map((section, index) => {
       const chapterParagraphs = allElements(section, 'p')
@@ -218,121 +222,127 @@ function loadTeiText(reference, content) {
     })
     .filter(chapter => chapter.text);
 
-  const paragraphElements = allElements(body, 'p');
-  const milestones = allElements(body, 'milestone')
-    .filter(milestone =>
-      milestone.getAttribute('unit') === 'chapter'
-      && /^\d+(?:[.:]\d+)*$/.test(milestone.getAttribute('n') || '')
-    );
-  const milestoneDivisions = milestones.map((milestone, index) => {
-    const number = milestone.getAttribute('n');
-    const startParagraph = paragraphElements.findIndex(paragraph => paragraph.contains(milestone));
-    const nextMilestone = milestones[index + 1];
-    const endParagraph = nextMilestone
-      ? paragraphElements.findIndex(paragraph => paragraph.contains(nextMilestone))
-      : paragraphElements.length;
-    const paragraphs = paragraphElements
-      .slice(startParagraph >= 0 ? startParagraph : 0, endParagraph > startParagraph ? endParagraph : paragraphElements.length)
+  let chapters = chapterDivisions;
+  if (!chapters.length) {
+    const paragraphElements = allElements(body, 'p');
+    const milestones = allElements(body, 'milestone')
+      .filter(milestone =>
+        milestone.getAttribute('unit') === 'chapter'
+        && /^\d+(?:[.:]\d+)*$/.test(milestone.getAttribute('n') || '')
+      );
+    chapters = milestones.map((milestone, index) => {
+      const number = milestone.getAttribute('n');
+      const startParagraph = paragraphElements.findIndex(paragraph => paragraph.contains(milestone));
+      const nextMilestone = milestones[index + 1];
+      const endParagraph = nextMilestone
+        ? paragraphElements.findIndex(paragraph => paragraph.contains(nextMilestone))
+        : paragraphElements.length;
+      const chapterParagraphs = paragraphElements
+        .slice(startParagraph >= 0 ? startParagraph : 0, endParagraph > startParagraph ? endParagraph : paragraphElements.length)
+        .map(cleanTextContent)
+        .filter(Boolean);
+      return {
+        number,
+        heading: '',
+        paragraphs: chapterParagraphs,
+        text: chapterParagraphs.join('\n\n')
+      };
+    }).filter(chapter => chapter.text);
+
+    if (!chapters.length) {
+      chapters = bodyDivisions
+        .filter(section => {
+          if (section.getAttribute('subtype') !== 'section') return false;
+          if (!/^\d+(?:[.:]\d+)*$/.test(section.getAttribute('n') || '')) return false;
+          let parent = section.parentElement;
+          let nestedInDivision = false;
+          while (parent && parent !== body) {
+            if ((parent.localName === 'div' || parent.tagName === 'div')
+              && ['chapter', 'section', 'book'].includes(parent.getAttribute('subtype'))) {
+              nestedInDivision = true;
+              break;
+            }
+            parent = parent.parentElement;
+          }
+          return !nestedInDivision && hasTextContent(section);
+        })
+        .map(section => {
+          const sectionParagraphs = allElements(section, 'p')
+            .map(cleanTextContent)
+            .filter(Boolean);
+          const sectionLines = sectionParagraphs.length
+            ? []
+            : allElements(section, 'l')
+              .map(cleanTextContent)
+              .filter(Boolean);
+          const heading = Array.from(section.children)
+            .find(child => child.localName === 'head');
+          const chapterText = sectionParagraphs.length ? sectionParagraphs : sectionLines;
+          return {
+            number: section.getAttribute('n'),
+            heading: heading ? cleanTextContent(heading) : '',
+            paragraphs: chapterText,
+            text: chapterText.join('\n\n')
+          };
+        })
+        .filter(chapter => chapter.text);
+    }
+
+    if (!chapters.length) {
+      const numberedCandidates = bodyDivisions
+        .filter(section => {
+          const number = section.getAttribute('n');
+          const hasChildDivision = Array.from(section.children)
+            .some(child => child.localName === 'div' || child.tagName === 'div');
+          return number && !hasChildDivision && hasTextContent(section)
+            && (section.getAttribute('subtype') === 'section'
+              || section.getAttribute('subtype') === 'poem'
+              || /^\d+(?:[.:]\d+)*$/.test(number));
+        });
+      const numberedLabelCounts = numberedCandidates.reduce((counts, section) => {
+        const number = section.getAttribute('n');
+        counts.set(number, (counts.get(number) || 0) + 1);
+        return counts;
+      }, new Map());
+      chapters = numberedCandidates
+        .map((section, index) => {
+          const chapterParagraphs = allElements(section, 'p')
+            .map(cleanTextContent)
+            .filter(Boolean);
+          const chapterLines = chapterParagraphs.length
+            ? []
+            : allElements(section, 'l')
+              .map(cleanTextContent)
+              .filter(Boolean);
+          const heading = Array.from(section.children)
+            .find(child => child.localName === 'head');
+          const headingText = heading ? cleanTextContent(heading) : '';
+          const chapterText = chapterParagraphs.length ? chapterParagraphs : chapterLines;
+          const sourceNumber = section.getAttribute('n');
+          return {
+            number: numberedLabelCounts.get(sourceNumber) > 1
+              ? String(index + 1)
+              : sourceNumber,
+            heading: headingText,
+            paragraphs: chapterText,
+            text: chapterText.join('\n\n')
+          };
+        })
+        .filter(chapter => chapter.text);
+    }
+  }
+
+  if (!chapters.length) {
+    const paragraphs = allElements(body, 'p')
       .map(cleanTextContent)
       .filter(Boolean);
-    return {
-      number,
-      heading: '',
-      paragraphs,
-      text: paragraphs.join('\n\n')
-    };
-  }).filter(chapter => chapter.text);
-
-  const sectionDivisions = allElements(body, 'div')
-    .filter(section => {
-      if (section.getAttribute('subtype') !== 'section') return false;
-      if (!/^\d+(?:[.:]\d+)*$/.test(section.getAttribute('n') || '')) return false;
-      let parent = section.parentElement;
-      let nestedInDivision = false;
-      while (parent && parent !== body) {
-        if ((parent.localName === 'div' || parent.tagName === 'div')
-          && ['chapter', 'section', 'book'].includes(parent.getAttribute('subtype'))) {
-          nestedInDivision = true;
-          break;
-        }
-        parent = parent.parentElement;
-      }
-      return !nestedInDivision
-        && (allElements(section, 'p').length > 0 || allElements(section, 'l').length > 0);
-    })
-    .map(section => {
-      const sectionParagraphs = allElements(section, 'p')
-        .map(cleanTextContent)
-        .filter(Boolean);
-      const sectionLines = sectionParagraphs.length
-        ? []
-        : allElements(section, 'l')
-          .map(cleanTextContent)
-          .filter(Boolean);
-      const heading = Array.from(section.children)
-        .find(child => child.localName === 'head');
-      const chapterText = sectionParagraphs.length ? sectionParagraphs : sectionLines;
-      return {
-        number: section.getAttribute('n'),
-        heading: heading ? cleanTextContent(heading) : '',
-        paragraphs: chapterText,
-        text: chapterText.join('\n\n')
-      };
-    })
-    .filter(chapter => chapter.text);
-
-  const numberedCandidates = allElements(body, 'div')
-    .filter(section => {
-      const number = section.getAttribute('n');
-      const hasChildDivision = Array.from(section.children)
-        .some(child => child.localName === 'div' || child.tagName === 'div');
-      const hasTextContent = allElements(section, 'p').length > 0
-        || allElements(section, 'l').length > 0;
-      return number && hasTextContent && !hasChildDivision
-        && (section.getAttribute('subtype') === 'section'
-          || section.getAttribute('subtype') === 'poem'
-          || /^\d+(?:[.:]\d+)*$/.test(number));
-    });
-  const numberedLabelCounts = numberedCandidates.reduce((counts, section) => {
-    const number = section.getAttribute('n');
-    counts.set(number, (counts.get(number) || 0) + 1);
-    return counts;
-  }, new Map());
-  const numberedDivisions = numberedCandidates
-    .map((section, index) => {
-      const chapterParagraphs = allElements(section, 'p')
-        .map(cleanTextContent)
-        .filter(Boolean);
-      const chapterLines = chapterParagraphs.length
-        ? []
-        : allElements(section, 'l')
-          .map(cleanTextContent)
-          .filter(Boolean);
-      const heading = Array.from(section.children)
-        .find(child => child.localName === 'head');
-      const headingText = heading ? cleanTextContent(heading) : '';
-      const chapterText = (chapterParagraphs.length ? chapterParagraphs : chapterLines);
-      const sourceNumber = section.getAttribute('n');
-      return {
-        number: numberedLabelCounts.get(sourceNumber) > 1
-          ? String(index + 1)
-          : sourceNumber,
-        heading: headingText,
-        paragraphs: chapterText,
-        text: chapterText.join('\n\n')
-      };
-    })
-    .filter(chapter => chapter.text);
-  let chapters = chapterDivisions.length
-      ? chapterDivisions
-      : milestoneDivisions.length
-        ? milestoneDivisions
-        : sectionDivisions.length
-          ? sectionDivisions
-          : numberedDivisions;
-  const fallbackContent = paragraphs.length ? paragraphs : lines;
-  if (!chapters.length && fallbackContent.length) {
-    chapters = [{ number: '1', heading: '', paragraphs: fallbackContent, text: fallbackContent.join('\n\n') }];
+    const lines = allElements(body, 'l')
+      .map(cleanTextContent)
+      .filter(Boolean);
+    const fallbackContent = paragraphs.length ? paragraphs : lines;
+    if (fallbackContent.length) {
+      chapters = [{ number: '1', heading: '', paragraphs: fallbackContent, text: fallbackContent.join('\n\n') }];
+    }
   }
   const chapterNumberCounts = chapters.reduce((counts, chapter) => {
     counts.set(chapter.number, (counts.get(chapter.number) || 0) + 1);
@@ -608,7 +618,10 @@ function addTextBreadcrumb(label, action = null) {
 
 function getTextWorks(author, languageGroup = textNavigation.languageGroup) {
   const works = new Map();
-  textDatabase.filter(entry => entry.author === author && entry.languageGroup === languageGroup).forEach(entry => {
+  const records = (textCatalog.length ? textCatalog : textDatabase)
+    .filter(entry => entry.author === author && entry.languageGroup === languageGroup)
+    .map(entry => textDocumentCache.get(entry.path) || entry);
+  records.forEach(entry => {
     if (!works.has(entry.title)) works.set(entry.title, []);
     works.get(entry.title).push(entry);
   });
@@ -749,18 +762,21 @@ function toggleTextFavorite(favorite, button = null) {
 }
 
 function showTextCollections() {
+  cancelTextNavigationLoad();
   textNavigation = { level: 'collections', languageGroup: '', author: '', work: '', volume: '' };
   activeTextChapter = null;
   renderTextBrowser();
 }
 
 function showTextAuthors(languageGroup) {
+  cancelTextNavigationLoad();
   textNavigation = { level: 'authors', languageGroup, author: '', work: '', volume: '' };
   activeTextChapter = null;
   renderTextBrowser();
 }
 
-async function showAuthorWorks(author) {
+function showAuthorWorks(author) {
+  cancelTextNavigationLoad();
   textNavigation = {
     level: 'works',
     languageGroup: textNavigation.languageGroup,
@@ -769,20 +785,32 @@ async function showAuthorWorks(author) {
     volume: ''
   };
   activeTextChapter = null;
-  await loadTextDocumentsForAuthor(author, textNavigation.languageGroup);
+  setTextsSearchStatus('');
   renderTextBrowser();
 }
 
 async function showWorkVolumes(work) {
+  const requestId = ++textNavigationLoadId;
+  textNavigationLoading = true;
   textNavigation.work = work;
   textNavigation.volume = '';
   textNavigation.level = 'volumes';
   activeTextChapter = null;
-  const workRecords = textCatalog.filter(entry =>
+  renderTextBrowser();
+  const workReferences = textCatalog.filter(entry =>
     entry.languageGroup === textNavigation.languageGroup
     && entry.author === textNavigation.author
+    && entry.title === work
   );
-  await loadTextDocuments(workRecords);
+  setTextsSearchStatus('Se încarcă capitolele operei…');
+  const loadedRecords = await loadTextDocuments(workReferences);
+  if (requestId !== textNavigationLoadId) return;
+  textNavigationLoading = false;
+  if (!loadedRecords.length) {
+    renderTextBrowser();
+    return;
+  }
+
   const selectedWork = getTextWorks(textNavigation.author, textNavigation.languageGroup)
     .find(item => item.title === work);
   const volumes = getTextVolumes(selectedWork?.records || []);
@@ -794,6 +822,7 @@ async function showWorkVolumes(work) {
 }
 
 function showVolumeChapters(volumeKey) {
+  cancelTextNavigationLoad();
   textNavigation.volume = volumeKey;
   textNavigation.level = 'chapters';
   activeTextChapter = null;
@@ -801,9 +830,15 @@ function showVolumeChapters(volumeKey) {
 }
 
 function showTextChapter(record, chapter) {
+  cancelTextNavigationLoad();
   activeTextChapter = { record, chapter };
   textNavigation.level = 'chapter';
   renderTextBrowser();
+}
+
+function cancelTextNavigationLoad() {
+  textNavigationLoadId += 1;
+  textNavigationLoading = false;
 }
 
 function goBackInTextHierarchy() {
@@ -1011,6 +1046,7 @@ function renderTextChapter() {
 }
 
 function renderTextBrowser() {
+  const renderId = ++textDirectoryRenderId;
   if (showingTextFavoritesPage) {
     renderTextFavoritesPage();
     return;
@@ -1171,10 +1207,14 @@ function renderTextBrowser() {
     getTextWorks(textNavigation.author, textNavigation.languageGroup).forEach(work => {
       const volumes = getTextVolumes(work.records);
       const chapterCount = work.records.reduce((count, record) => count + record.chapters.length, 0);
+      const chaptersLoaded = work.records.every(record => record.chapters.length > 0);
       const detail = [
         work.records[0].language,
-        `${chapterCount} ${chapterCount === 1 ? 'capitol' : 'capitole'}`,
-        volumes.length > 1 ? `${volumes.length} volume` : ''
+        chaptersLoaded
+          ? `${chapterCount} ${chapterCount === 1 ? 'capitol' : 'capitole'}`
+          : volumes.length > 1
+            ? `${volumes.length} volume · deschide pentru capitole`
+            : 'Deschide pentru capitole'
       ].filter(Boolean).join(' · ');
       textsDirectoryList.appendChild(createTextBrowseCard(
         work.title,
@@ -1199,6 +1239,21 @@ function renderTextBrowser() {
 
   if (textNavigation.level === 'volumes') {
     textsDirectoryTitle.textContent = `Volume — ${textNavigation.work}`;
+    if (textNavigationLoading) {
+      const loadingMessage = document.createElement('p');
+      loadingMessage.className = 'texts-empty-state';
+      loadingMessage.setAttribute('role', 'status');
+      loadingMessage.textContent = 'Se încarcă capitolele operei…';
+      textsDirectoryList.appendChild(loadingMessage);
+      return;
+    }
+    if (!volumes.some(item => item.records.some(record => record.chapters.length))) {
+      const empty = document.createElement('p');
+      empty.className = 'texts-empty-state';
+      empty.textContent = 'Capitolele operei nu s-au putut încărca. Înapoi și încearcă din nou.';
+      textsDirectoryList.appendChild(empty);
+      return;
+    }
     volumes.forEach(volume => {
       const chapterCount = volume.records.reduce((count, record) => count + record.chapters.length, 0);
       textsDirectoryList.appendChild(createTextBrowseCard(
@@ -1227,10 +1282,18 @@ function renderTextBrowser() {
 
   if (textNavigation.level === 'chapters') {
     textsDirectoryTitle.textContent = `Capitole — ${volumes.length === 1 ? textNavigation.work : volume.label}`;
-    volume.records
+    const chapters = volume.records
       .flatMap(record => record.chapters.map(chapter => ({ record, chapter })))
-      .sort((left, right) => left.chapter.number.localeCompare(right.chapter.number, 'ro', { numeric: true }))
-      .forEach(({ record, chapter }) => {
+      .sort((left, right) => left.chapter.number.localeCompare(right.chapter.number, 'ro', { numeric: true }));
+    let nextChapterIndex = 0;
+    const renderChapterBatch = () => {
+      if (renderId !== textDirectoryRenderId
+        || textNavigation.level !== 'chapters'
+        || showingTextFavoritesPage) return;
+
+      const fragment = document.createDocumentFragment();
+      const batch = chapters.slice(nextChapterIndex, nextChapterIndex + TEXT_CHAPTER_RENDER_BATCH_SIZE);
+      batch.forEach(({ record, chapter }) => {
         const detail = chapter.heading || chapter.text.slice(0, 100);
         const favorite = createTextFavorite('chapter', {
           languageGroup: record.languageGroup,
@@ -1241,13 +1304,20 @@ function renderTextBrowser() {
           chapterNumber: String(chapter.number),
           title: `Capitolul ${chapter.number}${chapter.heading ? ` — ${chapter.heading}` : ''}`
         });
-        textsDirectoryList.appendChild(createTextBrowseCard(
+        fragment.appendChild(createTextBrowseCard(
           `Capitolul ${chapter.number}`,
           detail,
           () => showTextChapter(record, chapter),
           { favorite }
         ));
       });
+      textsDirectoryList.appendChild(fragment);
+      nextChapterIndex += batch.length;
+      if (nextChapterIndex < chapters.length) {
+        requestAnimationFrame(renderChapterBatch);
+      }
+    };
+    renderChapterBatch();
     return;
   }
 
@@ -1303,6 +1373,7 @@ function renderTextFavoritesPage() {
 }
 
 async function openTextFavorite(favorite) {
+  cancelTextNavigationLoad();
   showingTextFavoritesPage = false;
   navigateToSitePage('texts');
   setTextsSearchStatus('Se încarcă textele…');
@@ -1311,7 +1382,17 @@ async function openTextFavorite(favorite) {
     renderTextFavoritesPage();
     return;
   }
-  await loadTextDocumentsForAuthor(favorite.author, favorite.languageGroup);
+  const workReferences = textCatalog.filter(entry =>
+    entry.languageGroup === favorite.languageGroup
+    && entry.author === favorite.author
+    && entry.title === favorite.work
+  );
+  const loadedRecords = await loadTextDocuments(workReferences);
+  if (!loadedRecords.length) {
+    showingTextFavoritesPage = true;
+    renderTextFavoritesPage();
+    return;
+  }
 
   const work = getTextWorks(favorite.author, favorite.languageGroup)
     .find(item => item.title === favorite.work);
@@ -1600,16 +1681,6 @@ async function loadTextDocuments(references) {
   return references
     .map(reference => textDocumentCache.get(reference.path))
     .filter(Boolean);
-}
-
-async function loadTextDocumentsForAuthor(author, languageGroup) {
-  const references = textCatalog.filter(entry =>
-    entry.languageGroup === languageGroup
-    && entry.author === author
-  );
-  if (!references.length) return [];
-  setTextsSearchStatus('Se încarcă textele acestui autor…');
-  return loadTextDocuments(references);
 }
 
 async function chooseRandomTextExcerpt(languageGroup) {

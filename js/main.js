@@ -118,6 +118,27 @@ let authorProfiles = {
     image: 'assets/authors/ovid.jpg',
     alt: 'Gravură cu Ovidiu',
     years: '43 î.Hr.–17/18 d.Hr.'
+  },
+  Horatius: {
+    name: 'Horatius',
+    image: 'assets/authors/horatius.jpg',
+    alt: 'Statuia lui Horatius din Venosa',
+    years: '65–8 î.Hr.',
+    description: 'Poet liric roman cunoscut pentru Ode, Epode, Satire și Epistole; autor al Ars poetica.'
+  },
+  Vergilius: {
+    name: 'Vergil',
+    image: 'assets/authors/vergilius.jpg',
+    alt: 'Bustul lui Vergil',
+    years: '70–19 î.Hr.',
+    description: 'Poet roman, autorul Eneidei, Georgicelor și Bucolicelor.'
+  },
+  Liviu: {
+    name: 'Titus Livius',
+    image: 'assets/authors/livius.jpg',
+    alt: 'Bustul lui Titus Livius',
+    years: '59 î.Hr.–17 d.Hr.',
+    description: 'Istoric roman, autorul lucrării Ab urbe condita, o amplă istorie a Romei.'
   }
 };
 let activeTextChapter = null;
