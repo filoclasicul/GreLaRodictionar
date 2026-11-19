@@ -1797,6 +1797,16 @@ main {
   box-shadow: var(--shadow-md);
 }
 
+@media (max-width: 640px) {
+  .recent-search-wrap {
+    position: static;
+  }
+
+  .recent-search-dropdown {
+    right: calc(-0.9rem - 0.75rem);
+  }
+}
+
 .recent-search-dropdown[hidden] {
   display: none;
 }
@@ -1849,6 +1859,12 @@ main {
 
 .recent-search-item:last-child {
   border-bottom: 0;
+}
+
+.recent-search-query {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow-wrap: anywhere;
 }
 
 .recent-search-item:hover {
@@ -2848,6 +2864,7 @@ footer {
 
   .daily-selection-table th {
     width: 4.7rem;
+    white-space: nowrap;
   }
 
   .daily-text-footer {

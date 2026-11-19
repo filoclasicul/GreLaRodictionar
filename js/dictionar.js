@@ -324,6 +324,7 @@ function renderRecentSearches() {
     button.type = 'button';
 
     const query = document.createElement('span');
+    query.className = 'recent-search-query';
     query.textContent = item.query;
     const mode = document.createElement('span');
     mode.className = 'recent-search-mode';
