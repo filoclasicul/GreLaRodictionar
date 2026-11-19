@@ -961,6 +961,9 @@ function handleSearchInput(query) {
 
   showingFavoritesPage = false;
   updateHomeView(query);
+  document.getElementById('dictionaryDisplay')
+    .querySelectorAll('.dictionary-load-error')
+    .forEach(message => message.remove());
   if (currentMode.endsWith('-rev')) {
     document.getElementById('autocompleteDropdown').classList.remove('active');
     document.getElementById('dictionaryDisplay').innerHTML = '';
@@ -977,10 +980,11 @@ function handleSearchInput(query) {
   }).catch(error => {
     if (requestId !== searchRequestId || currentMode.endsWith('-rev')) return;
     const display = document.getElementById('dictionaryDisplay');
-    const message = document.createElement('p');
+    const message = display.querySelector('.dictionary-load-error')
+      || document.createElement('p');
     message.className = 'dictionary-load-error';
     message.textContent = error.message;
-    display.appendChild(message);
+    if (!message.isConnected) display.appendChild(message);
   });
 }
 

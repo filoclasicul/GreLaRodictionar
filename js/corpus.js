@@ -58,20 +58,24 @@ function normalizeTextSearch(value) {
     .trim();
 }
 
-function matchesTextTitleSearch(title, query, languageGroup) {
-  const normalizedTitle = normalizeTextSearch(title);
-  const normalizedQuery = normalizeTextSearch(query);
-  if (normalizedTitle.includes(normalizedQuery)) return true;
-  return languageGroup === 'gr'
-    && normalizedTitle.includes(normalizeTextSearch(transliterateGreekInput(query).text));
+function getTextSearchVariants(query, languageGroup) {
+  const variants = new Set([normalizeTextSearch(query)]);
+  if (languageGroup === 'gr') {
+    variants.add(normalizeTextSearch(transliterateGreekInput(query).text));
+  }
+  return [...variants].filter(Boolean);
+}
+
+function matchesTextSearch(text, query, languageGroup) {
+  const normalizedText = normalizeTextSearch(text);
+  return getTextSearchVariants(query, languageGroup)
+    .some(variant => normalizedText.includes(variant));
 }
 
 function matchesTextTitlePrefix(title, query, languageGroup) {
   const normalizedTitle = normalizeTextSearch(title);
-  const normalizedQuery = normalizeTextSearch(query);
-  if (normalizedTitle.startsWith(normalizedQuery)) return true;
-  return languageGroup === 'gr'
-    && normalizedTitle.startsWith(normalizeTextSearch(transliterateGreekInput(query).text));
+  return getTextSearchVariants(query, languageGroup)
+    .some(variant => normalizedTitle.startsWith(variant));
 }
 
 function validateTextDatabase(data) {
@@ -488,7 +492,9 @@ function createTextResultCard(entry, query) {
   meta.textContent = [entry.author, entry.language].filter(Boolean).join(' · ');
   const attribution = createTextAttribution(entry);
   const normalizedText = normalizeTextSearch(entry.text);
-  const matchPosition = query ? normalizedText.indexOf(normalizeTextSearch(query)) : -1;
+  const matchPosition = getTextSearchVariants(query, entry.languageGroup)
+    .map(variant => normalizedText.indexOf(variant))
+    .find(position => position >= 0) ?? -1;
   const start = matchPosition > 120 ? matchPosition - 120 : 0;
   const end = Math.min(entry.text.length, start + 480);
   const excerptText = entry.text.slice(start, end);
@@ -1461,8 +1467,7 @@ async function renderTextsSearchResults(query) {
   }
   const matches = textDatabase.filter(entry => {
     const searchableContent = [entry.title, entry.author || '', entry.language || '', entry.text].join(' ');
-    return normalizeTextSearch(searchableContent).includes(normalizedQuery)
-      || matchesTextTitleSearch(entry.title, query, entry.languageGroup);
+    return matchesTextSearch(searchableContent, query, entry.languageGroup);
   });
 
   if (!matches.length) {
