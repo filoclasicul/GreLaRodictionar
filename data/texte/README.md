@@ -6,12 +6,16 @@ Adaugă fișierele în `lat/<autor>/` sau `gr/<autor>/` și regenerează lista c
 node scripts/build-text-manifest.mjs
 ```
 
-Lista automată este scrisă în `texte.json`; puteți adăuga și manual orice cale relativă:
+Scriptul generează în `texte.json` calea și metadatele de catalog (titlu, autor, limbă și volum) pentru fiecare document. Documentele complete se încarcă doar când sunt necesare. Pentru o intrare adăugată manual, include metadatele pentru ca opera să apară corect în catalog și în recomandările de căutare:
 
 ```json
 [
   {
-    "path": "lat/Cicero/numele-textului.xml"
+    "path": "lat/Cicero/numele-textului.xml",
+    "title": "Titlul operei",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "1"
   }
 ]
 ```

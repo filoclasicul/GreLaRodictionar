@@ -36,6 +36,13 @@
     "years": "c. 446–386 î.Hr.",
     "description": "Dramaturg atenian, cel mai cunoscut reprezentant al comediei vechi grecești. Comediile sale satirizează viața politică, societatea și cultura Atenei."
   },
+  "Homer": {
+    "name": "Homer",
+    "image": "assets/authors/homer.jpg",
+    "alt": "Bustul lui Homer (Musei Capitolini, MC 557)",
+    "years": "tradițional, sec. VIII î.Hr.",
+    "description": "Poet epic al Greciei antice, căruia îi sunt atribuite în mod tradițional Iliada și Odiseea. Opera sa a influențat profund literatura și cultura greacă."
+  },
   "Ovidiu": {
     "name": "Ovidiu",
     "image": "assets/authors/ovid.jpg",
