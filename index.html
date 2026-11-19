@@ -29,7 +29,7 @@
       <div class="header-controls">
         <a class="site-page-link" id="pageNavigationLink" href="#texte">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22z"></path><path d="M4 5.5v16M8 7h8M8 11h8"></path></svg>
-          <span id="pageNavigationLabel">📖 Texte</span>
+          <span id="pageNavigationLabel">Texte</span>
         </a>
         <button
           class="theme-toggle"
@@ -125,7 +125,12 @@
             >
             <div class="search-actions">
               <button class="icon-btn" id="searchSubmitBtn" data-action="submit-search" title="Caută" aria-label="Caută" hidden>🔎</button>
-              <button class="icon-btn" type="button" data-action="clear-search" title="Șterge textul" aria-label="Șterge textul">⌫</button>
+              <button class="icon-btn search-clear-button" type="button" data-action="clear-search" title="Șterge textul" aria-label="Șterge textul">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <path d="m9 9 6 6m0-6-6 6"></path>
+                </svg>
+              </button>
               <div class="recent-search-wrap">
                 <button
                   class="icon-btn"
@@ -266,8 +271,8 @@
   <button
     class="feedback-launcher"
     type="button"
-    aria-label="Trimite un mesaj"
-    title="Trimite un mesaj"
+    aria-label="Lasă o recenzie sau raportează o problemă"
+    title="Lasă o recenzie sau raportează o problemă"
     data-action="open-feedback"
   >
     <svg viewBox="0 0 24 24" aria-hidden="true">

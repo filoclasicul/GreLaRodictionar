@@ -131,7 +131,7 @@ function syncSitePageFromLocation() {
   textsPage.hidden = !showingTexts;
   textsFooter.hidden = !showingTexts;
   pageNavigationLink.href = showingTexts ? '#dictionar' : '#texte';
-  pageNavigationLabel.textContent = showingTexts ? '📖 Dicționar' : '📖 Texte';
+  pageNavigationLabel.textContent = showingTexts ? 'Dicționar' : 'Texte';
   document.title = showingTexts ? 'Texte clasice — GrecLaRo' : 'GrecLaRo — Dicționar Latin-Român și Greacă Veche-Român';
 
   if (showingTexts) {
@@ -176,14 +176,11 @@ function createDailyCardRefreshButton(label, refreshAction) {
   button.type = 'button';
   button.setAttribute('aria-label', label);
   button.title = label;
-  button.innerHTML = `
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M20 11a8 8 0 0 0-14.7-4.3L3 9"></path>
-      <path d="M3 4v5h5"></path>
-      <path d="M4 13a8 8 0 0 0 14.7 4.3L21 15"></path>
-      <path d="M21 20v-5h-5"></path>
-    </svg>
-  `;
+  const icon = document.createElement('span');
+  icon.className = 'daily-card-refresh-icon';
+  icon.setAttribute('aria-hidden', 'true');
+  icon.textContent = '🎲';
+  button.appendChild(icon);
   const text = document.createElement('span');
   text.textContent = 'Schimbă';
   button.appendChild(text);
