@@ -54,15 +54,15 @@ export async function onRequestPost({ request, env }) {
     return jsonResponse({ error: 'Adresa de email introdusă nu este validă.' }, 400);
   }
 
-  const { RESEND_API_KEY, FEEDBACK_TO, RESEND_FROM_EMAIL } = env;
-  if (!RESEND_API_KEY || !FEEDBACK_TO || !RESEND_FROM_EMAIL) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = env;
+  if (!RESEND_API_KEY || !RESEND_FROM_EMAIL) {
     return jsonResponse({ error: 'Formularul nu este configurat încă. Încearcă din nou mai târziu.' }, 503);
   }
 
   const emailPayload = {
     from: RESEND_FROM_EMAIL,
-    to: [FEEDBACK_TO],
-    subject: 'Mesaj nou de pe Dicționar Online',
+    to: ['greclaro2026@gmail.com'],
+    subject: 'Mesaj nou de pe GrecLaRo',
     text: `Mesaj primit de la un vizitator:\n\n${message}${email ? `\n\nEmail pentru răspuns: ${email}` : ''}`,
     html: `<p>Mesaj primit de la un vizitator:</p><pre style="font: inherit; white-space: pre-wrap;">${escapeHtml(message)}</pre>${email ? `<p>Email pentru răspuns: <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>` : ''}`
   };

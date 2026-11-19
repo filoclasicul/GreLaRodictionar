@@ -1,6 +1,6 @@
 # Configurarea formularului de mesaje
 
-Formularul trimite emailuri printr-o funcție Cloudflare Pages și API-ul Resend. Adresa destinatarului și cheia API sunt citite numai pe server și nu sunt incluse în pagină.
+Formularul trimite emailuri printr-o funcție Cloudflare Pages și API-ul Resend. Destinatarul este configurat în funcția server-side, iar cheia API este citită doar din configurarea secretă Cloudflare; niciuna nu este inclusă în pagină.
 
 ## 1. Configurează Resend
 
@@ -15,10 +15,10 @@ Formularul trimite emailuri printr-o funcție Cloudflare Pages și API-ul Resend
 | Nume | Tip | Valoare |
 |---|---|---|
 | `RESEND_API_KEY` | Secret | Cheia API creată în Resend |
-| `FEEDBACK_TO` | Variable | Adresa ta de primire |
 | `RESEND_FROM_EMAIL` | Variable | Un expeditor de pe domeniul verificat, de exemplu `Dicționar <mesaje@domeniul-tău.ro>` |
 
 Nu pune cheia API în HTML, JavaScript public sau în repository.
+Mesajele formularului sunt livrate la `greclaro2026@gmail.com`; adresa este definită în funcția server-side.
 
 ## 3. Publică site-ul
 

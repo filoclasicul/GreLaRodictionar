@@ -1663,7 +1663,7 @@ async function chooseRandomTextExcerpt(languageGroup) {
 
 function createTextHighlightCard(languageGroup, selection) {
   const card = document.createElement('article');
-  card.className = 'daily-selection-card';
+  card.className = 'daily-selection-card daily-text-card';
   card.dataset.dailyLanguage = languageGroup;
   const heading = document.createElement('h3');
   heading.textContent = languageGroup === 'gr' ? 'Greacă veche' : 'Latină';

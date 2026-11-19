@@ -1360,6 +1360,16 @@ main {
   margin-top: 1.25rem;
 }
 
+.texts-daily-selections .daily-text-card {
+  padding-bottom: 1.2rem;
+}
+
+.texts-daily-selections .daily-text-footer {
+  position: static;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
 .daily-card-refresh {
   position: absolute;
   right: 0.85rem;
