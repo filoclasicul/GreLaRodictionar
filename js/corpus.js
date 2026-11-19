@@ -1,4 +1,5 @@
 const TEXT_CHAPTER_RENDER_BATCH_SIZE = 40;
+const TEXT_BROWSER_HISTORY_KEY = 'grelaroTextBrowser';
 let textNavigationLoadId = 0;
 let textDirectoryRenderId = 0;
 let textNavigationLoading = false;
@@ -765,6 +766,7 @@ function showTextCollections() {
   cancelTextNavigationLoad();
   textNavigation = { level: 'collections', languageGroup: '', author: '', work: '', volume: '' };
   activeTextChapter = null;
+  pushTextBrowserHistoryState();
   renderTextBrowser();
 }
 
@@ -772,6 +774,7 @@ function showTextAuthors(languageGroup) {
   cancelTextNavigationLoad();
   textNavigation = { level: 'authors', languageGroup, author: '', work: '', volume: '' };
   activeTextChapter = null;
+  pushTextBrowserHistoryState();
   renderTextBrowser();
 }
 
@@ -786,6 +789,7 @@ function showAuthorWorks(author) {
   };
   activeTextChapter = null;
   setTextsSearchStatus('');
+  pushTextBrowserHistoryState();
   renderTextBrowser();
 }
 
@@ -796,6 +800,7 @@ async function showWorkVolumes(work) {
   textNavigation.volume = '';
   textNavigation.level = 'volumes';
   activeTextChapter = null;
+  pushTextBrowserHistoryState();
   renderTextBrowser();
   const workReferences = textCatalog.filter(entry =>
     entry.languageGroup === textNavigation.languageGroup
@@ -815,24 +820,26 @@ async function showWorkVolumes(work) {
     .find(item => item.title === work);
   const volumes = getTextVolumes(selectedWork?.records || []);
   if (volumes.length === 1) {
-    showVolumeChapters(volumes[0].key);
+    showVolumeChapters(volumes[0].key, true);
     return;
   }
   renderTextBrowser();
 }
 
-function showVolumeChapters(volumeKey) {
+function showVolumeChapters(volumeKey, replaceHistory = false) {
   cancelTextNavigationLoad();
   textNavigation.volume = volumeKey;
   textNavigation.level = 'chapters';
   activeTextChapter = null;
+  pushTextBrowserHistoryState(replaceHistory);
   renderTextBrowser();
 }
 
-function showTextChapter(record, chapter) {
+function showTextChapter(record, chapter, replaceHistory = false) {
   cancelTextNavigationLoad();
   activeTextChapter = { record, chapter };
   textNavigation.level = 'chapter';
+  pushTextBrowserHistoryState(replaceHistory);
   renderTextBrowser();
 }
 
@@ -856,8 +863,146 @@ function goBackInTextHierarchy() {
       .find(work => work.title === textNavigation.work)?.records || [];
     if (getTextVolumes(records).length === 1) showAuthorWorks(textNavigation.author);
     else showWorkVolumes(textNavigation.work);
+  } else if (textNavigation.level === 'chapter') {
+    showVolumeChapters(textNavigation.volume);
   }
 }
+
+function getTextBrowserHistorySnapshot() {
+  return {
+    textNavigation: { ...textNavigation },
+    activeChapter: activeTextChapter ? {
+      recordPath: activeTextChapter.record.path,
+      chapterNumber: String(activeTextChapter.chapter.number)
+    } : null,
+    showingTextFavoritesPage,
+    showingSearchResults: !textsSearchResults.hidden && !showingTextFavoritesPage,
+    searchQuery: textsSearchInput.value
+  };
+}
+
+function pushTextBrowserHistoryState(replace = false) {
+  if (window.location.hash !== '#texte') return;
+
+  const currentState = window.history.state;
+  const stateObject = currentState && typeof currentState === 'object' && !Array.isArray(currentState)
+    ? currentState
+    : {};
+  const state = {
+    ...stateObject,
+    [TEXT_BROWSER_HISTORY_KEY]: getTextBrowserHistorySnapshot()
+  };
+  const method = replace ? 'replaceState' : 'pushState';
+  window.history[method](state, '', window.location.href);
+}
+
+function initializeTextBrowserHistory() {
+  if (window.location.hash !== '#texte') return;
+
+  const snapshot = window.history.state?.[TEXT_BROWSER_HISTORY_KEY];
+  if (snapshot) restoreTextBrowserHistoryState(snapshot);
+  else pushTextBrowserHistoryState(true);
+}
+
+function restoreTextBrowserHistoryState(snapshot) {
+  cancelTextNavigationLoad();
+  const requestId = textNavigationLoadId;
+  if (!snapshot?.textNavigation) {
+    textNavigation = { level: 'collections', languageGroup: '', author: '', work: '', volume: '' };
+    activeTextChapter = null;
+    showingTextFavoritesPage = false;
+    renderTextBrowser();
+    pushTextBrowserHistoryState(true);
+    return;
+  }
+
+  textNavigation = {
+    level: 'collections',
+    languageGroup: '',
+    author: '',
+    work: '',
+    volume: '',
+    ...snapshot.textNavigation
+  };
+  showingTextFavoritesPage = Boolean(snapshot.showingTextFavoritesPage);
+  textsSearchInput.value = snapshot.searchQuery || '';
+  activeTextChapter = null;
+
+  if (showingTextFavoritesPage) {
+    renderTextFavoritesPage();
+    return;
+  }
+  if (snapshot.showingSearchResults) {
+    renderTextsSearchResults(snapshot.searchQuery || '');
+    return;
+  }
+
+  const chapter = snapshot.activeChapter;
+  if (!chapter) {
+    renderTextBrowser();
+    return;
+  }
+
+  const activateChapter = record => {
+    if (requestId !== textNavigationLoadId) return;
+    const activeChapter = record?.chapters.find(item =>
+      String(item.number) === chapter.chapterNumber
+    );
+    if (!record || !activeChapter) {
+      textNavigationLoading = false;
+      setTextsSearchStatus('Capitolul nu mai este disponibil în colecția de texte.', 'error');
+      renderTextBrowser();
+      return;
+    }
+    activeTextChapter = { record, chapter: activeChapter };
+    textNavigationLoading = false;
+    renderTextBrowser();
+  };
+
+  const cachedRecord = textDocumentCache.get(chapter.recordPath)
+    || textDatabase.find(record => record.path === chapter.recordPath);
+  if (cachedRecord) {
+    activateChapter(cachedRecord);
+    return;
+  }
+
+  textNavigationLoading = true;
+  renderTextBrowser();
+  void (async () => {
+    if (!await loadTextCatalog()) {
+      throw new Error('Catalogul textelor nu este disponibil.');
+    }
+    const reference = textCatalog.find(entry => entry.path === chapter.recordPath);
+    if (!reference) {
+      throw new Error('Documentul capitolului nu mai este disponibil în catalog.');
+    }
+    const records = await loadTextDocuments([reference]);
+    if (requestId !== textNavigationLoadId) return;
+    activateChapter(textDocumentCache.get(chapter.recordPath)
+      || records.find(record => record.path === chapter.recordPath));
+  })().catch(error => {
+    if (requestId !== textNavigationLoadId) return;
+    textNavigationLoading = false;
+    console.error('Nu s-a putut restaura capitolul din istoricul de navigare.', error);
+    setTextsSearchStatus('Capitolul nu s-a putut încărca. Înapoi și încearcă din nou.', 'error');
+    renderTextBrowser();
+  });
+}
+
+function navigateBackInTextBrowser() {
+  if (window.location.hash === '#texte'
+    && window.history.state?.[TEXT_BROWSER_HISTORY_KEY]
+    && (showingTextFavoritesPage || textNavigation.level !== 'collections')) {
+    window.history.back();
+    return;
+  }
+  goBackInTextHierarchy();
+}
+
+window.addEventListener('popstate', event => {
+  if (window.location.hash !== '#texte') return;
+  restoreTextBrowserHistoryState(event.state?.[TEXT_BROWSER_HISTORY_KEY] || null);
+});
 
 function createTextBackButton(label, action) {
   const button = document.createElement('button');
@@ -886,7 +1031,7 @@ function createTextChapterNavigation(chapters, currentIndex) {
     : 'Nu există un capitol anterior în acest volum');
   if (previousChapter) {
     previousButton.addEventListener('click', () => {
-      showTextChapter(previousChapter.record, previousChapter.chapter);
+      showTextChapter(previousChapter.record, previousChapter.chapter, true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
@@ -910,7 +1055,7 @@ function createTextChapterNavigation(chapters, currentIndex) {
     : 'Nu există un capitol următor în acest volum');
   if (nextChapter) {
     nextButton.addEventListener('click', () => {
-      showTextChapter(nextChapter.record, nextChapter.chapter);
+      showTextChapter(nextChapter.record, nextChapter.chapter, true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
@@ -996,7 +1141,16 @@ function linkifyTextWords(container, languageGroup) {
 }
 
 function renderTextChapter() {
-  if (!activeTextChapter) return;
+  if (!activeTextChapter) {
+    if (textNavigationLoading) {
+      const loading = document.createElement('p');
+      loading.className = 'texts-empty-state';
+      loading.setAttribute('role', 'status');
+      loading.textContent = 'Se încarcă capitolul…';
+      textsChapterView.appendChild(loading);
+    }
+    return;
+  }
   const { record, chapter } = activeTextChapter;
   const work = getTextWorks(record.author, record.languageGroup).find(item => item.title === record.title);
   const volume = getTextVolumes(work?.records || [])
@@ -1014,7 +1168,7 @@ function renderTextChapter() {
   title.textContent = chapter.heading || `Capitolul ${chapter.number}`;
   const heading = document.createElement('div');
   heading.className = 'texts-chapter-heading';
-  heading.appendChild(createTextBackButton('Înapoi la capitole', () => showVolumeChapters(textNavigation.volume)));
+  heading.appendChild(createTextBackButton('Înapoi la capitole', navigateBackInTextBrowser));
   heading.appendChild(title);
   heading.appendChild(createTextFavoriteButton(createTextFavorite('chapter', {
     languageGroup: record.languageGroup,
@@ -1160,6 +1314,7 @@ function renderTextBrowser() {
     if (profile) {
       const profileCard = document.createElement('article');
       profileCard.className = 'texts-author-profile';
+      profileCard.dataset.author = textNavigation.author;
 
       if (profile.image) {
         const image = document.createElement('img');
@@ -1780,13 +1935,17 @@ function openHighlightedText(selection) {
   showingTextFavoritesPage = false;
   navigateToSitePage('texts');
   textNavigation = {
-    level: 'chapter',
+    level: 'chapters',
     languageGroup: record.languageGroup,
     author: record.author,
     work: record.title,
     volume: String(record.volume)
   };
+  activeTextChapter = null;
+  pushTextBrowserHistoryState();
+  textNavigation.level = 'chapter';
   activeTextChapter = { record, chapter: selection.chapter };
+  pushTextBrowserHistoryState();
   renderTextBrowser();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }

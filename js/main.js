@@ -116,7 +116,7 @@ let authorProfiles = {
   Ovidiu: {
     name: 'Ovidiu',
     image: 'assets/authors/ovid.jpg',
-    alt: 'Gravură cu Ovidiu',
+    alt: 'Statuia lui Ovidiu din Constanța',
     years: '43 î.Hr.–17/18 d.Hr.'
   },
   Horatius: {
@@ -156,6 +156,7 @@ function syncSitePageFromLocation() {
   document.title = showingTexts ? 'Texte clasice — GrecLaRo' : 'GrecLaRo — Dicționar Latin-Român și Greacă Veche-Român';
 
   if (showingTexts) {
+    initializeTextBrowserHistory();
     if (!textCatalogLoaded) loadTextCatalog();
     if (textNavigation.level === 'collections' && !showingTextFavoritesPage) {
       requestAnimationFrame(() => {
@@ -321,8 +322,10 @@ function showFavoritesPage() {
 
 function showTextFavoritesPage() {
   showingFavoritesPage = false;
-  showingTextFavoritesPage = true;
+  showingTextFavoritesPage = false;
   navigateToSitePage('texts');
+  showingTextFavoritesPage = true;
+  pushTextBrowserHistoryState();
   toggleSiteMenu();
   renderTextFavoritesPage();
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -776,7 +779,7 @@ textsSearchInput.addEventListener('keydown', event => {
   }
 });
 
-textsBackButton.addEventListener('click', goBackInTextHierarchy);
+textsBackButton.addEventListener('click', navigateBackInTextBrowser);
 
 window.addEventListener('hashchange', syncSitePageFromLocation);
 

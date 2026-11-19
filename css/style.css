@@ -1153,6 +1153,19 @@ main {
   object-position: 50% 28%;
 }
 
+.texts-author-card[data-author="Horatius"] .texts-browse-card-image img {
+  object-position: 50% 10%;
+}
+
+.texts-author-card[data-author="Aristofan"] .texts-browse-card-image img,
+.texts-author-profile[data-author="Aristofan"] .texts-author-profile-image {
+  object-position: 50% 0%;
+}
+
+.texts-author-profile[data-author="Ovidiu"] .texts-author-profile-image {
+  object-position: 50% 20%;
+}
+
 .texts-author-card .texts-browse-card-copy {
   align-items: center;
   justify-content: center;
