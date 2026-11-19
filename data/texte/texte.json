@@ -126,6 +126,251 @@
     "volume": "1"
   },
   {
+    "path": "gr/Plato/tlg0059.tlg002.perseus-grc2.xml",
+    "title": "Ἀπολογία Σωκράτους",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg003.perseus-grc2.xml",
+    "title": "Κρίτων",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg004.perseus-grc2.xml",
+    "title": "Φαίδων",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg005.perseus-grc2.xml",
+    "title": "Κρατύλος",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg006.perseus-grc2.xml",
+    "title": "Θεαίτητος",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg007.perseus-grc2.xml",
+    "title": "Σοφιστής",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg008.perseus-grc2.xml",
+    "title": "Πολιτικός",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg009.perseus-grc2.xml",
+    "title": "Παρμενίδης",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "2"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg010.perseus-grc2.xml",
+    "title": "Φίληβος",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "2"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg011.perseus-grc2.xml",
+    "title": "Συμπόσιον",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "2"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg012.perseus-grc2.xml",
+    "title": "Φαῖδρος",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "2"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg013.perseus-grc2.xml",
+    "title": "Ἀλκιβιάδης αʹ",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "2"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg014.perseus-grc2.xml",
+    "title": "Ἀλκιβιάδης βʹ",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "2"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg015.perseus-grc2.xml",
+    "title": "Ἵππαρχος",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "2"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg016.perseus-grc2.xml",
+    "title": "Ἐρασταί",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "2"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg017.perseus-grc2.xml",
+    "title": "Θεάγης",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "3"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg018.perseus-grc2.xml",
+    "title": "Χαρμίδης",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "3"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg019.perseus-grc2.xml",
+    "title": "Λάχης",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "3"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg020.perseus-grc2.xml",
+    "title": "Λύσις",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "3"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg021.perseus-grc2.xml",
+    "title": "Εὐθύδημος",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "3"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg022.perseus-grc2.xml",
+    "title": "Πρωταγόρας",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "3"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg023.perseus-grc2.xml",
+    "title": "Γοργίας",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "3"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg024.perseus-grc2.xml",
+    "title": "Μένων",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "3"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg025.perseus-grc2.xml",
+    "title": "Ἱππίας μείζων",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "3"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg026.perseus-grc2.xml",
+    "title": "Ἱππίας ἐλάττων",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "3"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg027.perseus-grc2.xml",
+    "title": "Ἴων",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "3"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg028.perseus-grc2.xml",
+    "title": "Μενέξενος",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "3"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg029.perseus-grc2.xml",
+    "title": "Κλειτοφῶν",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "4"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg030.perseus-grc2.xml",
+    "title": "Πολιτεία",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "4"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg031.perseus-grc2.xml",
+    "title": "Τίμαιος",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "4"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg032.perseus-grc2.xml",
+    "title": "Κριτίας",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "4"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg033.perseus-grc2.xml",
+    "title": "Μίνως",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "5.1"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg034.perseus-grc2.xml",
+    "title": "Νόμοι",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "5.1"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg035.perseus-grc2.xml",
+    "title": "Ἐπινομίς",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "5.2"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg036.perseus-grc2.xml",
+    "title": "Ἐπιστολαί",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "5.2"
+  },
+  {
     "path": "lat/Caesar/phi0448.phi001.perseus-lat2.xml",
     "title": "De bello Gallico",
     "author": "Julius Caesar",

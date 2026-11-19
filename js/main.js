@@ -689,6 +689,21 @@ searchInput.addEventListener('beforeinput', handleGreekTransliterationInput);
 searchInput.addEventListener('input', () => handleSearchInput(searchInput.value));
 searchInput.addEventListener('keydown', handleSearchKeydown);
 
+textsChapterView.addEventListener('copy', event => {
+  const selection = window.getSelection();
+  const selectedText = selection?.toString();
+  if (!selectedText || !selection.anchorNode || !selection.focusNode
+    || !textsChapterView.contains(selection.anchorNode)
+    || !textsChapterView.contains(selection.focusNode)
+    || !event.clipboardData) {
+    return;
+  }
+
+  event.clipboardData.clearData();
+  event.clipboardData.setData('text/plain', selectedText);
+  event.preventDefault();
+});
+
 document.getElementById('feedbackForm').addEventListener('submit', submitFeedback);
 
 document.addEventListener('click', (e) => {

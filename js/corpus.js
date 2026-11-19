@@ -590,7 +590,13 @@ function getTextWorks(author, languageGroup = textNavigation.languageGroup) {
     if (!works.has(entry.title)) works.set(entry.title, []);
     works.get(entry.title).push(entry);
   });
-  return [...works.entries()].map(([title, records]) => ({ title, records }));
+  const collator = new Intl.Collator(languageGroup === 'gr' ? 'el' : 'en', {
+    sensitivity: 'base',
+    numeric: true
+  });
+  return [...works.entries()]
+    .map(([title, records]) => ({ title, records }))
+    .sort((left, right) => collator.compare(left.title, right.title));
 }
 
 function getTextVolumes(records) {
@@ -911,15 +917,21 @@ function linkifyTextWords(container, languageGroup) {
   for (const match of originalText.matchAll(tokenPattern)) {
     const token = match[0];
     if (/^[\p{L}\p{M}]+(?:[’'][\p{L}\p{M}]+)*$/u.test(token)) {
-      const link = document.createElement('a');
-      link.className = 'text-word-link';
-      link.href = '#dictionar';
-      link.textContent = token;
-      link.addEventListener('click', event => {
-        event.preventDefault();
+      const word = document.createElement('span');
+      word.className = 'text-word-link';
+      word.setAttribute('role', 'button');
+      word.tabIndex = 0;
+      word.textContent = token;
+      word.addEventListener('click', () => {
         openTextDictionaryWord(token, languageGroup);
       });
-      container.appendChild(link);
+      word.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openTextDictionaryWord(token, languageGroup);
+        }
+      });
+      container.appendChild(word);
     } else {
       container.appendChild(document.createTextNode(token));
     }
