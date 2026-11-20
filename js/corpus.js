@@ -1,4 +1,4 @@
-const TEXT_CHAPTER_RENDER_BATCH_SIZE = 40;
+const TEXT_CHAPTER_RENDER_BATCH_SIZE = 80;
 const TEXT_BROWSER_HISTORY_KEY = 'grelaroTextBrowser';
 let textNavigationLoadId = 0;
 let textDirectoryRenderId = 0;
@@ -589,6 +589,22 @@ function createTextBrowseCard(title, detail, onClick, options = {}) {
   cardInner.appendChild(textContent);
   openButton.appendChild(cardInner);
   openButton.addEventListener('click', onClick);
+  if (typeof options.preload === 'function') {
+    let preloadStarted = false;
+    let preloadTimer = 0;
+    const preload = () => {
+      if (preloadStarted) return;
+      preloadStarted = true;
+      window.clearTimeout(preloadTimer);
+      options.preload();
+    };
+    openButton.addEventListener('pointerenter', () => {
+      if (!preloadStarted) preloadTimer = window.setTimeout(preload, 120);
+    });
+    openButton.addEventListener('pointerleave', () => window.clearTimeout(preloadTimer));
+    openButton.addEventListener('pointerdown', preload);
+    openButton.addEventListener('focus', preload);
+  }
   card.appendChild(openButton);
   if (options.favorite) card.appendChild(createTextFavoriteButton(options.favorite));
   return card;
@@ -630,24 +646,23 @@ function getTextWorks(author, languageGroup = textNavigation.languageGroup) {
     sensitivity: 'base',
     numeric: true
   });
-  return [...works.entries()]
-    .map(([title, records]) => ({ title, records }))
-    .sort((left, right) => {
-      const leftFavorite = isTextFavorite(createTextFavorite('work', {
-        languageGroup,
-        author,
-        work: left.title,
-        title: left.title
-      }));
-      const rightFavorite = isTextFavorite(createTextFavorite('work', {
-        languageGroup,
-        author,
-        work: right.title,
-        title: right.title
-      }));
-      if (leftFavorite !== rightFavorite) return leftFavorite ? -1 : 1;
-      return collator.compare(left.title, right.title);
-    });
+  const workEntries = [...works.entries()]
+    .map(([title, records]) => ({ title, records }));
+  const favoriteByTitle = new Map(workEntries.map(work => [
+    work.title,
+    isTextFavorite(createTextFavorite('work', {
+      languageGroup,
+      author,
+      work: work.title,
+      title: work.title
+    }))
+  ]));
+  return workEntries.sort((left, right) => {
+    const leftFavorite = favoriteByTitle.get(left.title);
+    const rightFavorite = favoriteByTitle.get(right.title);
+    if (leftFavorite !== rightFavorite) return leftFavorite ? -1 : 1;
+    return collator.compare(left.title, right.title);
+  });
 }
 
 function getTextVolumes(records) {
@@ -1329,6 +1344,8 @@ function renderTextBrowser() {
   }
 
   if (textNavigation.level === 'works') {
+    const author = textNavigation.author;
+    const languageGroup = textNavigation.languageGroup;
     textsDirectoryTitle.textContent = `Opere — ${textNavigation.author}`;
     const profile = authorProfiles[textNavigation.author === 'Julius Caesar'
       ? 'Caesar'
@@ -1385,7 +1402,9 @@ function renderTextBrowser() {
       profileCard.appendChild(copy);
       textsDirectoryList.appendChild(profileCard);
     }
-    getTextWorks(textNavigation.author, textNavigation.languageGroup).forEach(work => {
+    const works = getTextWorks(author, textNavigation.languageGroup);
+    const workCards = document.createDocumentFragment();
+    works.forEach(work => {
       const volumes = getTextVolumes(work.records);
       const chapterCount = work.records.reduce((count, record) => count + record.chapters.length, 0);
       const chaptersLoaded = work.records.every(record => record.chapters.length > 0);
@@ -1397,7 +1416,7 @@ function renderTextBrowser() {
             ? `${volumes.length} volume · deschide pentru capitole`
             : 'Deschide pentru capitole'
       ].filter(Boolean).join(' · ');
-      textsDirectoryList.appendChild(createTextBrowseCard(
+      workCards.appendChild(createTextBrowseCard(
         work.title,
         detail,
         () => showWorkVolumes(work.title),
@@ -1407,10 +1426,28 @@ function renderTextBrowser() {
             author: textNavigation.author,
             work: work.title,
             title: work.title
-          })
+          }),
+          preload: () => prefetchTextWork(languageGroup, author, work.title)
         }
       ));
     });
+    textsDirectoryList.appendChild(workCards);
+    const firstWork = works[0];
+    if (firstWork && window.matchMedia('(pointer: coarse)').matches) {
+      const preloadFirstWork = () => {
+        if (textNavigation.level === 'works'
+          && textNavigation.author === author
+          && textNavigation.languageGroup === languageGroup
+          && !showingTextFavoritesPage) {
+          prefetchTextWork(languageGroup, author, firstWork.title);
+        }
+      };
+      if (typeof window.requestIdleCallback === 'function') {
+        window.requestIdleCallback(preloadFirstWork, { timeout: 1000 });
+      } else {
+        window.setTimeout(preloadFirstWork, 250);
+      }
+    }
     return;
   }
 
@@ -1464,19 +1501,17 @@ function renderTextBrowser() {
   if (textNavigation.level === 'chapters') {
     textsDirectoryTitle.textContent = `Capitole — ${volumes.length === 1 ? textNavigation.work : volume.label}`;
     const chapters = volume.records
-      .flatMap(record => record.chapters.map(chapter => ({ record, chapter })))
+      .flatMap(record => record.chapters.map(chapter => {
+        const favorite = createTextChapterFavorite(record, chapter, textNavigation.volume);
+        return {
+          record,
+          chapter,
+          favorite,
+          isFavorite: isTextFavorite(favorite)
+        };
+      }))
       .sort((left, right) => {
-        const leftFavorite = isTextFavorite(createTextChapterFavorite(
-          left.record,
-          left.chapter,
-          textNavigation.volume
-        ));
-        const rightFavorite = isTextFavorite(createTextChapterFavorite(
-          right.record,
-          right.chapter,
-          textNavigation.volume
-        ));
-        if (leftFavorite !== rightFavorite) return leftFavorite ? -1 : 1;
+        if (left.isFavorite !== right.isFavorite) return left.isFavorite ? -1 : 1;
         return left.chapter.number.localeCompare(right.chapter.number, 'ro', { numeric: true });
       });
     let nextChapterIndex = 0;
@@ -1487,9 +1522,8 @@ function renderTextBrowser() {
 
       const fragment = document.createDocumentFragment();
       const batch = chapters.slice(nextChapterIndex, nextChapterIndex + TEXT_CHAPTER_RENDER_BATCH_SIZE);
-      batch.forEach(({ record, chapter }) => {
+      batch.forEach(({ record, chapter, favorite }) => {
         const detail = chapter.heading || chapter.text.slice(0, 100);
-        const favorite = createTextChapterFavorite(record, chapter, textNavigation.volume);
         fragment.appendChild(createTextBrowseCard(
           `Capitolul ${chapter.number}`,
           detail,
@@ -1771,21 +1805,28 @@ async function loadTextCatalog() {
 
   textCatalogLoadPromise = (async () => {
     try {
-      await loadAuthorProfiles();
-      let references = [];
-      try {
-        const discoveryResponse = await fetch('/api/texts');
-        if (discoveryResponse.ok) {
-          references = validateTextDatabase(await discoveryResponse.json());
-        }
-      } catch (error) {
+      const discoveryPromise = fetch('/api/texts').catch(error => {
         console.info('Descoperirea dinamică a textelor nu este disponibilă; se folosește manifestul local.', error);
-      }
+        return null;
+      });
+      const manifestPromise = fetch('data/texte/texte.json').then(
+        response => ({ response }),
+        error => ({ error })
+      );
+      const [discoveryResponse, manifestResult] = await Promise.all([
+        discoveryPromise,
+        manifestPromise,
+        loadAuthorProfiles()
+      ]);
+      let references = discoveryResponse?.ok
+        ? validateTextDatabase(await discoveryResponse.json())
+        : [];
 
       if (!references.length || references.some(reference =>
         !reference.title || !reference.language || reference.volume === undefined
       )) {
-        const manifestResponse = await fetch('data/texte/texte.json');
+        if (manifestResult.error) throw manifestResult.error;
+        const manifestResponse = manifestResult.response;
         if (!manifestResponse.ok) throw new Error(`Răspuns HTTP ${manifestResponse.status}`);
         const manifestReferences = validateTextDatabase(await manifestResponse.json());
         if (!references.length) {
@@ -1842,6 +1883,19 @@ function loadAndCacheTextDocument(reference) {
   }).finally(() => textDocumentLoadPromises.delete(reference.path));
   textDocumentLoadPromises.set(reference.path, promise);
   return promise;
+}
+
+function prefetchTextWork(languageGroup, author, title) {
+  const references = textCatalog.filter(entry =>
+    entry.languageGroup === languageGroup
+    && entry.author === author
+    && entry.title === title
+  );
+  references.forEach(reference => {
+    void loadAndCacheTextDocument(reference).catch(error => {
+      console.warn(`Nu s-a putut preîncărca opera „${title}”.`, error);
+    });
+  });
 }
 
 async function loadTextDocuments(references) {
