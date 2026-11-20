@@ -427,6 +427,13 @@
     "volume": "3"
   },
   {
+    "path": "lat/Cicero/phi0474.phi005.perseus-lat2.xml",
+    "title": "In C. Verrem",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "3"
+  },
+  {
     "path": "lat/Horatius/phi0893.phi001.perseus-lat2.xml",
     "title": "Carmina",
     "author": "Q. Horatius Flaccus",
