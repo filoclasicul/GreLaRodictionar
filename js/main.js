@@ -83,21 +83,33 @@ const textLanguageGroups = [
 ];
 let textNavigation = { level: 'collections', languageGroup: '', author: '', work: '', volume: '' };
 let authorProfiles = {
+  Caesar: {
+    name: 'Gaius Iulius Caesar',
+    image: 'assets/authors/caesar.jpg',
+    alt: 'Portret sculptat al lui Iulius Caesar',
+    years: '100–44 î.Hr.',
+    description: 'General, om politic și scriitor roman; autorul comentariilor despre războaiele din Gallia și războiul civil.'
+  },
   Cicero: {
     name: 'M. Tullius Cicero',
     image: 'assets/authors/cicero.jpg',
     alt: 'Bustul lui Marcus Tullius Cicero',
-    years: '106–43 î.Hr.'
+    years: '106–43 î.Hr.',
+    description: 'Orator, filosof și om politic roman, autor al unor discursuri și scrieri despre retorică și filosofie.'
   },
   Plato: {
     name: 'Platon',
     image: 'assets/authors/plato.jpg',
     alt: 'Bustul lui Platon',
-    years: 'c. 428/427–348/347 î.Hr.'
+    years: 'c. 428/427–348/347 î.Hr.',
+    description: 'Filosof grec, fondator al Academiei din Atena și autor al unor dialoguri fundamentale.'
   },
   Aristotel: {
     name: 'Aristotel',
-    years: '384–322 î.Hr.'
+    image: 'assets/authors/aristotle.jpg',
+    alt: 'Bustul lui Aristotel',
+    years: '384–322 î.Hr.',
+    description: 'Filosof și cercetător grec, discipol al lui Platon și fondator al școlii peripatetice.'
   },
   Aristofan: {
     name: 'Aristofan',
@@ -117,7 +129,8 @@ let authorProfiles = {
     name: 'Ovidiu',
     image: 'assets/authors/ovid.jpg',
     alt: 'Statuia lui Ovidiu din Constanța',
-    years: '43 î.Hr.–17/18 d.Hr.'
+    years: '43 î.Hr.–17/18 d.Hr.',
+    description: 'Poet roman cunoscut pentru elegiile sale, Ars amatoria și poemul mitologic Metamorfoze.'
   },
   Horatius: {
     name: 'Horatius',
