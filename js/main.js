@@ -169,21 +169,21 @@ let authorProfiles = {
   },
   Lucretius: {
     name: 'Titus Lucretius Carus',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/9/95/Titus_Lucretius_Carus.jpg',
+    image: 'assets/authors/lucretius.jpg',
     alt: 'Portretul lui Lucretius',
     years: 'c. 94–55 î.Hr.',
     description: 'Poet roman și filosof epicurean, autorul poemului didactic De rerum natura (Despre natura lucrurilor), care prezintă filosofia lui Epicur și teoriile atomiste.'
   },
   Quintilian: {
     name: 'Marcus Fabius Quintilianus',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/e/ea/Quintilian%2C_engraving_by_Andre_Thevet.jpg',
+    image: 'assets/authors/quintilian.jpg',
     alt: 'Portretul lui Marcus Fabius Quintilianus',
     years: 'c. 35–100 d.Hr.',
     description: 'Retor și pedagog roman, autorul Institutio oratoria (Instituțiile oratorului), tratat complet despre educație și arta oratoriei.'
   },
   Seneca: {
     name: 'Lucius Annaeus Seneca',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/8/88/Seneca_the_Younger.jpg',
+    image: 'assets/authors/seneca.jpg',
     alt: 'Portretul lui Seneca',
     years: 'c. 4 î.Hr.–65 d.Hr.',
     description: 'Filosof stoic, dramaturg și om politic roman, autorul unor tratate filosofice, tragedii și Epistole morale.'
