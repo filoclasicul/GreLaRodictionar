@@ -22,13 +22,13 @@ const lexiconData = Object.create(null);
 const recentSearchStorageKey = 'dic-ionar-online-recent-searches';
 const recentSearchModes = new Set(['omnia-dir', 'greek-dir', 'latin-dir', 'omnia-rev', 'greek-rev', 'latin-rev']);
 let recentSearchStorageError = null;
-let recentSearches = loadRecentSearches();
+let recentSearches = [];
 const favoriteStorageKey = 'dic-ionar-online-favorite-words';
 let favoriteStorageError = null;
-let favoriteWords = loadFavoriteWords();
+let favoriteWords = [];
 const textFavoriteStorageKey = 'dic-ionar-online-favorite-texts';
 let textFavoriteStorageError = null;
-let textFavorites = loadTextFavorites();
+let textFavorites = [];
 let showingFavoritesPage = false;
 let showingTextFavoritesPage = false;
 const dictionaryPage = document.getElementById('dictionaryPage');
@@ -852,6 +852,12 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('themeToggleIcon').textContent = savedMode === 'dark' ? '☀️' : '🌙';
   themeToggle.setAttribute('aria-label', actionLabel);
   themeToggle.title = actionLabel;
+  
+  // Initialize storage-based variables after all scripts have loaded
+  recentSearches = loadRecentSearches();
+  favoriteWords = loadFavoriteWords();
+  textFavorites = loadTextFavorites();
+  
   setSearchMode('latin-dir');
   syncSitePageFromLocation();
 });
