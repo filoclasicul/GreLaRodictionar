@@ -1421,6 +1421,14 @@ function renderTextBrowser() {
         copy.appendChild(description);
       }
       profileCard.appendChild(copy);
+
+      if (profile.description && typeof tts !== 'undefined' && tts.isSupported()) {
+        const ttsContainer = document.createElement('div');
+        ttsContainer.className = 'texts-author-tts-container';
+        const textLanguage = textNavigation.languageGroup === 'gr' ? 'grc' : 'lat';
+        addTTSControls(ttsContainer, profile.description, textLanguage);
+        profileCard.appendChild(ttsContainer);
+      }
       textsDirectoryList.appendChild(profileCard);
     }
     const works = getTextWorks(author, textNavigation.languageGroup);
