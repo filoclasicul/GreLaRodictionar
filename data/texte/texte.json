@@ -523,5 +523,110 @@
     "author": "Titus Livius (Livy)",
     "language": "lat",
     "volume": "7.1"
+  },
+  {
+    "path": "gr/Tucidide/tlg0003.tlg001.perseus-grc2.xml",
+    "title": "Ἱστορίαι",
+    "author": "Thucydides",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg001.perseus-grc2.xml",
+    "title": "Ἑλληνικά",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg002.perseus-grc2.xml",
+    "title": "Ἀπομνημονεύματα",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg003.perseus-grc2.xml",
+    "title": "Οἰκονομικός",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg004.perseus-grc2.xml",
+    "title": "Συμπόσιον",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg005.perseus-grc2.xml",
+    "title": "Ἀπολογία Σωκράτους",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg006.perseus-grc2.xml",
+    "title": "Ἀνάβασις",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg007.perseus-grc2.xml",
+    "title": "Κύρου παιδεία",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg008.perseus-grc2.xml",
+    "title": "Ἱέρων",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg009.perseus-grc2.xml",
+    "title": "Ἀγησίλαος",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg010.perseus-grc2.xml",
+    "title": "Λακεδαιμονίων Πολιτεία",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg011.perseus-grc2.xml",
+    "title": "Πόροι ἢ περὶ προσόδων",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg012.perseus-grc2.xml",
+    "title": "Ἱππαρχικός",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg013.perseus-grc2.xml",
+    "title": "Περὶ ἱππικῆς",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg014.perseus-grc2.xml",
+    "title": "Κυνηγετικός",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "1"
   }
 ]

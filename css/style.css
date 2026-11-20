@@ -1149,6 +1149,13 @@ main {
   object-position: 50% 18%;
 }
 
+.texts-author-card[data-author="Tucidide"] .texts-browse-card-image img,
+.texts-author-card[data-author="Xenofon"] .texts-browse-card-image img,
+.texts-author-profile[data-author="Tucidide"] .texts-author-profile-image,
+.texts-author-profile[data-author="Xenofon"] .texts-author-profile-image {
+  object-position: 50% 10%;
+}
+
 .texts-author-card[data-author="Ovidiu"] .texts-browse-card-image img {
   object-position: 50% 28%;
 }
@@ -1299,9 +1306,43 @@ main {
 }
 
 .texts-collection-card {
-  min-height: 6.25rem;
-  border-color: var(--border-accent);
+  min-height: 7rem;
+  border: 2px solid var(--border-accent);
+  background: var(--gold-light);
   grid-column: auto;
+}
+
+.texts-collection-card:hover,
+.texts-collection-card:focus-within {
+  border-color: var(--crimson);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--crimson) 18%, transparent);
+}
+
+.texts-collection-card .texts-browse-card-open {
+  justify-content: center;
+  padding: 1.2rem;
+  text-align: center;
+}
+
+.texts-collection-card .texts-browse-card-inner,
+.texts-collection-card .texts-browse-card-copy {
+  justify-content: center;
+  text-align: center;
+}
+
+.texts-collection-card .texts-browse-card-copy {
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.texts-collection-card .texts-browse-card-title {
+  color: var(--crimson);
+  font-size: clamp(1.15rem, 2.5vw, 1.4rem);
+  font-weight: 800;
+}
+
+.texts-collection-card .texts-browse-card-detail {
+  font-weight: 650;
 }
 
 .texts-directory-list[data-level="collections"] {

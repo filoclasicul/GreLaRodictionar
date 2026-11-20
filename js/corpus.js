@@ -632,7 +632,22 @@ function getTextWorks(author, languageGroup = textNavigation.languageGroup) {
   });
   return [...works.entries()]
     .map(([title, records]) => ({ title, records }))
-    .sort((left, right) => collator.compare(left.title, right.title));
+    .sort((left, right) => {
+      const leftFavorite = isTextFavorite(createTextFavorite('work', {
+        languageGroup,
+        author,
+        work: left.title,
+        title: left.title
+      }));
+      const rightFavorite = isTextFavorite(createTextFavorite('work', {
+        languageGroup,
+        author,
+        work: right.title,
+        title: right.title
+      }));
+      if (leftFavorite !== rightFavorite) return leftFavorite ? -1 : 1;
+      return collator.compare(left.title, right.title);
+    });
 }
 
 function getTextVolumes(records) {
@@ -666,6 +681,18 @@ function createTextFavorite(type, details) {
     type,
     key: getTextFavoriteKey(type, details)
   };
+}
+
+function createTextChapterFavorite(record, chapter, volumeKey) {
+  return createTextFavorite('chapter', {
+    languageGroup: record.languageGroup,
+    author: record.author,
+    work: record.title,
+    volumeKey,
+    recordPath: record.path,
+    chapterNumber: String(chapter.number),
+    title: `Capitolul ${chapter.number}${chapter.heading ? ` — ${chapter.heading}` : ''}`
+  });
 }
 
 function isValidTextFavorite(favorite) {
@@ -755,7 +782,11 @@ function toggleTextFavorite(favorite, button = null) {
   const saved = saveTextFavorites();
   if (button) updateTextFavoriteButton(button, favorite);
   if (showingTextFavoritesPage) renderTextFavoritesPage();
-  else if (favorite.type === 'author' && textNavigation.level === 'authors') renderTextBrowser();
+  else if ((favorite.type === 'author' && textNavigation.level === 'authors')
+    || (favorite.type === 'work' && textNavigation.level === 'works')
+    || (favorite.type === 'chapter' && textNavigation.level === 'chapters')) {
+    renderTextBrowser();
+  }
 
   setTextsSearchStatus(saved
     ? (existingIndex >= 0 ? 'Eliminat din favorite.' : 'Adăugat la favorite.')
@@ -1170,15 +1201,9 @@ function renderTextChapter() {
   heading.className = 'texts-chapter-heading';
   heading.appendChild(createTextBackButton('Înapoi la capitole', navigateBackInTextBrowser));
   heading.appendChild(title);
-  heading.appendChild(createTextFavoriteButton(createTextFavorite('chapter', {
-    languageGroup: record.languageGroup,
-    author: record.author,
-    work: record.title,
-    volumeKey: textNavigation.volume,
-    recordPath: record.path,
-    chapterNumber: String(chapter.number),
-    title: `Capitolul ${chapter.number}${chapter.heading ? ` — ${chapter.heading}` : ''}`
-  })));
+  heading.appendChild(createTextFavoriteButton(
+    createTextChapterFavorite(record, chapter, textNavigation.volume)
+  ));
   const workTitle = document.createElement('p');
   workTitle.className = 'texts-chapter-meta';
   workTitle.textContent = [record.title, record.author, `Volumul ${record.volume}`]
@@ -1232,6 +1257,7 @@ function renderTextBrowser() {
         () => showTextAuthors(group.id)
       );
       card.classList.add('texts-collection-card');
+      card.classList.add(`texts-collection-card-${group.id}`);
       textsDirectoryList.appendChild(card);
     });
     if (window.location.hash === '#texte') refreshTextHighlights();
@@ -1439,7 +1465,20 @@ function renderTextBrowser() {
     textsDirectoryTitle.textContent = `Capitole — ${volumes.length === 1 ? textNavigation.work : volume.label}`;
     const chapters = volume.records
       .flatMap(record => record.chapters.map(chapter => ({ record, chapter })))
-      .sort((left, right) => left.chapter.number.localeCompare(right.chapter.number, 'ro', { numeric: true }));
+      .sort((left, right) => {
+        const leftFavorite = isTextFavorite(createTextChapterFavorite(
+          left.record,
+          left.chapter,
+          textNavigation.volume
+        ));
+        const rightFavorite = isTextFavorite(createTextChapterFavorite(
+          right.record,
+          right.chapter,
+          textNavigation.volume
+        ));
+        if (leftFavorite !== rightFavorite) return leftFavorite ? -1 : 1;
+        return left.chapter.number.localeCompare(right.chapter.number, 'ro', { numeric: true });
+      });
     let nextChapterIndex = 0;
     const renderChapterBatch = () => {
       if (renderId !== textDirectoryRenderId
@@ -1450,15 +1489,7 @@ function renderTextBrowser() {
       const batch = chapters.slice(nextChapterIndex, nextChapterIndex + TEXT_CHAPTER_RENDER_BATCH_SIZE);
       batch.forEach(({ record, chapter }) => {
         const detail = chapter.heading || chapter.text.slice(0, 100);
-        const favorite = createTextFavorite('chapter', {
-          languageGroup: record.languageGroup,
-          author: record.author,
-          work: record.title,
-          volumeKey: textNavigation.volume,
-          recordPath: record.path,
-          chapterNumber: String(chapter.number),
-          title: `Capitolul ${chapter.number}${chapter.heading ? ` — ${chapter.heading}` : ''}`
-        });
+        const favorite = createTextChapterFavorite(record, chapter, textNavigation.volume);
         fragment.appendChild(createTextBrowseCard(
           `Capitolul ${chapter.number}`,
           detail,

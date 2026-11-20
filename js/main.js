@@ -139,6 +139,20 @@ let authorProfiles = {
     alt: 'Bustul lui Titus Livius',
     years: '59 î.Hr.–17 d.Hr.',
     description: 'Istoric roman, autorul lucrării Ab urbe condita, o amplă istorie a Romei.'
+  },
+  Tucidide: {
+    name: 'Tucidide',
+    image: 'assets/authors/thucydides.jpg',
+    alt: 'Bustul lui Tucidide',
+    years: 'c. 460–c. 400 î.Hr.',
+    description: 'Istoric atenian, autorul Istoriei războiului peloponesiac, una dintre cele mai importante relatări ale conflictului dintre Atena și Sparta.'
+  },
+  Xenofon: {
+    name: 'Xenofon',
+    image: 'assets/authors/xenophon.jpg',
+    alt: 'Bustul lui Xenofon',
+    years: 'c. 430–354 î.Hr.',
+    description: 'Istoric, comandant și eseist grec, cunoscut pentru Anabasis, Memorabilia și relatările despre Socrate.'
   }
 };
 let activeTextChapter = null;
