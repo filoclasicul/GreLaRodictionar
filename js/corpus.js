@@ -527,6 +527,14 @@ function createTextResultCard(entry, query) {
     fullText.className = 'texts-full-text';
     fullText.textContent = entry.text;
     details.append(summary, fullText);
+    
+    // Adauga TTS pentru textul complet dacă browserul le suportă
+    if (typeof tts !== 'undefined' && tts.isSupported()) {
+      const ttsContainer = document.createElement('div');
+      addTTSControls(ttsContainer, entry.text, entry.languageGroup);
+      details.appendChild(ttsContainer);
+    }
+
     card.appendChild(details);
   }
 
@@ -1237,7 +1245,18 @@ function renderTextChapter() {
     linkifyTextWords(paragraph, record.languageGroup);
     chapterText.appendChild(paragraph);
   });
-  textsChapterView.append(chapterText, createTextChapterNavigation(chapters, currentIndex));
+
+  // Adauga controalele text-to-speech dacă browserul le suportă
+  if (typeof tts !== 'undefined' && tts.isSupported()) {
+    const fullChapterText = chapter.paragraphs.join('\n');
+    const ttsContainer = document.createElement('div');
+    addTTSControls(ttsContainer, fullChapterText, record.languageGroup);
+    textsChapterView.append(ttsContainer, chapterText);
+  } else {
+    textsChapterView.appendChild(chapterText);
+  }
+
+  textsChapterView.appendChild(createTextChapterNavigation(chapters, currentIndex));
 }
 
 function renderTextBrowser() {
@@ -2076,6 +2095,14 @@ function createTextHighlightCard(languageGroup, selection) {
   quoteLink.setAttribute('aria-label', `Deschide textul „${selection.title}”, ${selection.chapter.heading || `capitolul ${selection.chapter.number}`}`);
   quoteLink.addEventListener('click', () => openHighlightedText(selection));
   quote.appendChild(quoteLink);
+  
+  // Adauga TTS pentru fragment dacă browserul le suportă
+  if (typeof tts !== 'undefined' && tts.isSupported()) {
+    const ttsContainer = document.createElement('div');
+    addTTSControls(ttsContainer, selection.text, languageGroup);
+    quote.appendChild(ttsContainer);
+  }
+
   const attribution = document.createElement('p');
   attribution.className = 'daily-selection-attribution';
   const chapterLabel = selection.chapter.heading
