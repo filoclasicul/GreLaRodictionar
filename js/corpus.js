@@ -1575,21 +1575,103 @@ function renderTextFavoritesPage() {
     return;
   }
 
+  const authorGroups = new Map();
   visibleFavorites.forEach(favorite => {
-    const typeLabel = favorite.type === 'work' ? 'Operă'
-      : favorite.type === 'volume' ? 'Volum' : 'Capitol';
-    const detail = [
-      typeLabel,
-      favorite.author,
-      favorite.work && favorite.type !== 'work' ? favorite.work : ''
-    ].filter(Boolean).join(' · ');
-    textsDirectoryList.appendChild(createTextBrowseCard(
-      favorite.title,
-      detail,
-      () => openTextFavorite(favorite),
-      { favorite }
-    ));
+    const authorKey = JSON.stringify([favorite.languageGroup, favorite.author]);
+    if (!authorGroups.has(authorKey)) {
+      authorGroups.set(authorKey, {
+        author: favorite.author,
+        languageGroup: favorite.languageGroup,
+        works: new Map()
+      });
+    }
+
+    const authorGroup = authorGroups.get(authorKey);
+    if (!authorGroup.works.has(favorite.work)) {
+      authorGroup.works.set(favorite.work, {
+        title: favorite.work,
+        favorites: []
+      });
+    }
+    authorGroup.works.get(favorite.work).favorites.push(favorite);
   });
+
+  const authorCollator = new Intl.Collator('ro', { sensitivity: 'base' });
+  const favoritesContent = document.createDocumentFragment();
+  [...authorGroups.values()]
+    .sort((left, right) =>
+      authorCollator.compare(left.author, right.author)
+      || left.languageGroup.localeCompare(right.languageGroup)
+    )
+    .forEach(authorGroup => {
+      const authorSection = document.createElement('section');
+      authorSection.className = 'texts-favorites-author-group';
+      const authorHeading = document.createElement('h3');
+      authorHeading.className = 'texts-favorites-author-title';
+      authorHeading.textContent = authorGroup.author;
+      authorSection.appendChild(authorHeading);
+
+      const workList = document.createElement('div');
+      workList.className = 'texts-favorites-work-list';
+      const workCollator = new Intl.Collator(
+        authorGroup.languageGroup === 'gr' ? 'el' : 'en',
+        { sensitivity: 'base', numeric: true }
+      );
+      [...authorGroup.works.values()]
+        .sort((left, right) => workCollator.compare(left.title, right.title))
+        .forEach(workGroup => {
+          const workSection = document.createElement('section');
+          workSection.className = 'texts-favorites-work-group';
+
+          const workHeading = document.createElement('div');
+          workHeading.className = 'texts-favorites-work-heading';
+          const workFavorite = workGroup.favorites.find(favorite => favorite.type === 'work')
+            || createTextFavorite('work', {
+              languageGroup: authorGroup.languageGroup,
+              author: authorGroup.author,
+              work: workGroup.title,
+              title: workGroup.title
+            });
+          const openWorkButton = document.createElement('button');
+          openWorkButton.className = 'texts-favorites-work-open';
+          openWorkButton.type = 'button';
+          openWorkButton.textContent = workGroup.title;
+          openWorkButton.setAttribute('aria-label', `Deschide opera „${workGroup.title}”`);
+          openWorkButton.addEventListener('click', () => openTextFavorite(workFavorite));
+          workHeading.append(openWorkButton, createTextFavoriteButton(workFavorite));
+          workSection.appendChild(workHeading);
+
+          const itemList = document.createElement('div');
+          itemList.className = 'texts-favorites-items';
+          const favorites = workGroup.favorites;
+          const volumeFavorites = favorites
+            .filter(favorite => favorite.type === 'volume')
+            .sort((left, right) => left.volumeKey.localeCompare(right.volumeKey, 'ro', { numeric: true }));
+          const chapterFavorites = favorites
+            .filter(favorite => favorite.type === 'chapter')
+            .sort((left, right) =>
+              left.volumeKey.localeCompare(right.volumeKey, 'ro', { numeric: true })
+              || left.chapterNumber.localeCompare(right.chapterNumber, 'ro', { numeric: true })
+            );
+          [...volumeFavorites, ...chapterFavorites].forEach(favorite => {
+            const detail = favorite.type === 'volume'
+              ? 'Volum favorit'
+              : `Capitol favorit · Volumul ${favorite.volumeKey}`;
+            itemList.appendChild(createTextBrowseCard(
+              favorite.title,
+              detail,
+              () => openTextFavorite(favorite),
+              { favorite }
+            ));
+          });
+          if (itemList.childElementCount) workSection.appendChild(itemList);
+          workList.appendChild(workSection);
+        });
+
+      authorSection.appendChild(workList);
+      favoritesContent.appendChild(authorSection);
+    });
+  textsDirectoryList.appendChild(favoritesContent);
 }
 
 async function openTextFavorite(favorite) {
