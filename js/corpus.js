@@ -1900,9 +1900,14 @@ async function loadTextCatalog() {
         manifestPromise,
         loadAuthorProfiles()
       ]);
-      let references = discoveryResponse?.ok
-        ? validateTextDatabase(await discoveryResponse.json())
-        : [];
+      let references = [];
+      if (discoveryResponse?.ok) {
+        try {
+          references = validateTextDatabase(await discoveryResponse.json());
+        } catch (error) {
+          console.info('Descoperirea dinamică a textelor nu este disponibilă; se folosește manifestul local.', error);
+        }
+      }
 
       if (!references.length || references.some(reference =>
         !reference.title || !reference.language || reference.volume === undefined
