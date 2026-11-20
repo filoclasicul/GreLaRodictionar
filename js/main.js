@@ -153,6 +153,27 @@ let authorProfiles = {
     alt: 'Bustul lui Xenofon',
     years: 'c. 430–354 î.Hr.',
     description: 'Istoric, comandant și eseist grec, cunoscut pentru Anabasis, Memorabilia și relatările despre Socrate.'
+  },
+  Lucretius: {
+    name: 'Titus Lucretius Carus',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Lucretius_Carus_Titus_Lucretius_Carus_floruit_55_BCE_Ancient_Roman_poet_and_philosopher.jpg/440px-Lucretius_Carus_Titus_Lucretius_Carus_floruit_55_BCE_Ancient_Roman_poet_and_philosopher.jpg',
+    alt: 'Portretul lui Lucretius',
+    years: 'c. 94–55 î.Hr.',
+    description: 'Poet roman și filosof epicurean, autorul poemului didactic De rerum natura (Despre natura lucrurilor), care prezintă filosofia lui Epicur și teoriile atomiste.'
+  },
+  Quintilian: {
+    name: 'Marcus Fabius Quintilianus',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Quintilian_bust.jpg/440px-Quintilian_bust.jpg',
+    alt: 'Portretul lui Marcus Fabius Quintilianus',
+    years: 'c. 35–100 d.Hr.',
+    description: 'Retor și pedagog roman, autorul Institutio oratoria (Instituțiile oratorului), tratat complet despre educație și arta oratoriei.'
+  },
+  Seneca: {
+    name: 'Lucius Annaeus Seneca',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Seneca_MAN_Napoli_6265_cropped.jpg/440px-Seneca_MAN_Napoli_6265_cropped.jpg',
+    alt: 'Portretul lui Seneca',
+    years: 'c. 4 î.Hr.–65 d.Hr.',
+    description: 'Filosof stoic, dramaturg și om politic roman, autorul unor tratate filosofice, tragedii și Epistole morale.'
   }
 };
 let activeTextChapter = null;
