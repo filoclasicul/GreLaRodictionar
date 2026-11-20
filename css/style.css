@@ -2022,6 +2022,21 @@ main {
   margin-top: 0.75rem;
 }
 
+.greek-key-table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.search-secondary-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  margin-left: auto;
+}
+
 .greek-key-table-toggle {
   padding: 0.45rem 0.75rem;
   border: 1px solid var(--border-color);
@@ -2067,7 +2082,7 @@ main {
 
 .search-input {
   width: 100%;
-  padding: 0.85rem 8.5rem 0.85rem 1.1rem;
+  padding: 0.85rem 6.25rem 0.85rem 1.1rem;
   font-size: 1.15rem;
   font-family: var(--font-body);
   border: 2px solid var(--border-color);
@@ -2135,11 +2150,7 @@ main {
 
 @media (max-width: 640px) {
   .recent-search-wrap {
-    position: static;
-  }
-
-  .recent-search-dropdown {
-    right: calc(-0.9rem - 0.75rem);
+    position: relative;
   }
 }
 
@@ -2235,7 +2246,8 @@ main {
   background: var(--gold-light);
 }
 
-.search-clear-button {
+.search-clear-button,
+.search-submit-button {
   width: 2.25rem;
   height: 2.25rem;
   display: grid;
@@ -2248,7 +2260,8 @@ main {
   box-shadow: var(--shadow-sm);
 }
 
-.search-clear-button svg {
+.search-clear-button svg,
+.search-submit-button svg {
   width: 1rem;
   height: 1rem;
   fill: none;
@@ -2262,6 +2275,34 @@ main {
   background: var(--gold-light);
   color: var(--crimson);
   transform: scale(1.05);
+}
+
+.search-submit-button {
+  border-color: var(--crimson);
+  background: var(--crimson);
+  color: #ffffff;
+}
+
+.search-submit-button:hover {
+  border-color: var(--crimson-hover);
+  background: var(--crimson-hover);
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.search-secondary-actions .icon-btn {
+  min-width: 2.25rem;
+  height: 2.25rem;
+}
+
+@media (max-width: 480px) {
+  .greek-key-table-toolbar {
+    align-items: flex-start;
+  }
+
+  .greek-key-table-toggle {
+    min-height: 2.25rem;
+  }
 }
 
 /* Dropdown Autocomplete / Recomandări la fiecare literă */
@@ -3287,7 +3328,7 @@ footer {
   }
 
   .search-input {
-    padding-right: 9rem;
+    padding-right: 6.25rem;
   }
 
   .modes-group-label {

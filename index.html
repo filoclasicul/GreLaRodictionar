@@ -124,33 +124,18 @@
               autocomplete="off"
             >
             <div class="search-actions">
-              <button class="icon-btn" id="searchSubmitBtn" data-action="submit-search" title="Caută" aria-label="Caută" hidden>🔎</button>
               <button class="icon-btn search-clear-button" type="button" data-action="clear-search" title="Șterge textul" aria-label="Șterge textul">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <circle cx="12" cy="12" r="9"></circle>
                   <path d="m9 9 6 6m0-6-6 6"></path>
                 </svg>
               </button>
-              <div class="recent-search-wrap">
-                <button
-                  class="icon-btn"
-                  id="recentSearchToggle"
-                  type="button"
-                  title="Căutări recente"
-                  aria-label="Căutări recente"
-                  aria-expanded="false"
-                  aria-controls="recentSearchDropdown"
-                  data-action="toggle-recent-searches"
-                >🕰️</button>
-                <div class="recent-search-dropdown" id="recentSearchDropdown" hidden>
-                  <div class="recent-search-header">
-                    <span>Căutări recente</span>
-                    <button class="recent-search-clear" id="clearRecentSearchesBtn" type="button" data-action="clear-recent-searches">Șterge tot</button>
-                  </div>
-                  <div class="recent-search-list" id="recentSearchList"></div>
-                </div>
-              </div>
-              <button class="icon-btn" id="kbdToggleBtn" data-action="toggle-keyboard" title="Tastatură diacritice" aria-label="Tastatură diacritice">ᾱ/ὦ</button>
+              <button class="icon-btn search-submit-button" id="searchSubmitBtn" type="button" data-action="submit-search" title="Caută" aria-label="Caută">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="10.5" cy="10.5" r="6.5"></circle>
+                  <path d="m15.5 15.5 5 5"></path>
+                </svg>
+              </button>
             </div>
             <div class="autocomplete-dropdown" id="autocompleteDropdown">
               <div class="dropdown-header">
@@ -161,14 +146,38 @@
             </div>
           </div>
           <div class="greek-key-table-section">
-            <button
-              class="greek-key-table-toggle"
-              id="greekKeyTableToggle"
-              type="button"
-              aria-expanded="false"
-              aria-controls="greekKeyTable"
-              data-action="toggle-greek-key-table"
-            >Tabel taste → greacă</button>
+            <div class="greek-key-table-toolbar">
+              <button
+                class="greek-key-table-toggle"
+                id="greekKeyTableToggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls="greekKeyTable"
+                data-action="toggle-greek-key-table"
+              >Tabel taste → greacă</button>
+              <div class="search-secondary-actions">
+                <div class="recent-search-wrap">
+                  <button
+                    class="icon-btn"
+                    id="recentSearchToggle"
+                    type="button"
+                    title="Căutări recente"
+                    aria-label="Căutări recente"
+                    aria-expanded="false"
+                    aria-controls="recentSearchDropdown"
+                    data-action="toggle-recent-searches"
+                  >🕰️</button>
+                  <div class="recent-search-dropdown" id="recentSearchDropdown" hidden>
+                    <div class="recent-search-header">
+                      <span>Căutări recente</span>
+                      <button class="recent-search-clear" id="clearRecentSearchesBtn" type="button" data-action="clear-recent-searches">Șterge tot</button>
+                    </div>
+                    <div class="recent-search-list" id="recentSearchList"></div>
+                  </div>
+                </div>
+                <button class="icon-btn" id="kbdToggleBtn" type="button" data-action="toggle-keyboard" title="Tastatură diacritice" aria-label="Tastatură diacritice">ᾱ/ὦ</button>
+              </div>
+            </div>
             <div class="greek-key-table-wrap">
               <table class="greek-key-table" id="greekKeyTable" aria-label="Corespondența literelor grecești cu tastele latine" hidden>
                 <tbody>

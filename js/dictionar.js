@@ -830,7 +830,6 @@ function setSearchMode(mode) {
     greekOutputToSource = convertedInput.outputToSource;
   }
   const kbdBtn = document.getElementById('kbdToggleBtn');
-  const searchSubmitBtn = document.getElementById('searchSubmitBtn');
   const kbdPanel = document.getElementById('keyboardPanel');
 
   kbdPanel.classList.remove('active');
@@ -838,7 +837,6 @@ function setSearchMode(mode) {
 
   const isReverse = mode.endsWith('-rev');
   kbdBtn.hidden = isReverse;
-  searchSubmitBtn.hidden = !isReverse;
 
   if (!isReverse) {
     input.placeholder = mode === 'greek-dir'
