@@ -551,6 +551,7 @@ function createTextBrowseCard(title, detail, onClick, options = {}) {
     image.alt = options.alt || title;
     image.loading = 'lazy';
     image.decoding = 'async';
+    image.crossOrigin = 'anonymous';
     image.addEventListener('error', () => {
       imageWrap.replaceChildren();
       imageWrap.textContent = '🏛️';
@@ -1366,6 +1367,7 @@ function renderTextBrowser() {
         image.alt = profile.alt || profile.name;
         image.loading = 'lazy';
         image.decoding = 'async';
+        image.crossOrigin = 'anonymous';
         image.addEventListener('error', () => {
           const fallback = document.createElement('div');
           fallback.className = 'texts-author-profile-icon';
