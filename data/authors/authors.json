@@ -84,5 +84,26 @@
     "alt": "Bustul lui Xenofon",
     "years": "c. 430–354 î.Hr.",
     "description": "Istoric, comandant și eseist grec, cunoscut pentru Anabasis, Memorabilia și relatările despre Socrate."
+  },
+  "Lucretius": {
+    "name": "Titus Lucretius Carus",
+    "image": "assets/authors/lucretius.jpg",
+    "alt": "Portretul lui Lucretius",
+    "years": "c. 94–55 î.Hr.",
+    "description": "Poet roman și filosof epicurean, autorul poemului didactic De rerum natura (Despre natura lucrurilor), care prezintă filosofia lui Epicur și teoriile atomiste."
+  },
+  "Quintilian": {
+    "name": "Marcus Fabius Quintilianus",
+    "image": "assets/authors/quintilian.jpg",
+    "alt": "Portretul lui Marcus Fabius Quintilianus",
+    "years": "c. 35–100 d.Hr.",
+    "description": "Retor și pedagog roman, autorul Institutio oratoria (Instituțiile oratorului), tratat complet despre educație și arta oratoriei."
+  },
+  "Seneca": {
+    "name": "Lucius Annaeus Seneca",
+    "image": "assets/authors/seneca.jpg",
+    "alt": "Portretul lui Seneca (Museo del Prado)",
+    "years": "c. 4 î.Hr.–65 d.Hr.",
+    "description": "Filosof stoic, dramaturg și om politic roman, autorul unor tratate filosofice, tragedii și Epistole morale."
   }
 }

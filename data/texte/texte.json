@@ -628,5 +628,117 @@
     "author": "Xenophon",
     "language": "grc",
     "volume": "1"
+  },
+  {
+    "path": "lat/Lucretius/phi0550.phi001.perseus-lat1.xml",
+    "title": "De Rerum Natura",
+    "author": "Lucretius",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Quintilian/phi1002.phi001.perseus-lat2.xml",
+    "title": "Institutio Oratoria",
+    "author": "Marcus Fabius Quintilianus",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Seneca/phi1017.phi001.perseus-lat2.xml",
+    "title": "Dialogi",
+    "author": "Lucius Annaeus Seneca",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Seneca/phi1017.phi002.perseus-lat2.xml",
+    "title": "De Providentia",
+    "author": "Lucius Annaeus Seneca",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Seneca/phi1017.phi003.perseus-lat2.xml",
+    "title": "De Constantia Sapientis",
+    "author": "Lucius Annaeus Seneca",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Seneca/phi1017.phi004.perseus-lat2.xml",
+    "title": "De Ira",
+    "author": "Lucius Annaeus Seneca",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Seneca/phi1017.phi005.perseus-lat2.xml",
+    "title": "De Consolatione ad Marciam",
+    "author": "Lucius Annaeus Seneca",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Seneca/phi1017.phi006.perseus-lat2.xml",
+    "title": "De Vita Beata",
+    "author": "Lucius Annaeus Seneca",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Seneca/phi1017.phi007.perseus-lat2.xml",
+    "title": "De Otio",
+    "author": "Lucius Annaeus Seneca",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Seneca/phi1017.phi008.perseus-lat2.xml",
+    "title": "De Brevitate Vitae",
+    "author": "Lucius Annaeus Seneca",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Seneca/phi1017.phi009.perseus-lat2.xml",
+    "title": "Epistularum Moralium ad Lucilium",
+    "author": "Lucius Annaeus Seneca",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Seneca/phi1017.phi010.perseus-lat2.xml",
+    "title": "De Clementia",
+    "author": "Lucius Annaeus Seneca",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Seneca/phi1017.phi011.perseus-lat2.xml",
+    "title": "Naturales Quaestiones",
+    "author": "Lucius Annaeus Seneca",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Seneca/phi1017.phi013.perseus-lat2.xml",
+    "title": "Hercules Furens",
+    "author": "Lucius Annaeus Seneca",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Seneca/phi1017.phi014.perseus-lat2.xml",
+    "title": "Thyesta",
+    "author": "Lucius Annaeus Seneca",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Seneca/phi1017.phi015.perseus-lat2.xml",
+    "title": "Oedipus",
+    "author": "Lucius Annaeus Seneca",
+    "language": "lat",
+    "volume": "1"
   }
 ]
