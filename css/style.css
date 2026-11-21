@@ -1889,6 +1889,39 @@ main {
   overflow-wrap: anywhere;
 }
 
+.texts-result-location {
+  margin: 0.9rem 0 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.texts-result-phrase {
+  padding: 0.75rem 0.9rem;
+  border-left: 3px solid var(--crimson);
+  border-radius: 6px;
+  background: var(--highlight);
+}
+
+.texts-result-open {
+  margin-top: 0.65rem;
+  padding: 0.48rem 0.75rem;
+  border: 1px solid var(--border-accent);
+  border-radius: 8px;
+  background: var(--gold-light);
+  color: var(--text-main);
+  font: 700 0.82rem var(--font-body);
+  cursor: pointer;
+}
+
+.texts-search-hit {
+  margin-inline: -0.55rem;
+  padding: 0.55rem;
+  border-radius: 8px;
+  background: var(--highlight);
+  box-shadow: inset 3px 0 0 var(--crimson);
+}
+
 .texts-full-text-toggle {
   margin-top: 0.8rem;
   color: var(--crimson);

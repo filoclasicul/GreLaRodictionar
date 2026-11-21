@@ -61,6 +61,7 @@ function normalizeTextSearch(value) {
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLocaleLowerCase('ro')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
@@ -82,6 +83,30 @@ function matchesTextTitlePrefix(title, query, languageGroup) {
   const normalizedTitle = normalizeTextSearch(title);
   return getTextSearchVariants(query, languageGroup)
     .some(variant => normalizedTitle.startsWith(variant));
+}
+
+function getTextSearchWordCount(query) {
+  return (String(query).match(/[\p{L}\p{M}\p{N}]+(?:[’'][\p{L}\p{M}\p{N}]+)*/gu) || []).length;
+}
+
+function findTextPhraseParagraphMatches(entry, query) {
+  if (getTextSearchWordCount(query) < 4) return [];
+
+  const variants = getTextSearchVariants(query, entry.languageGroup);
+  const matches = [];
+  entry.chapters.forEach(chapter => {
+    chapter.paragraphs.forEach((paragraph, paragraphIndex) => {
+      const normalizedParagraph = normalizeTextSearch(paragraph);
+      if (variants.some(variant => normalizedParagraph.includes(variant))) {
+        matches.push({
+          chapter,
+          paragraph,
+          paragraphIndex
+        });
+      }
+    });
+  });
+  return matches;
 }
 
 function validateTextDatabase(data) {
@@ -492,7 +517,7 @@ function createTextAttribution(entry) {
   return attribution;
 }
 
-function createTextResultCard(entry, query) {
+function createTextResultCard(entry, query, phraseMatches = []) {
   const card = document.createElement('article');
   card.className = 'texts-result-card';
 
@@ -503,19 +528,40 @@ function createTextResultCard(entry, query) {
   meta.textContent = [entry.author, entry.language].filter(Boolean).join(' · ');
   const attribution = createTextAttribution(entry);
   const normalizedText = normalizeTextSearch(entry.text);
-  const matchPosition = getTextSearchVariants(query, entry.languageGroup)
-    .map(variant => normalizedText.indexOf(variant))
-    .find(position => position >= 0) ?? -1;
-  const start = matchPosition > 120 ? matchPosition - 120 : 0;
-  const end = Math.min(entry.text.length, start + 480);
-  const excerptText = entry.text.slice(start, end);
-  const excerpt = document.createElement('p');
-  excerpt.className = 'texts-result-excerpt';
-  const completeExcerpt = completeTextExcerpt(excerptText);
-  excerpt.textContent = `${start > 0 ? '…' : ''}${completeExcerpt}${end < entry.text.length && !/[.!?;··]\s*$/.test(completeExcerpt) ? '…' : ''}`;
   card.append(title, meta);
   if (attribution) card.appendChild(attribution);
-  card.appendChild(excerpt);
+
+  if (phraseMatches.length) {
+    phraseMatches.forEach(match => {
+      const location = document.createElement('p');
+      location.className = 'texts-result-location';
+      location.textContent = `Volumul ${entry.volume} · Capitolul ${match.chapter.number} · Paragraful ${match.paragraphIndex + 1}`;
+
+      const excerpt = document.createElement('p');
+      excerpt.className = 'texts-result-excerpt texts-result-phrase';
+      excerpt.textContent = completeTextExcerpt(match.paragraph, 360, 520);
+
+      const openButton = document.createElement('button');
+      openButton.type = 'button';
+      openButton.className = 'texts-result-open';
+      openButton.textContent = 'Deschide la locul găsit';
+      openButton.addEventListener('click', () => openTextSearchMatch(entry, match, query));
+
+      card.append(location, excerpt, openButton);
+    });
+  } else {
+    const matchPosition = getTextSearchVariants(query, entry.languageGroup)
+      .map(variant => normalizedText.indexOf(variant))
+      .find(position => position >= 0) ?? -1;
+    const start = matchPosition > 120 ? matchPosition - 120 : 0;
+    const end = Math.min(entry.text.length, start + 480);
+    const excerptText = entry.text.slice(start, end);
+    const excerpt = document.createElement('p');
+    excerpt.className = 'texts-result-excerpt';
+    const completeExcerpt = completeTextExcerpt(excerptText);
+    excerpt.textContent = `${start > 0 ? '…' : ''}${completeExcerpt}${end < entry.text.length && !/[.!?;··]\s*$/.test(completeExcerpt) ? '…' : ''}`;
+    card.appendChild(excerpt);
+  }
 
   if (entry.text.length > 320) {
     const details = document.createElement('details');
@@ -1239,9 +1285,12 @@ function renderTextChapter() {
 
   const chapterText = document.createElement('div');
   chapterText.className = 'texts-chapter-text';
-  chapter.paragraphs.forEach(text => {
+  chapter.paragraphs.forEach((text, paragraphIndex) => {
     const paragraph = document.createElement('p');
     paragraph.textContent = text;
+    if (activeTextChapter.searchParagraphIndex === paragraphIndex) {
+      paragraph.classList.add('texts-search-hit');
+    }
     linkifyTextWords(paragraph, record.languageGroup);
     chapterText.appendChild(paragraph);
   });
@@ -1854,6 +1903,32 @@ function openTextSuggestion(suggestion) {
   else showWorkVolumes(suggestion.label);
 }
 
+function openTextSearchMatch(entry, match, query) {
+  cancelTextNavigationLoad();
+  textNavigation = {
+    level: 'chapter',
+    languageGroup: entry.languageGroup,
+    author: entry.author,
+    work: entry.title,
+    volume: String(entry.volume)
+  };
+  activeTextChapter = {
+    record: entry,
+    chapter: match.chapter,
+    searchQuery: query,
+    searchParagraphIndex: match.paragraphIndex
+  };
+  showingTextFavoritesPage = false;
+  textsSearchResults.hidden = true;
+  textsBrowser.hidden = false;
+  pushTextBrowserHistoryState();
+  renderTextBrowser();
+  window.setTimeout(() => {
+    const hit = textsChapterView.querySelector('.texts-search-hit');
+    hit?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 50);
+}
+
 async function renderTextsSearchResults(query) {
   textsSearchResults.replaceChildren();
   textsAutocomplete.classList.remove('active');
@@ -1871,24 +1946,47 @@ async function renderTextsSearchResults(query) {
     return;
   }
 
+  const wordCount = getTextSearchWordCount(query);
+  const isPhraseSearch = wordCount >= 4;
+
   textsBrowser.hidden = true;
   textsSearchResults.hidden = false;
   if (!textDatabaseLoaded) {
     setTextsSearchStatus('Se caută în textele accesate…');
     await loadTextDatabase();
   }
-  const matches = textDatabase.filter(entry => {
+  let matchCount = 0;
+  const matches = [];
+  textDatabase.forEach(entry => {
+    if (isPhraseSearch) {
+      const phraseMatches = findTextPhraseParagraphMatches(entry, query);
+      if (phraseMatches.length) {
+        matchCount += phraseMatches.length;
+        matches.push({ entry, phraseMatches });
+      }
+      return;
+    }
+
     const searchableContent = [entry.title, entry.author || '', entry.language || '', entry.text].join(' ');
-    return matchesTextSearch(searchableContent, query, entry.languageGroup);
+    if (matchesTextSearch(searchableContent, query, entry.languageGroup)) {
+      matchCount += 1;
+      matches.push({ entry, phraseMatches: [] });
+    }
   });
 
   if (!matches.length) {
-    setTextsSearchStatus('Nu am găsit texte care să corespundă căutării.');
+    setTextsSearchStatus(isPhraseSearch
+      ? 'Nu am găsit această frază în paragrafele textelor.'
+      : 'Nu am găsit texte care să corespundă căutării.');
     return;
   }
 
-  matches.forEach(entry => textsSearchResults.appendChild(createTextResultCard(entry, query)));
-  setTextsSearchStatus(`${matches.length} ${matches.length === 1 ? 'rezultat găsit' : 'rezultate găsite'}.`);
+  matches.forEach(({ entry, phraseMatches }) =>
+    textsSearchResults.appendChild(createTextResultCard(entry, query, phraseMatches))
+  );
+  setTextsSearchStatus(isPhraseSearch
+    ? `${matchCount} ${matchCount === 1 ? 'potrivire găsită' : 'potriviri găsite'} în paragrafe.`
+    : `${matches.length} ${matches.length === 1 ? 'rezultat găsit' : 'rezultate găsite'}.`);
 }
 
 function getTextCatalogEntry(reference) {

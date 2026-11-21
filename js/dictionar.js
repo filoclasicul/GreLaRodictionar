@@ -838,13 +838,7 @@ function setSearchMode(mode) {
   const isReverse = mode.endsWith('-rev');
   kbdBtn.hidden = isReverse;
 
-  if (!isReverse) {
-    input.placeholder = mode === 'greek-dir'
-      ? 'Tastează transliterarea: „logos” → „λόγος”'
-      : "Tastează o literă sau un cuvânt";
-  } else {
-    input.placeholder = "Tastează un cuvânt în română...";
-  }
+  input.placeholder = "Tastează o literă sau un cuvânt";
 
   if (isReverse) {
     document.getElementById('autocompleteDropdown').classList.remove('active');
