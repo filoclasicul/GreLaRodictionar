@@ -39,21 +39,21 @@
     "title": "Ἀθηναίων πολιτεία",
     "author": "Aristotle",
     "language": "grc",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "gr/Aristotel/tlg0086.tlg009.perseus-grc2.xml",
     "title": "Ἠθικὰ Εὐδήμεια",
     "author": "Aristotle",
     "language": "grc",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "gr/Aristotel/tlg0086.tlg010.perseus-grc2.xml",
     "title": "Ἠθικὰ Νικομάχεια",
     "author": "Aristotle",
     "language": "grc",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "gr/Aristotel/tlg0086.tlg025.perseus-grc2.xml",
@@ -67,7 +67,7 @@
     "title": "Οἰκονομικά",
     "author": "Aristotle",
     "language": "grc",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "gr/Aristotel/tlg0086.tlg034.digicorpus-grc2.xml",
@@ -81,14 +81,14 @@
     "title": "Πολιτικά",
     "author": "Aristotle",
     "language": "grc",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "gr/Aristotel/tlg0086.tlg038.perseus-grc2.xml",
     "title": "Ῥητορική",
     "author": "Aristotle",
     "language": "grc",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "gr/Aristotel/tlg0086.tlg045.perseus-grc2.xml",
@@ -96,6 +96,27 @@
     "author": "Aristotle",
     "language": "grc",
     "volume": "2"
+  },
+  {
+    "path": "gr/Hesiod/tlg0020.tlg001.perseus-grc2.xml",
+    "title": "Θεογονία",
+    "author": "Hesiod",
+    "language": "grc",
+    "volume": null
+  },
+  {
+    "path": "gr/Hesiod/tlg0020.tlg002.perseus-grc2.xml",
+    "title": "Ἔργα καὶ Ἡμέραι",
+    "author": "Hesiod",
+    "language": "grc",
+    "volume": null
+  },
+  {
+    "path": "gr/Hesiod/tlg0020.tlg003.perseus-grc2.xml",
+    "title": "Ἀσπὶς Ἡρακλέους",
+    "author": "Hesiod",
+    "language": "grc",
+    "volume": null
   },
   {
     "path": "gr/Homer/tlg0012.tlg001.perseus-grc2.xml",
@@ -116,7 +137,7 @@
     "title": "Ἐπιγράμματα",
     "author": "Homer",
     "language": "grc",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "gr/Plato/tlg0059.tlg001.perseus-grc1.xml",
@@ -163,6 +184,13 @@
   {
     "path": "gr/Plato/tlg0059.tlg007.perseus-grc2.xml",
     "title": "Σοφιστής",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg008.perseus-grc2 (1).xml",
+    "title": "Πολιτικός",
     "author": "Plato",
     "language": "grc",
     "volume": "1"
@@ -280,6 +308,13 @@
     "volume": "3"
   },
   {
+    "path": "gr/Plato/tlg0059.tlg024.perseus-grc2 (1).xml",
+    "title": "Μένων",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "3"
+  },
+  {
     "path": "gr/Plato/tlg0059.tlg024.perseus-grc2.xml",
     "title": "Μένων",
     "author": "Plato",
@@ -289,6 +324,13 @@
   {
     "path": "gr/Plato/tlg0059.tlg025.perseus-grc2.xml",
     "title": "Ἱππίας μείζων",
+    "author": "Plato",
+    "language": "grc",
+    "volume": "3"
+  },
+  {
+    "path": "gr/Plato/tlg0059.tlg026.perseus-grc2 (1).xml",
+    "title": "Ἱππίας ἐλάττων",
     "author": "Plato",
     "language": "grc",
     "volume": "3"
@@ -371,25 +413,130 @@
     "volume": "5.2"
   },
   {
+    "path": "gr/Tucidide/tlg0003.tlg001.perseus-grc2.xml",
+    "title": "Ἱστορίαι",
+    "author": "Thucydides",
+    "language": "grc",
+    "volume": "1-2"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg001.perseus-grc2.xml",
+    "title": "Ἑλληνικά",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "1"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg002.perseus-grc2.xml",
+    "title": "Ἀπομνημονεύματα",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "2"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg003.perseus-grc2.xml",
+    "title": "Οἰκονομικός",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "2"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg004.perseus-grc2.xml",
+    "title": "Συμπόσιον",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "2"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg005.perseus-grc2.xml",
+    "title": "Ἀπολογία Σωκράτους",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "2"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg006.perseus-grc2.xml",
+    "title": "Ἀνάβασις",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "3"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg007.perseus-grc2.xml",
+    "title": "Κύρου παιδεία",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "4"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg008.perseus-grc2.xml",
+    "title": "Ἱέρων",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "5"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg009.perseus-grc2.xml",
+    "title": "Ἀγησίλαος",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "5"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg010.perseus-grc2.xml",
+    "title": "Λακεδαιμονίων Πολιτεία",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "5"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg011.perseus-grc2.xml",
+    "title": "Πόροι ἢ περὶ προσόδων",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "5"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg012.perseus-grc2.xml",
+    "title": "Ἱππαρχικός",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "5"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg013.perseus-grc2.xml",
+    "title": "Περὶ ἱππικῆς",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "5"
+  },
+  {
+    "path": "gr/Xenofon/tlg0032.tlg014.perseus-grc2.xml",
+    "title": "Κυνηγετικός",
+    "author": "Xenophon",
+    "language": "grc",
+    "volume": "5"
+  },
+  {
     "path": "lat/Caesar/phi0448.phi001.perseus-lat2.xml",
     "title": "De bello Gallico",
     "author": "Julius Caesar",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Caesar/phi0448.phi002.perseus-lat2.xml",
     "title": "De Bello Civili",
     "author": "Julius Caesar",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Caesar/phi0448.phi002.perseus-lat3.xml",
     "title": "The Civil Wars",
     "author": "Julius Caesar",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Cicero/phi0474.phi001.perseus-lat2.xml",
@@ -427,9 +574,156 @@
     "volume": "3"
   },
   {
-    "path": "lat/Cicero/phi0474.phi005.perseus-lat2.xml",
-    "title": "In C. Verrem",
+    "path": "lat/Cicero/phi0474.phi006.perseus-lat2 (1).xml",
+    "title": "Pro M. Tullio",
     "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "6"
+  },
+  {
+    "path": "lat/Cicero/phi0474.phi007.perseus-lat2 (1).xml",
+    "title": "Pro M. Fonteio",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "6"
+  },
+  {
+    "path": "lat/Cicero/phi0474.phi008.perseus-lat2.xml",
+    "title": "Pro A. Caecina",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "4"
+  },
+  {
+    "path": "lat/Cicero/phi0474.phi009.perseus-lat2.xml",
+    "title": "De Imperio Cn. Pompei Ad Quirites",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Cicero/phi0474.phi010.perseus-lat2.xml",
+    "title": "Pro A. Cluentio",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Cicero/phi0474.phi011.perseus-lat2.xml",
+    "title": "De Lege Agraria",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "4"
+  },
+  {
+    "path": "lat/Cicero/phi0474.phi012.perseus-lat2.xml",
+    "title": "Pro C. Rabirio Perduellionis Reo Ad Quirites",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "4"
+  },
+  {
+    "path": "lat/Cicero/phi0474.phi013.perseus-lat2.xml",
+    "title": "In L. Catilinam",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Cicero/phi0474.phi014.perseus-lat2.xml",
+    "title": "Pro L. Murena",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Cicero/phi0474.phi015.perseus-lat2.xml",
+    "title": "Pro P. Sulla",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "6"
+  },
+  {
+    "path": "lat/Cicero/phi0474.phi016.perseus-lat2.xml",
+    "title": "Pro Archia Poeta",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "6"
+  },
+  {
+    "path": "lat/Cicero/phi0474.phi017.perseus-lat2.xml",
+    "title": "Pro L. Flacco",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "4"
+  },
+  {
+    "path": "lat/Cicero/phi0474.phi018.perseus-lat2.xml",
+    "title": "Cum Populo Gratias Egit",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "5"
+  },
+  {
+    "path": "lat/Cicero/phi0474.phi019.perseus-lat2.xml",
+    "title": "Cum Senatui Gratias Egit",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "5"
+  },
+  {
+    "path": "lat/Cicero/phi0474.phi020.perseus-lat2.xml",
+    "title": "De Domo Sua Ad Pontifices",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "5"
+  },
+  {
+    "path": "lat/Cicero/phi0474.phi021.perseus-lat2.xml",
+    "title": "De Haruspicum Responso in P. Clodium in Senatu Habita",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "5"
+  },
+  {
+    "path": "lat/Cicero/phi0474.phi022.perseus-lat2.xml",
+    "title": "Pro P. Sestio",
+    "author": "M. Tullius Cicero",
+    "language": "lat",
+    "volume": "5"
+  },
+  {
+    "path": "lat/Cicero/phi0959.phi006.perseus-lat2.xml",
+    "title": "Metamorphoses",
+    "author": "P. Ovidius Naso",
+    "language": "lat",
+    "volume": "1-3"
+  },
+  {
+    "path": "lat/Cicero/phi0959.phi007.perseus-lat2.xml",
+    "title": "Fasti",
+    "author": "P. Ovidius Naso",
+    "language": "lat",
+    "volume": null
+  },
+  {
+    "path": "lat/Cicero/phi0959.phi008.perseus-lat2.xml",
+    "title": "Tristia",
+    "author": "P. Ovidius Naso",
+    "language": "lat",
+    "volume": null
+  },
+  {
+    "path": "lat/Cicero/phi0959.phi009.perseus-lat2.xml",
+    "title": "Ex Ponto",
+    "author": "P. Ovidius Naso",
+    "language": "lat",
+    "volume": null
+  },
+  {
+    "path": "lat/Cicero/phi0959.phi010.perseus-lat2.xml",
+    "title": "Ibis",
+    "author": "P. Ovidius Naso",
     "language": "lat",
     "volume": "3"
   },
@@ -438,21 +732,21 @@
     "title": "Carmina",
     "author": "Q. Horatius Flaccus",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Horatius/phi0893.phi002.perseus-lat2.xml",
     "title": "Carmen Saeculare",
     "author": "Q. Horatius Flaccus",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Horatius/phi0893.phi003.perseus-lat2.xml",
     "title": "Epodon",
     "author": "Q. Horatius Flaccus",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Horatius/phi0893.phi004.perseus-lat2.xml",
@@ -466,7 +760,7 @@
     "title": "Epistulae",
     "author": "Q. Horatius Flaccus",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Horatius/phi0893.phi006.perseus-lat2.xml",
@@ -476,39 +770,11 @@
     "volume": "2"
   },
   {
-    "path": "lat/Ovidiu/phi0959.phi001.perseus-lat2.xml",
-    "title": "Amores",
-    "author": "P. Ovidius Naso",
-    "language": "lat",
-    "volume": "1"
-  },
-  {
-    "path": "lat/Vergilius/phi0690.phi001.perseus-lat2.xml",
-    "title": "Eclogues",
-    "author": "P. Vergilius Maro",
-    "language": "lat",
-    "volume": "1"
-  },
-  {
-    "path": "lat/Vergilius/phi0690.phi002.perseus-lat2.xml",
-    "title": "Georgicon",
-    "author": "P. Vergilius Maro",
-    "language": "lat",
-    "volume": "1"
-  },
-  {
-    "path": "lat/Vergilius/phi0690.phi003.perseus-lat2.xml",
-    "title": "Aeneid",
-    "author": "P. Vergilius Maro",
-    "language": "lat",
-    "volume": "1"
-  },
-  {
     "path": "lat/Liviu/phi0914.phi001.perseus-lat2.xml",
     "title": "Ab urbe condita",
     "author": "Titus Livius (Livy)",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Liviu/phi0914.phi001.perseus-lat3.xml",
@@ -522,7 +788,7 @@
     "title": "Ab Urbe Condita, books 1-5, 8-10, 21-30, 43-45, with periochae 11-20",
     "author": "Titus Livius (Livy)",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Liviu/phi0914.phi001.perseus-lat5.xml",
@@ -532,220 +798,206 @@
     "volume": "7.1"
   },
   {
-    "path": "gr/Tucidide/tlg0003.tlg001.perseus-grc2.xml",
-    "title": "Ἱστορίαι",
-    "author": "Thucydides",
-    "language": "grc",
-    "volume": "1"
-  },
-  {
-    "path": "gr/Xenofon/tlg0032.tlg001.perseus-grc2.xml",
-    "title": "Ἑλληνικά",
-    "author": "Xenophon",
-    "language": "grc",
-    "volume": "1"
-  },
-  {
-    "path": "gr/Xenofon/tlg0032.tlg002.perseus-grc2.xml",
-    "title": "Ἀπομνημονεύματα",
-    "author": "Xenophon",
-    "language": "grc",
-    "volume": "1"
-  },
-  {
-    "path": "gr/Xenofon/tlg0032.tlg003.perseus-grc2.xml",
-    "title": "Οἰκονομικός",
-    "author": "Xenophon",
-    "language": "grc",
-    "volume": "1"
-  },
-  {
-    "path": "gr/Xenofon/tlg0032.tlg004.perseus-grc2.xml",
-    "title": "Συμπόσιον",
-    "author": "Xenophon",
-    "language": "grc",
-    "volume": "1"
-  },
-  {
-    "path": "gr/Xenofon/tlg0032.tlg005.perseus-grc2.xml",
-    "title": "Ἀπολογία Σωκράτους",
-    "author": "Xenophon",
-    "language": "grc",
-    "volume": "1"
-  },
-  {
-    "path": "gr/Xenofon/tlg0032.tlg006.perseus-grc2.xml",
-    "title": "Ἀνάβασις",
-    "author": "Xenophon",
-    "language": "grc",
-    "volume": "1"
-  },
-  {
-    "path": "gr/Xenofon/tlg0032.tlg007.perseus-grc2.xml",
-    "title": "Κύρου παιδεία",
-    "author": "Xenophon",
-    "language": "grc",
-    "volume": "1"
-  },
-  {
-    "path": "gr/Xenofon/tlg0032.tlg008.perseus-grc2.xml",
-    "title": "Ἱέρων",
-    "author": "Xenophon",
-    "language": "grc",
-    "volume": "1"
-  },
-  {
-    "path": "gr/Xenofon/tlg0032.tlg009.perseus-grc2.xml",
-    "title": "Ἀγησίλαος",
-    "author": "Xenophon",
-    "language": "grc",
-    "volume": "1"
-  },
-  {
-    "path": "gr/Xenofon/tlg0032.tlg010.perseus-grc2.xml",
-    "title": "Λακεδαιμονίων Πολιτεία",
-    "author": "Xenophon",
-    "language": "grc",
-    "volume": "1"
-  },
-  {
-    "path": "gr/Xenofon/tlg0032.tlg011.perseus-grc2.xml",
-    "title": "Πόροι ἢ περὶ προσόδων",
-    "author": "Xenophon",
-    "language": "grc",
-    "volume": "1"
-  },
-  {
-    "path": "gr/Xenofon/tlg0032.tlg012.perseus-grc2.xml",
-    "title": "Ἱππαρχικός",
-    "author": "Xenophon",
-    "language": "grc",
-    "volume": "1"
-  },
-  {
-    "path": "gr/Xenofon/tlg0032.tlg013.perseus-grc2.xml",
-    "title": "Περὶ ἱππικῆς",
-    "author": "Xenophon",
-    "language": "grc",
-    "volume": "1"
-  },
-  {
-    "path": "gr/Xenofon/tlg0032.tlg014.perseus-grc2.xml",
-    "title": "Κυνηγετικός",
-    "author": "Xenophon",
-    "language": "grc",
-    "volume": "1"
-  },
-  {
     "path": "lat/Lucretius/phi0550.phi001.perseus-lat1.xml",
     "title": "De Rerum Natura",
     "author": "Lucretius",
     "language": "lat",
+    "volume": null
+  },
+  {
+    "path": "lat/Ovidiu/phi0959.phi001.perseus-lat2.xml",
+    "title": "Amores",
+    "author": "P. Ovidius Naso",
+    "language": "lat",
     "volume": "1"
+  },
+  {
+    "path": "lat/Ovidiu/phi0959.phi002.perseus-lat2.xml",
+    "title": "Epistulae",
+    "author": "P. Ovidius Naso",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Ovidiu/phi0959.phi003.perseus-lat2.xml",
+    "title": "Medicamina faciei femineae",
+    "author": "P. Ovidius Naso",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Ovidiu/phi0959.phi004.perseus-lat2.xml",
+    "title": "Ars Amatoria",
+    "author": "P. Ovidius Naso",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Ovidiu/phi0959.phi005.perseus-lat2.xml",
+    "title": "Remedia Amoris",
+    "author": "P. Ovidius Naso",
+    "language": "lat",
+    "volume": "1"
+  },
+  {
+    "path": "lat/Ovidiu/phi0959.phi006.perseus-lat2.xml",
+    "title": "Metamorphoses",
+    "author": "P. Ovidius Naso",
+    "language": "lat",
+    "volume": "1-3"
+  },
+  {
+    "path": "lat/Ovidiu/phi0959.phi007.perseus-lat2.xml",
+    "title": "Fasti",
+    "author": "P. Ovidius Naso",
+    "language": "lat",
+    "volume": null
+  },
+  {
+    "path": "lat/Ovidiu/phi0959.phi008.perseus-lat2.xml",
+    "title": "Tristia",
+    "author": "P. Ovidius Naso",
+    "language": "lat",
+    "volume": null
+  },
+  {
+    "path": "lat/Ovidiu/phi0959.phi009.perseus-lat2.xml",
+    "title": "Ex Ponto",
+    "author": "P. Ovidius Naso",
+    "language": "lat",
+    "volume": null
+  },
+  {
+    "path": "lat/Ovidiu/phi0959.phi010.perseus-lat2.xml",
+    "title": "Ibis",
+    "author": "P. Ovidius Naso",
+    "language": "lat",
+    "volume": "3"
   },
   {
     "path": "lat/Quintilian/phi1002.phi001.perseus-lat2.xml",
     "title": "Institutio Oratoria",
-    "author": "Marcus Fabius Quintilianus",
+    "author": "Quintilian",
     "language": "lat",
-    "volume": "1"
+    "volume": "1-4"
   },
   {
     "path": "lat/Seneca/phi1017.phi001.perseus-lat2.xml",
-    "title": "Dialogi",
-    "author": "Lucius Annaeus Seneca",
+    "title": "Hercules",
+    "author": "Seneca, Lucius Annaeus",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Seneca/phi1017.phi002.perseus-lat2.xml",
-    "title": "De Providentia",
-    "author": "Lucius Annaeus Seneca",
+    "title": "Troades",
+    "author": "Seneca, Lucius Annaeus",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Seneca/phi1017.phi003.perseus-lat2.xml",
-    "title": "De Constantia Sapientis",
-    "author": "Lucius Annaeus Seneca",
+    "title": "Phoenissae",
+    "author": "Seneca, Lucius Annaeus",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Seneca/phi1017.phi004.perseus-lat2.xml",
-    "title": "De Ira",
-    "author": "Lucius Annaeus Seneca",
+    "title": "Medea",
+    "author": "Seneca, Lucius Annaeus",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Seneca/phi1017.phi005.perseus-lat2.xml",
-    "title": "De Consolatione ad Marciam",
-    "author": "Lucius Annaeus Seneca",
+    "title": "Phaedra",
+    "author": "Seneca, Lucius Annaeus",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Seneca/phi1017.phi006.perseus-lat2.xml",
-    "title": "De Vita Beata",
-    "author": "Lucius Annaeus Seneca",
+    "title": "Oedipus",
+    "author": "Seneca, Lucius Annaeus",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Seneca/phi1017.phi007.perseus-lat2.xml",
-    "title": "De Otio",
-    "author": "Lucius Annaeus Seneca",
+    "title": "Agamemnon",
+    "author": "Seneca, Lucius Annaeus",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Seneca/phi1017.phi008.perseus-lat2.xml",
-    "title": "De Brevitate Vitae",
-    "author": "Lucius Annaeus Seneca",
+    "title": "Thyestes",
+    "author": "Seneca, Lucius Annaeus",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Seneca/phi1017.phi009.perseus-lat2.xml",
-    "title": "Epistularum Moralium ad Lucilium",
-    "author": "Lucius Annaeus Seneca",
+    "title": "Hercules Oetaeus",
+    "author": "Seneca, Lucius Annaeus",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Seneca/phi1017.phi010.perseus-lat2.xml",
-    "title": "De Clementia",
-    "author": "Lucius Annaeus Seneca",
+    "title": "Octavia",
+    "author": "Seneca, Lucius Annaeus",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Seneca/phi1017.phi011.perseus-lat2.xml",
-    "title": "Naturales Quaestiones",
-    "author": "Lucius Annaeus Seneca",
+    "title": "Apocolocyntosis",
+    "author": "Seneca, Lucius Annaeus",
     "language": "lat",
-    "volume": "1"
+    "volume": null
   },
   {
     "path": "lat/Seneca/phi1017.phi013.perseus-lat2.xml",
-    "title": "Hercules Furens",
-    "author": "Lucius Annaeus Seneca",
+    "title": "De Beneficiis",
+    "author": "Seneca, Lucius Annaeus",
     "language": "lat",
-    "volume": "1"
+    "volume": "3"
   },
   {
     "path": "lat/Seneca/phi1017.phi014.perseus-lat2.xml",
-    "title": "Thyesta",
-    "author": "Lucius Annaeus Seneca",
+    "title": "De Clementia",
+    "author": "Seneca, Lucius Annaeus",
     "language": "lat",
     "volume": "1"
   },
   {
     "path": "lat/Seneca/phi1017.phi015.perseus-lat2.xml",
-    "title": "Oedipus",
-    "author": "Lucius Annaeus Seneca",
+    "title": "Ad Lucilium Epistulae Morales",
+    "author": "Seneca, Lucius Annaeus",
     "language": "lat",
-    "volume": "1"
+    "volume": "1-3"
+  },
+  {
+    "path": "lat/Vergilius/phi0690.phi001.perseus-lat2.xml",
+    "title": "Eclogues",
+    "author": "P. Vergilius Maro",
+    "language": "lat",
+    "volume": null
+  },
+  {
+    "path": "lat/Vergilius/phi0690.phi002.perseus-lat2.xml",
+    "title": "Georgicon",
+    "author": "P. Vergilius Maro",
+    "language": "lat",
+    "volume": null
+  },
+  {
+    "path": "lat/Vergilius/phi0690.phi003.perseus-lat2.xml",
+    "title": "Aeneid",
+    "author": "P. Vergilius Maro",
+    "language": "lat",
+    "volume": null
   }
 ]
