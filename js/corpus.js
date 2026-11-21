@@ -563,26 +563,12 @@ function createTextResultCard(entry, query, phraseMatches = []) {
     card.appendChild(excerpt);
   }
 
-  if (entry.text.length > 320) {
-    const details = document.createElement('details');
-    const summary = document.createElement('summary');
-    summary.className = 'texts-full-text-toggle';
-    summary.textContent = 'Citește textul integral';
-    details.open = !query;
-    const fullText = document.createElement('p');
-    fullText.className = 'texts-full-text';
-    fullText.textContent = entry.text;
-    details.append(summary, fullText);
-    
-    // Adauga TTS pentru textul complet dacă browserul le suportă
-    if (typeof tts !== 'undefined' && tts.isSupported()) {
-      const ttsContainer = document.createElement('div');
-      addTTSControls(ttsContainer, entry.text, entry.languageGroup);
-      details.appendChild(ttsContainer);
-    }
-
-    card.appendChild(details);
-  }
+  const openButton = document.createElement('button');
+  openButton.type = 'button';
+  openButton.className = 'texts-result-open';
+  openButton.textContent = 'Deschide textul integral';
+  openButton.addEventListener('click', () => openTextDocumentFromResult(entry, query));
+  card.appendChild(openButton);
 
   return card;
 }
@@ -1875,17 +1861,149 @@ async function updateTextAutocomplete(query) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'texts-autocomplete-item';
+    const copy = document.createElement('span');
+    copy.className = 'texts-autocomplete-copy';
     const label = document.createElement('span');
     label.className = 'texts-autocomplete-label';
     label.textContent = suggestion.label;
+    copy.appendChild(label);
+    if (suggestion.type === 'work' && suggestion.author) {
+      const author = document.createElement('span');
+      author.className = 'texts-autocomplete-author';
+      author.textContent = suggestion.author;
+      copy.appendChild(author);
+    }
     const type = document.createElement('span');
     type.className = 'texts-autocomplete-type';
     type.textContent = suggestion.type === 'author' ? 'Autor' : 'Text';
-    button.append(label, type);
+    button.append(copy, type);
     button.addEventListener('click', () => openTextSuggestion(suggestion));
     textsAutocompleteList.appendChild(button);
   });
   textsAutocomplete.classList.add('active');
+}
+
+function populateTextSearchFilters() {
+  if (!textsLatinAuthorFilter || !textsGreekAuthorFilter || !textsWorkFilter) return;
+
+  const latinAuthors = [...new Set(textCatalog
+    .filter(entry => entry.languageGroup === 'lat')
+    .map(entry => entry.author)
+    .filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right, 'ro'));
+  const greekAuthors = [...new Set(textCatalog
+    .filter(entry => entry.languageGroup === 'gr')
+    .map(entry => entry.author)
+    .filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right, 'ro'));
+
+  setupTextFilterAutocomplete(textsLatinAuthorFilter, 'textsLatinAuthors', () => latinAuthors, true);
+  setupTextFilterAutocomplete(textsGreekAuthorFilter, 'textsGreekAuthors', () => greekAuthors, true);
+  populateTextWorkFilter();
+}
+
+function populateTextWorkFilter() {
+  if (!textsWorkFilter) return;
+  const latinAuthor = textsLatinAuthorFilter.value.trim();
+  const greekAuthor = textsGreekAuthorFilter.value.trim();
+  const author = latinAuthor || greekAuthor;
+  const languageGroup = latinAuthor ? 'lat' : greekAuthor ? 'gr' : '';
+  const exactAuthorSelected = Boolean(author) && textCatalog.some(entry =>
+    (!languageGroup || entry.languageGroup === languageGroup)
+    && normalizeTextSearch(entry.author) === normalizeTextSearch(author)
+  );
+
+  const works = [...new Set(textCatalog
+    .filter(entry => (!exactAuthorSelected || (
+      (!languageGroup || entry.languageGroup === languageGroup)
+      && normalizeTextSearch(entry.author) === normalizeTextSearch(author)
+    )))
+    .map(entry => entry.title)
+    .filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right, 'ro'));
+  setupTextFilterAutocomplete(textsWorkFilter, 'textsWorkOptions', () => works, false);
+}
+
+function setupTextFilterAutocomplete(input, listId, getOptions, isAuthor) {
+  const list = document.getElementById(listId);
+  if (!input || !list) return;
+
+  const renderOptions = () => {
+    const query = normalizeTextSearch(input.value);
+    const options = getOptions().filter(option =>
+      !query || normalizeTextSearch(option).includes(query)
+    ).slice(0, 12);
+    list.replaceChildren();
+    options.forEach(option => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'texts-filter-option';
+      button.textContent = option;
+      button.setAttribute('role', 'option');
+      button.addEventListener('mousedown', event => event.preventDefault());
+      button.addEventListener('click', () => {
+        input.value = option;
+        list.hidden = true;
+        const toggle = list.parentElement?.querySelector('.texts-filter-toggle');
+        if (toggle) {
+          toggle.textContent = '⌃';
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+        if (isAuthor) {
+          const isLatin = input === textsLatinAuthorFilter;
+          if (isLatin) textsGreekAuthorFilter.value = '';
+          else textsLatinAuthorFilter.value = '';
+          textsWorkFilter.value = '';
+          populateTextWorkFilter();
+        }
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      list.appendChild(button);
+    });
+    list.hidden = options.length === 0;
+    const toggle = list.parentElement?.querySelector('.texts-filter-toggle');
+    if (toggle) {
+      toggle.textContent = list.hidden ? '⌃' : '⌄';
+      toggle.setAttribute('aria-expanded', String(!list.hidden));
+    }
+  };
+
+  input.onfocus = renderOptions;
+  input.oninput = () => {
+    if (isAuthor) {
+      textsWorkFilter.value = '';
+      populateTextWorkFilter();
+    }
+    renderOptions();
+  };
+  input.onblur = () => {
+    window.setTimeout(() => {
+      if (document.activeElement === input) return;
+      list.hidden = true;
+      const toggle = list.parentElement?.querySelector('.texts-filter-toggle');
+      if (toggle) {
+        toggle.textContent = '⌃';
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    }, 120);
+  };
+  input.onkeydown = event => {
+    if (event.key === 'Escape') {
+      list.hidden = true;
+      const toggle = list.parentElement?.querySelector('.texts-filter-toggle');
+      if (toggle) {
+        toggle.textContent = '⌃';
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    }
+    if (event.key === 'Enter' && !list.hidden) {
+      const firstOption = list.querySelector('.texts-filter-option');
+      if (firstOption) {
+        event.preventDefault();
+        firstOption.click();
+      }
+    }
+  };
 }
 
 function openTextSuggestion(suggestion) {
@@ -1929,9 +2047,38 @@ function openTextSearchMatch(entry, match, query) {
   }, 50);
 }
 
+function openTextDocumentFromResult(entry, query) {
+  const variants = getTextSearchVariants(query, entry.languageGroup);
+  let selectedChapter = entry.chapters[0] || null;
+  let selectedParagraphIndex = 0;
+
+  if (variants.length) {
+    let found = false;
+    entry.chapters.forEach(chapter => {
+      if (found) return;
+      chapter.paragraphs.forEach((paragraph, paragraphIndex) => {
+        if (!found && variants.some(variant => normalizeTextSearch(paragraph).includes(variant))) {
+          selectedChapter = chapter;
+          selectedParagraphIndex = paragraphIndex;
+          found = true;
+        }
+      });
+    });
+  }
+
+  if (!selectedChapter) return;
+  openTextSearchMatch(entry, {
+    chapter: selectedChapter,
+    paragraph: selectedChapter.paragraphs[selectedParagraphIndex] || '',
+    paragraphIndex: selectedParagraphIndex
+  }, query);
+}
+
 async function renderTextsSearchResults(query) {
   textsSearchResults.replaceChildren();
   textsAutocomplete.classList.remove('active');
+  cancelTextNavigationLoad();
+  activeTextChapter = null;
   if (showingTextFavoritesPage) {
     renderTextFavoritesPage();
     setTextsSearchStatus('');
@@ -1958,6 +2105,15 @@ async function renderTextsSearchResults(query) {
   let matchCount = 0;
   const matches = [];
   textDatabase.forEach(entry => {
+    const latinAuthor = textsLatinAuthorFilter?.value.trim() || '';
+    const greekAuthor = textsGreekAuthorFilter?.value.trim() || '';
+    const workFilter = textsWorkFilter?.value.trim() || '';
+    if (latinAuthor && !(entry.languageGroup === 'lat'
+      && normalizeTextSearch(entry.author) === normalizeTextSearch(latinAuthor))) return;
+    if (greekAuthor && !(entry.languageGroup === 'gr'
+      && normalizeTextSearch(entry.author) === normalizeTextSearch(greekAuthor))) return;
+    if (workFilter && normalizeTextSearch(entry.title) !== normalizeTextSearch(workFilter)) return;
+
     if (isPhraseSearch) {
       const phraseMatches = findTextPhraseParagraphMatches(entry, query);
       if (phraseMatches.length) {
@@ -2064,6 +2220,7 @@ async function loadTextCatalog() {
       textCatalog = references.map(getTextCatalogEntry);
       if (!textCatalog.length) throw new Error('Manifestul de texte nu conține documente.');
       textCatalogLoaded = true;
+      populateTextSearchFilters();
       if (window.location.hash === '#texte'
         && !textsSearchInput.value.trim()
         && !showingTextFavoritesPage) {

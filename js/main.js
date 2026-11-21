@@ -43,6 +43,10 @@ const textsDailySection = document.getElementById('textsDailySection');
 const textsDailyCards = document.getElementById('textsDailyCards');
 const textsSearchForm = document.getElementById('textsSearchForm');
 const textsSearchInput = document.getElementById('textsSearchInput');
+const textsLatinAuthorFilter = document.getElementById('textsLatinAuthorFilter');
+const textsGreekAuthorFilter = document.getElementById('textsGreekAuthorFilter');
+const textsWorkFilter = document.getElementById('textsWorkFilter');
+const textsClearFilters = document.getElementById('textsClearFilters');
 const textsSearchStatus = document.getElementById('textsSearchStatus');
 const textsAutocomplete = document.getElementById('textsAutocomplete');
 const textsAutocompleteTitle = document.getElementById('textsAutocompleteTitle');
@@ -194,6 +198,12 @@ let activeTextChapter = null;
 
 function syncSitePageFromLocation() {
   const showingTexts = window.location.hash === '#texte';
+  if (!showingTexts) {
+    textsSearchResults.hidden = true;
+    textsSearchResults.replaceChildren();
+    textsAutocomplete.classList.remove('active');
+    activeTextChapter = null;
+  }
   if (!showingTexts) showingTextFavoritesPage = false;
   dictionaryPage.hidden = showingTexts;
   dictionaryFooter.hidden = showingTexts;
@@ -752,6 +762,28 @@ const clickActions = {
   'toggle-greek-key-table': () => toggleGreekKeyTable(),
   'set-keyboard-language': element => setKeyboardLanguage(element.dataset.language),
   'insert-char': element => insertChar(element.dataset.character),
+  'toggle-text-filter': element => {
+    const list = document.getElementById(element.dataset.filterTarget);
+    if (!list) return;
+    const willOpen = list.hidden;
+    document.querySelectorAll('.texts-filter-list').forEach(otherList => {
+      if (otherList !== list) {
+        otherList.hidden = true;
+        const otherToggle = otherList.parentElement?.querySelector('.texts-filter-toggle');
+        if (otherToggle) {
+          otherToggle.textContent = '⌃';
+          otherToggle.setAttribute('aria-expanded', 'false');
+        }
+      }
+    });
+    list.hidden = !willOpen;
+    element.textContent = willOpen ? '⌄' : '⌃';
+    element.setAttribute('aria-expanded', String(willOpen));
+    if (willOpen) {
+      const input = list.parentElement?.querySelector('input');
+      input?.focus();
+    }
+  },
   'open-feedback': () => openFeedbackDialog(),
   'close-feedback': () => closeFeedbackDialog()
 };
@@ -793,6 +825,15 @@ document.addEventListener('click', (e) => {
   if (!e.target.closest('.texts-search-panel')) {
     textsAutocomplete.classList.remove('active');
   }
+  if (!e.target.closest('.texts-filter-control')) {
+    document.querySelectorAll('.texts-filter-list').forEach(list => {
+      list.hidden = true;
+    });
+    document.querySelectorAll('.texts-filter-toggle').forEach(toggle => {
+      toggle.textContent = '⌃';
+      toggle.setAttribute('aria-expanded', 'false');
+    });
+  }
   if (!e.target.closest('.recent-search-wrap') && !document.getElementById('recentSearchDropdown').hidden) {
     closeRecentSearches();
   }
@@ -817,7 +858,42 @@ textsSearchForm.addEventListener('submit', async event => {
   await renderTextsSearchResults(textsSearchInput.value);
 });
 
+textsLatinAuthorFilter.addEventListener('input', () => {
+  if (textsLatinAuthorFilter.value.trim()) textsGreekAuthorFilter.value = '';
+  populateTextWorkFilter();
+});
+
+textsGreekAuthorFilter.addEventListener('input', () => {
+  if (textsGreekAuthorFilter.value.trim()) textsLatinAuthorFilter.value = '';
+  populateTextWorkFilter();
+});
+
+textsClearFilters.addEventListener('click', () => {
+  textsLatinAuthorFilter.value = '';
+  textsGreekAuthorFilter.value = '';
+  textsWorkFilter.value = '';
+  populateTextWorkFilter();
+  document.querySelectorAll('.texts-filter-list').forEach(list => {
+    list.hidden = true;
+  });
+  document.querySelectorAll('.texts-filter-toggle').forEach(toggle => {
+    toggle.textContent = '⌃';
+    toggle.setAttribute('aria-expanded', 'false');
+  });
+  if (textsSearchInput.value.trim()) {
+    void renderTextsSearchResults(textsSearchInput.value);
+  }
+});
+
 textsSearchInput.addEventListener('input', () => {
+  if (!textsSearchResults.hidden || activeTextChapter) {
+    textsSearchResults.hidden = true;
+    textsSearchResults.replaceChildren();
+    textsBrowser.hidden = false;
+    activeTextChapter = null;
+    textNavigation = { level: 'collections', languageGroup: '', author: '', work: '', volume: '' };
+    renderTextBrowser();
+  }
   updateTextAutocomplete(textsSearchInput.value);
 });
 
