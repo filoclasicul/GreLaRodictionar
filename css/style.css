@@ -1038,6 +1038,12 @@ main {
   outline: 3px solid var(--gold-light);
 }
 
+.texts-filter-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  box-shadow: none;
+}
+
 .texts-filter-control input {
   padding-right: 2.6rem;
 }
@@ -2809,6 +2815,18 @@ main {
   padding: 0.5rem 0.8rem;
   border-radius: 4px;
   border: 1px dashed var(--border-color);
+}
+
+.omnia-definition-preview {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.omnia-match-preview {
+  font-size: 0.92rem;
 }
 
 /* Card Articol Dicționar */

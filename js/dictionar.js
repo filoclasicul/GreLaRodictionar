@@ -1394,17 +1394,33 @@ function runOmniaPrefixSearch(query) {
   const raw = query.trim();
   const prefixKey = greekSearchKey(raw);
   const reverse = currentMode === 'omnia-rev';
-  const matches = Object.values(lexiconData).filter(item => {
+  const definitionPrefix = cleanUniversal(raw);
+  const matches = Object.values(lexiconData).map(item => {
     if (!reverse) {
-      return matchesSearchPrefix(item.id, prefixKey)
+      const matchesPrefix = matchesSearchPrefix(item.id, prefixKey)
         || item.searchForms?.some(form => matchesSearchPrefix(form, prefixKey));
+      return matchesPrefix ? { item } : null;
     }
 
-    const definitionPrefix = cleanUniversal(raw);
-    return item.defs.some(definition => cleanUniversal(decodeDictionaryText(definition))
-      .split(/[^\p{L}\p{N}]+/u)
-      .some(word => word.startsWith(definitionPrefix)));
-  });
+    const matchedDefinition = item.defs.map((definition, index) => {
+      const plainDefinition = decodeDictionaryText(definition);
+      const lines = plainDefinition.split(/¶/);
+      const matchingLine = lines.find(line => cleanUniversal(line)
+        .split(/[^\p{L}\p{N}]+/u)
+        .some(word => word.startsWith(definitionPrefix)));
+      if (!matchingLine) return null;
+      const matchingWord = [...matchingLine.matchAll(/[\p{L}\p{N}]+/gu)]
+        .find(match => cleanUniversal(match[0]).startsWith(definitionPrefix));
+      const excerptStart = Math.max(0, (matchingWord?.index ?? 0) - 70);
+      const excerpt = `${excerptStart ? '…' : ''}${matchingLine.slice(excerptStart).trimStart()}`;
+      return {
+        num: index + 1,
+        text: truncateFeaturedText(excerpt, 220)
+      };
+    }).find(Boolean);
+
+    return matchedDefinition ? { item, matchedDefinition } : null;
+  }).filter(Boolean);
 
   if (!matches.length) {
     const message = document.createElement('p');
@@ -1414,8 +1430,8 @@ function runOmniaPrefixSearch(query) {
     return;
   }
 
-  matches.sort((left, right) => left.id.localeCompare(right.id, 'ro', { sensitivity: 'base' }));
-  display.innerHTML = `<div class="reverse-results-container">${matches.map(item => `
+  matches.sort((left, right) => left.item.id.localeCompare(right.item.id, 'ro', { sensitivity: 'base' }));
+  display.innerHTML = `<div class="reverse-results-container">${matches.map(({ item, matchedDefinition }) => `
     <div class="reverse-item-card" data-omnia-lemma="${escapeHtmlAttribute(item.lemmaKey)}" tabindex="0" role="button">
       <div class="reverse-header">
         <div>
@@ -1425,9 +1441,9 @@ function runOmniaPrefixSearch(query) {
         </div>
         <span class="reverse-result-open-label">Vezi fișa ➔</span>
       </div>
-      ${reverse ? `<div class="reverse-match-text">${item.defs.map((definition, index) =>
-        `<div><strong>${index + 1}.</strong> ${formatDefinition(definition)}</div>`
-      ).join('')}</div>` : `<div class="reverse-result-forms">${item.defs[0] || ''}</div>`}
+      ${reverse
+        ? `<div class="reverse-match-text omnia-match-preview"><strong>${matchedDefinition.num}.</strong> ${escapeHtml(matchedDefinition.text)}</div>`
+        : `<div class="reverse-result-forms omnia-definition-preview">${escapeHtml(truncateFeaturedText(decodeDictionaryText(item.defs[0]), 240))}</div>`}
     </div>
   `).join('')}</div>`;
 

@@ -878,11 +878,13 @@ textsSearchForm.addEventListener('submit', async event => {
 textsLatinAuthorFilter.addEventListener('input', () => {
   if (textsLatinAuthorFilter.value.trim()) textsGreekAuthorFilter.value = '';
   populateTextWorkFilter();
+  updateTextAutocomplete(textsSearchInput.value);
 });
 
 textsGreekAuthorFilter.addEventListener('input', () => {
   if (textsGreekAuthorFilter.value.trim()) textsLatinAuthorFilter.value = '';
   populateTextWorkFilter();
+  updateTextAutocomplete(textsSearchInput.value);
 });
 
 textsClearFilters.addEventListener('click', () => {
@@ -890,6 +892,7 @@ textsClearFilters.addEventListener('click', () => {
   textsGreekAuthorFilter.value = '';
   textsWorkFilter.value = '';
   populateTextWorkFilter();
+  textsAutocomplete.classList.remove('active');
   document.querySelectorAll('.texts-filter-list').forEach(list => {
     list.hidden = true;
   });

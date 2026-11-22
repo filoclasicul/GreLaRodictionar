@@ -1810,7 +1810,8 @@ async function openTextFavorite(favorite) {
 async function updateTextAutocomplete(query) {
   const normalizedQuery = normalizeTextSearch(query);
   textsAutocompleteList.replaceChildren();
-  if (!normalizedQuery) {
+  const selectedAuthor = getSelectedTextAuthor();
+  if (!normalizedQuery || !selectedAuthor) {
     textsAutocomplete.classList.remove('active');
     return;
   }
@@ -1825,16 +1826,12 @@ async function updateTextAutocomplete(query) {
   textCatalog.forEach(entry => {
     const author = entry.author?.trim();
     const work = entry.title?.trim();
-
-    if (author && normalizeTextSearch(author).startsWith(normalizedQuery)) {
-      const key = `author\0${entry.languageGroup}\0${author}`;
-      if (!seen.has(key)) {
-        seen.add(key);
-        suggestions.push({ type: 'author', label: author, languageGroup: entry.languageGroup });
-      }
+    if (entry.languageGroup !== selectedAuthor.languageGroup
+      || normalizeTextSearch(author) !== normalizeTextSearch(selectedAuthor.author)) {
+      return;
     }
 
-    if (work && matchesTextTitlePrefix(work, query, entry.languageGroup)) {
+    if (work && normalizeTextSearch(work).includes(normalizedQuery)) {
       const key = `work\0${entry.languageGroup}\0${author}\0${work}`;
       if (!seen.has(key)) {
         seen.add(key);
@@ -1883,6 +1880,20 @@ async function updateTextAutocomplete(query) {
   textsAutocomplete.classList.add('active');
 }
 
+function getSelectedTextAuthor() {
+  const latinAuthor = textsLatinAuthorFilter?.value.trim() || '';
+  const greekAuthor = textsGreekAuthorFilter?.value.trim() || '';
+  const languageGroup = latinAuthor ? 'lat' : greekAuthor ? 'gr' : '';
+  const author = latinAuthor || greekAuthor;
+  if (!author) return null;
+
+  const selectedEntry = textCatalog.find(entry =>
+    entry.languageGroup === languageGroup
+    && normalizeTextSearch(entry.author) === normalizeTextSearch(author)
+  );
+  return selectedEntry ? { author: selectedEntry.author, languageGroup } : null;
+}
+
 function populateTextSearchFilters() {
   if (!textsLatinAuthorFilter || !textsGreekAuthorFilter || !textsWorkFilter) return;
 
@@ -1904,23 +1915,27 @@ function populateTextSearchFilters() {
 
 function populateTextWorkFilter() {
   if (!textsWorkFilter) return;
-  const latinAuthor = textsLatinAuthorFilter.value.trim();
-  const greekAuthor = textsGreekAuthorFilter.value.trim();
-  const author = latinAuthor || greekAuthor;
-  const languageGroup = latinAuthor ? 'lat' : greekAuthor ? 'gr' : '';
-  const exactAuthorSelected = Boolean(author) && textCatalog.some(entry =>
-    (!languageGroup || entry.languageGroup === languageGroup)
-    && normalizeTextSearch(entry.author) === normalizeTextSearch(author)
-  );
+  const selectedAuthor = getSelectedTextAuthor();
 
   const works = [...new Set(textCatalog
-    .filter(entry => (!exactAuthorSelected || (
-      (!languageGroup || entry.languageGroup === languageGroup)
-      && normalizeTextSearch(entry.author) === normalizeTextSearch(author)
-    )))
+    .filter(entry => selectedAuthor
+      && entry.languageGroup === selectedAuthor.languageGroup
+      && normalizeTextSearch(entry.author) === normalizeTextSearch(selectedAuthor.author))
     .map(entry => entry.title)
     .filter(Boolean))]
     .sort((left, right) => left.localeCompare(right, 'ro'));
+  textsWorkFilter.disabled = !selectedAuthor;
+  textsWorkFilter.placeholder = selectedAuthor ? 'Scrie opera dorită' : 'Alege mai întâi un autor';
+  const workList = document.getElementById('textsWorkOptions');
+  const workToggle = workList?.parentElement?.querySelector('.texts-filter-toggle');
+  if (workToggle) {
+    workToggle.disabled = !selectedAuthor;
+    workToggle.setAttribute('aria-disabled', String(!selectedAuthor));
+  }
+  if (!selectedAuthor && workList) {
+    workList.hidden = true;
+    workList.replaceChildren();
+  }
   setupTextFilterAutocomplete(textsWorkFilter, 'textsWorkOptions', () => works, false);
 }
 
@@ -1955,6 +1970,7 @@ function setupTextFilterAutocomplete(input, listId, getOptions, isAuthor) {
           else textsLatinAuthorFilter.value = '';
           textsWorkFilter.value = '';
           populateTextWorkFilter();
+          updateTextAutocomplete(textsSearchInput.value);
         }
         input.dispatchEvent(new Event('change', { bubbles: true }));
       });
