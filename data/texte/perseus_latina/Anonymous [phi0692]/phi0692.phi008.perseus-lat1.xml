@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://epidoc.stoa.org/schema/latest/tei-epidoc.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader xml:lang="eng">
+    <fileDesc>
+      <titleStmt>
+        <title xml:lang="lat">Priapea</title>
+        <author>Anonymous</author>
+        <editor>Robinson Ellis</editor>
+        <sponsor>Perseus Project, Tufts University</sponsor>
+        <principal>Gregory Crane</principal>
+        <respStmt>
+          <resp>Prepared under the supervision of</resp>
+          <name>Bridget Almas</name>
+          <name>Lisa Cerrato</name>
+          <name>Rashmi Singhal</name>
+        </respStmt>
+        <funder n="org:Tufts">Tufts University</funder>
+      </titleStmt>
+      <publicationStmt>
+        <publisher>Trustees of Tufts University</publisher>
+        <pubPlace>Medford, MA</pubPlace>
+        <authority>Perseus Project</authority>
+        <date type="release" when="2026-10-27">Perseus 5.0</date>
+        <idno type="filename">phi0692.phi008.perseus-lat1.xml</idno>
+        <availability>
+          <licence target="https://creativecommons.org/licenses/by-sa/4.0/">Available under a Creative Commons Attribution-ShareAlike 4.0 International License</licence>
+        </availability>
+      </publicationStmt>
+      <sourceDesc>
+        <biblStruct>
+          <monogr>
+            <title xml:lang="lat">Appendix Vergiliana</title>
+            <title xml:lang="lat" type="sub">sive carmina minora Vergilio adtributa</title>
+            <editor>Robinson Ellis</editor>
+            <imprint>
+              <publisher>e Typographeo Clarendoniano</publisher>
+              <pubPlace>Oxonii</pubPlace>
+              <date>1907</date>
+            </imprint>
+          </monogr>
+          <ref target="https://archive.org/details/appendixvergilia00elliuoft/page/n101/mode/2up">Internet Archive</ref>
+        </biblStruct>
+      </sourceDesc>
+    </fileDesc>
+    
+    <encodingDesc>
+      <editorialDecl>
+        <p>Keyboarding</p>
+      </editorialDecl>
+      
+      <refsDecl n="CTS">
+        <cRefPattern n="line" matchPattern="(\w+).(\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@type='textpart' and @subtype='poem' and @n='$1']//tei:l[@n='$2'])">
+          <p>This pointer pattern extracts line by poem and line.</p>
+        </cRefPattern>
+        <cRefPattern n="poem" matchPattern="(\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@type='textpart' and @subtype='poem' and @n='$1'])">
+          <p>This pointer pattern extracts poem.</p>
+        </cRefPattern>
+      </refsDecl>
+      
+      <refsDecl xml:id="CTS">
+        <citeStructure match="/TEI/text/body" use="@xml:base" n="chunk" unit="work">
+          <citeStructure match="div/div[@type='textpart' and @subtype='poem']" use="@n" unit="poem" delim=":">
+            <citeStructure match="l" use="@n" unit="line" delim="."/>
+          </citeStructure>
+        </citeStructure>
+      </refsDecl>
+      
+      
+      
+    </encodingDesc>
+    
+    <profileDesc>
+      <langUsage>
+        <language ident="lat">Latin</language>
+      </langUsage>
+    </profileDesc>
+    <revisionDesc>
+      <change who="Alison Babeu" when="2026-10-30">Converted to standard Epidoc format, updated XML base, added edition div, replaced daggers with actual dagger characters, replaced double hyphens with em-dashes, kept notes, and removed indents.</change>
+      <change who="Charles Pletcher" when="2026-08-26">Add citeStructure refsDecl</change>
+      <change who="Bridget Almas" when="2011">Added to repository November, 2011. Unreleased.</change>
+    </revisionDesc>
+  </teiHeader>
+  
+  <text xml:lang="lat">
+    <body xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1">
+      <div type="edition" n="urn:cts:latinLit:phi0692.phi008.perseus-lat1" xml:lang="lat">
+        <lb/>
+        <head>Priapea</head>
+        <div type="textpart" xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:1" subtype="poem" n="1">
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:1" n="1">Vere rosa, autumno pomis, aestate frequentor</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:1" n="2" rend="indent">spicis: una mihi est horrida pestis hiemps.</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:1" n="3">nam frigus metuo, et uereor ne ligneus ignem</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:1" n="4" rend="indent">hic deus ignaris praebeat agricolis.</l>
+        </div>
+        <div type="textpart" xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" subtype="poem" n="2">
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="1">Ego haec, ego arte fabricata rustica,</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="2">ego arida, o uiator, ecce populus,</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="3">agellulum hunc sinistra et ante quem uides,</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="4">erique uillulam hortulumque pauperis</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="5">tuor malaque furis arceo manu.</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="6">mihi corolla picta uere ponitur,</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="7">mihi rubens arista sole feruido,</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="8">mihi uirente dulcis uua pampino,</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="9">mihi caduca oliua, cocta frigore.</l>
+        <lb/>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="10">meis capella delicata pascuis</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="11">in urbem adulta lacte portat ubera,</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="12">meisque pinguis agnus ex ouilibus</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="13">grauem domum remittit aere dexteram.</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="14">teneraque matre mugiente uaccula</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="15">deum profundit ante templa sanguinem.</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="16">proin, uiator, hunc deum uereberis</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="17">manumque sursum habebis: hoc tibi expedit,</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="18">parata namque trux stat ecce mentula.</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="19"><q rend="single">uelim pol</q> inquis. at pol ecce uilicus</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="20">uenit, ualente cui reuulsa bracchio</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:2" n="21">fit ista mentula apta claua dexterae.</l>
+        </div>
+        <div type="textpart" xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" subtype="poem" n="3">
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="1">Hunc ego, o iuuenes, locum uillulamque palustrem,</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="2">tectam uimine iunceo caricisque maniplis,</l>
+          <lb/>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="3">quercus arida rustica †formitata securi,</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="4">nutrior, magis ut magis sit beata quotannis.</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="5">huius nam domini colunt me deumque salutant</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="6">pauperis tuguri pater filiusque adulescens,</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="7">alter assidua colens diligentia ut herbae,</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="8">aspera ut rubus a meo sit remota sacello,</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="9">alter parua manu ferens semper munera larga.</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="10">florido mihi ponitur picta uere corolla,</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="11">primitus tenera uirens spica mollis arista,</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="12">luteae uiolae mihi lacteumque papauer,</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="13">pallentesque cucurbitae et suaue olentia mala,</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="14">uua pampinea rubens educata sub umbra.</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="15">sanguine hanc etiam mihi—sed tacebitis—aram</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="16">barbatus linit hirculus cornipesque capella.</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="17">pro quis omnia honoribus †hoc necesse Priapo est</l>
+          <lb/>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="18">praestare et domini hortulum uineamque tueri.</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="19">quare hinc, o pueri, malas abstinete rapinas.</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="20">uicinus prope diues est neglegensque Priapus.</l>
+          <l xml:base="urn:cts:latinLit:phi0692.phi008.perseus-lat1:3" n="21">inde sumite, semita haec deinde uos feret ipsa.</l>
+        </div>
+      </div>
+    </body>
+  </text>
+</TEI>
