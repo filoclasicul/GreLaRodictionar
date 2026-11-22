@@ -135,6 +135,7 @@ function textDocumentUrl(reference) {
 
 function getTextAuthorProfile(reference) {
   const authorFolder = reference.path.split('/')[1];
+  if (reference.path.includes('/phi0478.')) return null;
   return authorProfiles[authorFolder] || null;
 }
 
@@ -1345,8 +1346,10 @@ function renderTextBrowser() {
       })
       .forEach(([author, records]) => {
         const workCount = new Set(records.map(record => record.title)).size;
-        const profile = authorProfiles[records[0].path.split('/')[1]]
-          || Object.values(authorProfiles).find(item => item.name === author);
+        const folderProfile = authorProfiles[records[0].path.split('/')[1]];
+        const profile = folderProfile?.name === author
+          ? folderProfile
+          : Object.values(authorProfiles).find(item => item.name === author);
         const favorite = createTextFavorite('author', {
           languageGroup: textNavigation.languageGroup,
           author,
@@ -2152,7 +2155,7 @@ function getTextCatalogEntry(reference) {
   const pathParts = reference.path.split('/');
   const languageGroup = pathParts[0];
   const folderAuthor = pathParts[1] || '';
-  const profile = authorProfiles[folderAuthor];
+  const profile = getTextAuthorProfile(reference);
   const author = profile?.name || reference.author || folderAuthor;
   const title = typeof reference.title === 'string' ? reference.title.trim() : '';
   return {

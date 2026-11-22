@@ -105,5 +105,28 @@
     "alt": "Portretul lui Seneca",
     "years": "c. 4 î.Hr.–65 d.Hr.",
     "description": "Filosof stoic, dramaturg și om politic roman, autorul unor tratate filosofice, tragedii și Epistole morale."
+  },
+  "Catulus": {
+    "name": "C. Valerius Catullus",
+    "icon": "✒️",
+    "years": "c. 84–54 î.Hr.",
+    "description": "Poet liric roman, cunoscut pentru colecția de carmina dedicate iubirii, prieteniei și polemicii literare."
+  },
+  "Plautus": {
+    "name": "T. Maccius Plautus",
+    "icon": "🎭",
+    "years": "c. 254–184 î.Hr.",
+    "description": "Dramaturg roman, unul dintre principalii reprezentanți ai comediei latine arhaice, cunoscut pentru dialogul viu și intrigile inspirate din comedia greacă."
+  },
+  "Terentius": {
+    "name": "Publius Terentius Afer (Terence)",
+    "icon": "🎭",
+    "years": "c. 195–159 î.Hr.",
+    "description": "Dramaturg roman al republicii, autor de comedii centrate pe relații familiale, identitate și complexitatea morală."
+  },
+  "Pseudo - Caesar": {
+    "name": "Pseudo-Caesar",
+    "icon": "📜",
+    "description": "Autor sau autori anonimi cărora le sunt atribuite relatările despre războaiele din Alexandria, Africa și Hispania."
   }
 }
