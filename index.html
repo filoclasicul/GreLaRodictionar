@@ -53,7 +53,7 @@
           </button>
           <div class="site-menu-panel" id="siteMenuPanel" hidden>
             <div class="site-menu-content" id="siteMenuMain">
-              <div class="site-menu-heading">Setări</div>
+              <div class="site-menu-heading">Meniu</div>
               <button class="site-menu-item" type="button" data-action="show-appearance-menu">
                 <span>🎨 Aspect</span><span aria-hidden="true">›</span>
               </button>
@@ -63,10 +63,13 @@
               <button class="site-menu-item" type="button" data-action="show-text-favorites">
                 <span>📚 Texte favorite</span><span aria-hidden="true">›</span>
               </button>
+              <a class="site-menu-item" href="#despre" data-action="show-about">
+                <span>ℹ️ Despre</span><span aria-hidden="true">›</span>
+              </a>
             </div>
             <div class="site-menu-content" id="appearanceMenu" hidden>
               <div class="appearance-heading">
-                <button class="menu-back" type="button" aria-label="Înapoi la setări" data-action="show-main-menu">←</button>
+                <button class="menu-back" type="button" aria-label="Înapoi la meniu" data-action="show-main-menu">←</button>
                 <span>Aspect</span>
               </div>
               <p class="palette-label">Alege tema de culoare</p>
@@ -302,6 +305,37 @@
 
   <footer id="textsFooter" hidden>
     O colecție de texte clasice grecești și latine.
+  </footer>
+
+  <main class="about-page" id="aboutPage" aria-labelledby="aboutPageTitle" hidden>
+    <section class="about-intro">
+      <p class="about-eyebrow">GrecLaRo</p>
+      <h1 id="aboutPageTitle">Despre</h1>
+      <p>Informații despre proiect, conținut, licențe și condițiile de utilizare.</p>
+    </section>
+
+    <div class="about-sections">
+      <section class="about-card" aria-labelledby="aboutDictionaryTitle">
+        <h2 id="aboutDictionaryTitle">Despre dicționar</h2>
+        <p class="about-placeholder">Informațiile despre GrecLaRo și dicționar vor fi adăugate aici.</p>
+      </section>
+      <section class="about-card" aria-labelledby="aboutLegalTitle">
+        <h2 id="aboutLegalTitle">Informații legale</h2>
+        <p class="about-placeholder">Informațiile de identificare și mențiunile legale vor fi adăugate aici.</p>
+      </section>
+      <section class="about-card" aria-labelledby="aboutLicenseTitle">
+        <h2 id="aboutLicenseTitle">Licențe și drepturi de utilizare</h2>
+        <p class="about-placeholder">Licențele, drepturile de autor și condițiile de reutilizare a conținutului vor fi adăugate aici.</p>
+      </section>
+      <section class="about-card" aria-labelledby="aboutContactTitle">
+        <h2 id="aboutContactTitle">Contact</h2>
+        <p class="about-placeholder">Datele de contact și informațiile pentru solicitări legale vor fi adăugate aici.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer id="aboutFooter" hidden>
+    GrecLaRo — dicționar și texte clasice.
   </footer>
 
   <button

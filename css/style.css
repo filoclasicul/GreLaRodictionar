@@ -523,6 +523,7 @@ header {
   color: var(--text-main);
   font: 600 0.9rem var(--font-body);
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
 }
 
@@ -790,6 +791,59 @@ main {
 .texts-page {
   max-width: 900px;
   width: 100%;
+}
+
+.about-page {
+  max-width: 960px;
+  width: 100%;
+}
+
+.about-intro {
+  margin: 1.25rem 0 2rem;
+  text-align: center;
+}
+
+.about-eyebrow {
+  color: var(--crimson);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.about-intro h1 {
+  margin: 0.2rem 0 0.45rem;
+  font: 700 clamp(2rem, 5vw, 3rem)/1.15 var(--font-title);
+}
+
+.about-intro > p:last-child {
+  max-width: 42rem;
+  margin: 0 auto;
+  color: var(--text-muted);
+}
+
+.about-sections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.about-card {
+  padding: 1.35rem;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.about-card h2 {
+  margin-bottom: 0.65rem;
+  color: var(--crimson);
+  font: 700 1.15rem var(--font-title);
+}
+
+.about-placeholder {
+  color: var(--text-muted);
 }
 
 .texts-intro {
@@ -2300,6 +2354,48 @@ main {
     grid-template-areas: "content";
     gap: 1rem;
   }
+
+  .texts-search-row {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .texts-search-input,
+  .texts-search-filter input {
+    font-size: 1rem;
+  }
+
+  .texts-search-submit {
+    width: 100%;
+    min-height: 2.9rem;
+  }
+
+  .texts-search-filters {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 0.85rem;
+    margin-top: 1rem;
+  }
+
+  .texts-search-filter {
+    gap: 0.4rem;
+    font-size: 0.85rem;
+  }
+
+  .texts-search-filter input {
+    min-height: 2.9rem;
+  }
+
+  .texts-filter-toggle {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .texts-search-filter-clear {
+    width: 100%;
+    min-height: 2.9rem;
+    font-size: 0.88rem;
+  }
 }
 
 .search-actions {
@@ -3437,6 +3533,10 @@ footer {
     padding: 0 0.85rem;
   }
 
+  .about-sections {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .texts-directory-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 0.75rem;
@@ -3614,18 +3714,6 @@ footer {
     height: 0.9rem;
   }
 
-  .texts-search-row {
-    flex-direction: column;
-  }
-
-  .texts-search-filters {
-    grid-template-columns: 1fr;
-    align-items: stretch;
-  }
-
-  .texts-search-submit {
-    width: 100%;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

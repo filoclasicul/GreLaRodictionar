@@ -725,6 +725,23 @@ async function loadRemoteDictionary(query, languageOverride = null) {
   return needsRefresh;
 }
 
+async function loadAllDictionaryData() {
+  const catalog = await loadDictionaryCatalog();
+  const targets = [];
+  for (const language of ['gr', 'lat']) {
+    for (const fileLetter of catalog[language]) {
+      targets.push({
+        language,
+        fileLetter,
+        path: language === 'gr'
+          ? `data/litere/gr/${encodeURIComponent(fileLetter)}.jsonl`
+          : `data/litere/lat/${encodeURIComponent(fileLetter)}.json`
+      });
+    }
+  }
+  await Promise.all(targets.map(target => loadDictionaryTarget(target)));
+}
+
 function getDictionaryFileLetter(lemma) {
   const firstLetter = [...lemma.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()]
     .find(character => /\p{L}/u.test(character));
@@ -842,6 +859,8 @@ function setSearchMode(mode) {
 
   if (isReverse) {
     document.getElementById('autocompleteDropdown').classList.remove('active');
+    document.getElementById('dictionaryDisplay').innerHTML = '';
+  } else if (mode === 'omnia-dir') {
     document.getElementById('dictionaryDisplay').innerHTML = '';
   } else {
     handleSearchInput(input.value);
@@ -1007,6 +1026,11 @@ function handleSearchInput(query) {
     document.getElementById('dictionaryDisplay').innerHTML = '';
     return;
   }
+  if (currentMode === 'omnia-dir') {
+    document.getElementById('autocompleteDropdown').classList.remove('active');
+    document.getElementById('dictionaryDisplay').innerHTML = '';
+    return;
+  }
 
   const requestId = ++searchRequestId;
   updateLiveSuggestions(query);
@@ -1032,6 +1056,21 @@ async function submitSearch() {
   synchronizeGreekTypingInput(input);
   const query = input.value;
   if (!query.trim()) return;
+
+  if (currentMode.startsWith('omnia-')) {
+    const display = document.getElementById('dictionaryDisplay');
+    try {
+      display.innerHTML = '<p class="search-loading">Se caută în dicționare…</p>';
+      await loadAllDictionaryData();
+      runOmniaPrefixSearch(query);
+    } catch (error) {
+      const message = document.createElement('p');
+      message.className = 'dictionary-load-error';
+      message.textContent = error.message;
+      display.replaceChildren(message);
+    }
+    return;
+  }
 
   if (currentMode.endsWith('-rev')) {
     runReverseSearch(query);
@@ -1348,6 +1387,60 @@ function runDirectSearch(query) {
     showingFavoritesPage = false;
     display.innerHTML = '';
   }
+}
+
+function runOmniaPrefixSearch(query) {
+  const display = document.getElementById('dictionaryDisplay');
+  const raw = query.trim();
+  const prefixKey = greekSearchKey(raw);
+  const reverse = currentMode === 'omnia-rev';
+  const matches = Object.values(lexiconData).filter(item => {
+    if (!reverse) {
+      return matchesSearchPrefix(item.id, prefixKey)
+        || item.searchForms?.some(form => matchesSearchPrefix(form, prefixKey));
+    }
+
+    const definitionPrefix = cleanUniversal(raw);
+    return item.defs.some(definition => cleanUniversal(decodeDictionaryText(definition))
+      .split(/[^\p{L}\p{N}]+/u)
+      .some(word => word.startsWith(definitionPrefix)));
+  });
+
+  if (!matches.length) {
+    const message = document.createElement('p');
+    message.className = 'favorites-empty';
+    message.textContent = `Nu există cuvinte care încep cu „${raw}”.`;
+    display.replaceChildren(message);
+    return;
+  }
+
+  matches.sort((left, right) => left.id.localeCompare(right.id, 'ro', { sensitivity: 'base' }));
+  display.innerHTML = `<div class="reverse-results-container">${matches.map(item => `
+    <div class="reverse-item-card" data-omnia-lemma="${escapeHtmlAttribute(item.lemmaKey)}" tabindex="0" role="button">
+      <div class="reverse-header">
+        <div>
+          <span class="reverse-lemma${item.lang === 'Greacă Veche' ? ' greek-text' : ''}">${item.id}</span>
+          <span class="badge badge-lang reverse-result-lang">${item.lang}</span>
+          <span class="badge badge-pos">${item.pos}</span>
+        </div>
+        <span class="reverse-result-open-label">Vezi fișa ➔</span>
+      </div>
+      ${reverse ? `<div class="reverse-match-text">${item.defs.map((definition, index) =>
+        `<div><strong>${index + 1}.</strong> ${formatDefinition(definition)}</div>`
+      ).join('')}</div>` : `<div class="reverse-result-forms">${item.defs[0] || ''}</div>`}
+    </div>
+  `).join('')}</div>`;
+
+  display.querySelectorAll('[data-omnia-lemma]').forEach(card => {
+    const open = () => selectSuggestion(card.dataset.omniaLemma);
+    card.addEventListener('click', open);
+    card.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        open();
+      }
+    });
+  });
 }
 
 function runReverseSearch(query) {

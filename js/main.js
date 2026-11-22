@@ -35,6 +35,8 @@ const dictionaryPage = document.getElementById('dictionaryPage');
 const dictionaryFooter = document.getElementById('dictionaryFooter');
 const textsPage = document.getElementById('textsPage');
 const textsFooter = document.getElementById('textsFooter');
+const aboutPage = document.getElementById('aboutPage');
+const aboutFooter = document.getElementById('aboutFooter');
 const pageNavigationLink = document.getElementById('pageNavigationLink');
 const pageNavigationLabel = document.getElementById('pageNavigationLabel');
 const dictionaryDailySection = document.getElementById('dictionaryDailySection');
@@ -198,6 +200,8 @@ let activeTextChapter = null;
 
 function syncSitePageFromLocation() {
   const showingTexts = window.location.hash === '#texte';
+  const showingAbout = window.location.hash === '#despre';
+  const showingDictionary = !showingTexts && !showingAbout;
   if (!showingTexts) {
     textsSearchResults.hidden = true;
     textsSearchResults.replaceChildren();
@@ -205,13 +209,19 @@ function syncSitePageFromLocation() {
     activeTextChapter = null;
   }
   if (!showingTexts) showingTextFavoritesPage = false;
-  dictionaryPage.hidden = showingTexts;
-  dictionaryFooter.hidden = showingTexts;
+  dictionaryPage.hidden = !showingDictionary;
+  dictionaryFooter.hidden = !showingDictionary;
   textsPage.hidden = !showingTexts;
   textsFooter.hidden = !showingTexts;
-  pageNavigationLink.href = showingTexts ? '#dictionar' : '#texte';
-  pageNavigationLabel.textContent = showingTexts ? 'Dicționar' : 'Texte';
-  document.title = showingTexts ? 'Texte clasice — GrecLaRo' : 'GrecLaRo — Dicționar Latin-Român și Greacă Veche-Român';
+  aboutPage.hidden = !showingAbout;
+  aboutFooter.hidden = !showingAbout;
+  pageNavigationLink.href = showingAbout || showingTexts ? '#dictionar' : '#texte';
+  pageNavigationLabel.textContent = showingAbout || showingTexts ? 'Dicționar' : 'Texte';
+  document.title = showingAbout
+    ? 'Despre — GrecLaRo'
+    : showingTexts
+      ? 'Texte clasice — GrecLaRo'
+      : dictionaryPageTitle;
 
   if (showingTexts) {
     initializeTextBrowserHistory();
@@ -225,9 +235,9 @@ function syncSitePageFromLocation() {
         }
       });
     }
-  } else if (!showingFavoritesPage) {
+  } else if (showingDictionary && !showingFavoritesPage) {
     requestAnimationFrame(() => {
-      if (window.location.hash !== '#texte' && !showingFavoritesPage) {
+      if (window.location.hash !== '#texte' && window.location.hash !== '#despre' && !showingFavoritesPage) {
         refreshDictionaryHighlights();
       }
     });
@@ -235,7 +245,7 @@ function syncSitePageFromLocation() {
 }
 
 function navigateToSitePage(page) {
-  const targetHash = page === 'texts' ? '#texte' : '#dictionar';
+  const targetHash = page === 'texts' ? '#texte' : page === 'about' ? '#despre' : '#dictionar';
   if (window.location.hash !== targetHash) window.location.hash = targetHash;
   syncSitePageFromLocation();
 }
@@ -386,6 +396,12 @@ function showTextFavoritesPage() {
   pushTextBrowserHistoryState();
   toggleSiteMenu();
   renderTextFavoritesPage();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showAboutPage() {
+  navigateToSitePage('about');
+  if (!document.getElementById('siteMenuPanel').hidden) toggleSiteMenu();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -751,6 +767,7 @@ const clickActions = {
   'show-appearance-menu': () => showAppearanceMenu(),
   'show-favorites': () => showFavoritesPage(),
   'show-text-favorites': () => showTextFavoritesPage(),
+  'show-about': () => showAboutPage(),
   'show-main-menu': () => showMainMenu(),
   'set-color-theme': element => setColorTheme(element.dataset.colorTheme),
   'set-search-mode': element => setSearchMode(element.dataset.mode),
