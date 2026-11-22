@@ -1909,8 +1909,13 @@ async function updateTextAutocomplete(query) {
 }
 
 function getSelectedTextAuthor() {
-  const latinAuthor = textsLatinAuthorFilter?.value.trim() || '';
-  const greekAuthor = textsGreekAuthorFilter?.value.trim() || '';
+  const latinAuthorDisplay = textsLatinAuthorFilter?.value.trim() || '';
+  const greekAuthorDisplay = textsGreekAuthorFilter?.value.trim() || '';
+  
+  // Use internal value if available (original English name), otherwise use display name
+  const latinAuthor = textsLatinAuthorFilter?.dataset.internalValue || latinAuthorDisplay;
+  const greekAuthor = textsGreekAuthorFilter?.dataset.internalValue || greekAuthorDisplay;
+  
   const languageGroup = latinAuthor ? 'lat' : greekAuthor ? 'gr' : '';
   const author = latinAuthor || greekAuthor;
   if (!author) return null;
@@ -1936,8 +1941,18 @@ function populateTextSearchFilters() {
     .filter(Boolean))]
     .sort((left, right) => left.localeCompare(right, 'ro'));
 
-  setupTextFilterAutocomplete(textsLatinAuthorFilter, 'textsLatinAuthors', () => latinAuthors, true);
-  setupTextFilterAutocomplete(textsGreekAuthorFilter, 'textsGreekAuthors', () => greekAuthors, true);
+  // Map English names to display names for latin authors
+  const latinAuthorsDisplay = latinAuthors.map(author => 
+    getDisplayName(author, 'lat') || author
+  ).sort((left, right) => left.localeCompare(right, 'ro'));
+
+  // Map English names to display names for greek authors
+  const greekAuthorsDisplay = greekAuthors.map(author => 
+    getDisplayName(author, 'grc') || author
+  ).sort((left, right) => left.localeCompare(right, 'ro'));
+
+  setupTextFilterAutocomplete(textsLatinAuthorFilter, 'textsLatinAuthors', () => latinAuthorsDisplay, true, latinAuthors);
+  setupTextFilterAutocomplete(textsGreekAuthorFilter, 'textsGreekAuthors', () => greekAuthorsDisplay, true, greekAuthors);
   populateTextWorkFilter();
 }
 
@@ -1967,7 +1982,7 @@ function populateTextWorkFilter() {
   setupTextFilterAutocomplete(textsWorkFilter, 'textsWorkOptions', () => works, false);
 }
 
-function setupTextFilterAutocomplete(input, listId, getOptions, isAuthor) {
+function setupTextFilterAutocomplete(input, listId, getOptions, isAuthor, originalOptions = null) {
   const list = document.getElementById(listId);
   if (!input || !list) return;
 
@@ -1989,7 +2004,7 @@ function setupTextFilterAutocomplete(input, listId, getOptions, isAuthor) {
       !query || normalizeTextSearch(option).includes(query)
     ).slice(0, 12);
     list.replaceChildren();
-    options.forEach(option => {
+    options.forEach((option, index) => {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'texts-filter-option';
@@ -1997,7 +2012,11 @@ function setupTextFilterAutocomplete(input, listId, getOptions, isAuthor) {
       button.setAttribute('role', 'option');
       button.addEventListener('mousedown', event => event.preventDefault());
       button.addEventListener('click', () => {
+        // If we have original options (for author mapping), use the English name internally
+        const internalValue = (isAuthor && originalOptions) ? originalOptions[getOptions().indexOf(option)] : option;
         input.value = option;
+        // Store the actual internal value for filtering
+        input.dataset.internalValue = internalValue;
         list.hidden = true;
         const toggle = list.parentElement?.querySelector('.texts-filter-toggle');
         if (toggle) {
