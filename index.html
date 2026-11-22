@@ -234,7 +234,11 @@
   </main>
 
   <footer id="dictionaryFooter">
-    Un spațiu interactiv pentru cuvintele grecești și latine.
+    <span>Un spațiu interactiv pentru cuvintele grecești și latine.</span>
+    <nav class="footer-links" aria-label="Legături footer">
+      <a href="#despre" class="footer-icon-link" aria-label="Despre GrecLaRo" title="Despre GrecLaRo">ℹ️</a>
+      <a href="#despre-contact" class="footer-icon-link" aria-label="Contact" title="Contact">✉️</a>
+    </nav>
   </footer>
 
   <main class="texts-page" id="textsPage" hidden>
@@ -304,7 +308,11 @@
   </main>
 
   <footer id="textsFooter" hidden>
-    O colecție de texte clasice grecești și latine.
+    <span>O colecție de texte clasice grecești și latine.</span>
+    <nav class="footer-links" aria-label="Legături footer">
+      <a href="#despre" class="footer-icon-link" aria-label="Despre GrecLaRo" title="Despre GrecLaRo">ℹ️</a>
+      <a href="#despre-contact" class="footer-icon-link" aria-label="Contact" title="Contact">✉️</a>
+    </nav>
   </footer>
 
   <main class="about-page" id="aboutPage" aria-labelledby="aboutPageTitle" hidden>
@@ -314,28 +322,67 @@
       <p>Informații despre proiect, conținut, licențe și condițiile de utilizare.</p>
     </section>
 
-    <div class="about-sections">
-      <section class="about-card" aria-labelledby="aboutDictionaryTitle">
+    <nav class="about-sections" id="aboutOverview" aria-label="Subpagini Despre">
+      <a class="about-section-link" href="#despre-dictionar">
+        <span><strong>Despre dicționar</strong><small>Scopul, structura și informațiile proiectului.</small></span>
+        <span aria-hidden="true">›</span>
+      </a>
+      <a class="about-section-link" href="#despre-informatii-legale">
+        <span><strong>Informații legale</strong><small>Identificare, mențiuni obligatorii și responsabilități.</small></span>
+        <span aria-hidden="true">›</span>
+      </a>
+      <a class="about-section-link" href="#despre-licente">
+        <span><strong>Credite, licențe și drepturi de utilizare</strong><small>Sursele Perseus, atribuirile și condițiile de reutilizare.</small></span>
+        <span aria-hidden="true">›</span>
+      </a>
+      <a class="about-section-link" href="#despre-contact">
+        <span><strong>Contact</strong><small>Corecturi, atribuire și solicitări privind conținutul.</small></span>
+        <span aria-hidden="true">›</span>
+      </a>
+    </nav>
+
+    <div class="about-details" id="aboutDetails" hidden>
+      <a class="about-back-link" href="#despre">← Înapoi la Despre</a>
+      <section class="about-card" data-about-route="despre-dictionar" aria-labelledby="aboutDictionaryTitle" hidden>
         <h2 id="aboutDictionaryTitle">Despre dicționar</h2>
         <p class="about-placeholder">Informațiile despre GrecLaRo și dicționar vor fi adăugate aici.</p>
       </section>
-      <section class="about-card" aria-labelledby="aboutLegalTitle">
+      <section class="about-card" data-about-route="despre-informatii-legale" aria-labelledby="aboutLegalTitle" hidden>
         <h2 id="aboutLegalTitle">Informații legale</h2>
         <p class="about-placeholder">Informațiile de identificare și mențiunile legale vor fi adăugate aici.</p>
       </section>
-      <section class="about-card" aria-labelledby="aboutLicenseTitle">
-        <h2 id="aboutLicenseTitle">Licențe și drepturi de utilizare</h2>
-        <p class="about-placeholder">Licențele, drepturile de autor și condițiile de reutilizare a conținutului vor fi adăugate aici.</p>
+      <section class="about-card" data-about-route="despre-licente" aria-labelledby="aboutLicenseTitle" hidden>
+        <h2 id="aboutLicenseTitle">Credite, licențe și drepturi de utilizare</h2>
+        <h3>Textele clasice și sursele Perseus</h3>
+        <p>Textele grecești și latine din GrecLaRo provin din corpusurile digitale <strong>Perseus Digital Library Project / Perseus Project</strong>, editate și distribuite de Tufts University și colaboratori. Sursele, editorii și edițiile individuale sunt păstrate în metadatele TEI ale fiecărui fișier.</p>
+        <ul>
+          <li>Proiectul Perseus: <a href="https://www.perseus.tufts.edu/" target="_blank" rel="noopener noreferrer">Perseus Digital Library</a></li>
+          <li>Surse grecești: <a href="https://github.com/PerseusDL/canonical-greekLit" target="_blank" rel="noopener noreferrer">canonical-greekLit</a></li>
+          <li>Surse latine: <a href="https://github.com/PerseusDL/canonical-latinLit" target="_blank" rel="noopener noreferrer">canonical-latinLit</a></li>
+        </ul>
+        <h3>Licență și atribuiri</h3>
+        <p>100 dintre cele 143 de fișiere textuale includ în metadate licența <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)</a>. Celelalte 43 de fișiere nu declară o licență proprie în antetul TEI disponibil; înaintea reutilizării lor trebuie verificată sursa și termenii ediției indicate.</p>
+        <p>La reutilizarea materialului licențiat CC BY-SA: atribuie Perseus Digital Library / Perseus Project și autorii/editorii ediției utilizate, păstrează linkul către sursă și licență, menționează dacă ai modificat materialul și publică adaptările sub CC BY-SA 4.0. GrecLaRo parsează și normalizează textele TEI pentru navigare, căutare, evidențiere și citire vocală; ordinea sau marcajele pot fi prezentate diferit față de sursa originală.</p>
+        <details class="about-sources" id="aboutTextSources">
+          <summary>Lista surselor Perseus pentru operele folosite</summary>
+          <p class="about-sources-status">Se încarcă indexul surselor…</p>
+        </details>
+        <h3>Dicționar și restul conținutului</h3>
+        <p>Textele clasice, datele lexicale, traducerile și interfața pot avea drepturi distincte. Drepturile și informațiile editoriale ale dicționarului, ale traducerilor și ale altor resurse vor fi completate de administrator.</p>
       </section>
-      <section class="about-card" aria-labelledby="aboutContactTitle">
+      <section class="about-card" data-about-route="despre-contact" aria-labelledby="aboutContactTitle" hidden>
         <h2 id="aboutContactTitle">Contact</h2>
-        <p class="about-placeholder">Datele de contact și informațiile pentru solicitări legale vor fi adăugate aici.</p>
+        <p class="about-placeholder">Pentru corecturi, solicitări de atribuire sau eliminarea unui conținut, datele de contact vor fi adăugate aici.</p>
       </section>
     </div>
   </main>
 
   <footer id="aboutFooter" hidden>
-    GrecLaRo — dicționar și texte clasice.
+    <span>GrecLaRo — dicționar și texte clasice.</span>
+    <nav class="footer-links" aria-label="Legături footer">
+      <a href="#despre" class="footer-icon-link" aria-label="Despre GrecLaRo" title="Despre GrecLaRo">ℹ️</a>
+      <a href="#despre-contact" class="footer-icon-link" aria-label="Contact" title="Contact">✉️</a>
+    </nav>
   </footer>
 
   <button

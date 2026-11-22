@@ -497,26 +497,6 @@ function setTextsSearchStatus(message, state = '') {
   else delete textsSearchStatus.dataset.state;
 }
 
-function createTextAttribution(entry) {
-  if (!entry.source && !entry.license) return null;
-
-  const attribution = document.createElement('p');
-  attribution.className = 'texts-attribution';
-  attribution.textContent = entry.source ? `${entry.source} · ` : '';
-  if (entry.licenseUrl) {
-    const licenseLink = document.createElement('a');
-    licenseLink.href = entry.licenseUrl;
-    licenseLink.target = '_blank';
-    licenseLink.rel = 'noopener noreferrer';
-    licenseLink.textContent = entry.license || 'Licență';
-    attribution.appendChild(licenseLink);
-  } else if (entry.license) {
-    attribution.append(document.createTextNode(entry.license));
-  }
-
-  return attribution;
-}
-
 function createTextResultCard(entry, query, phraseMatches = []) {
   const card = document.createElement('article');
   card.className = 'texts-result-card';
@@ -526,10 +506,8 @@ function createTextResultCard(entry, query, phraseMatches = []) {
   const meta = document.createElement('p');
   meta.className = 'texts-result-meta';
   meta.textContent = [entry.author, entry.language].filter(Boolean).join(' · ');
-  const attribution = createTextAttribution(entry);
   const normalizedText = normalizeTextSearch(entry.text);
   card.append(title, meta);
-  if (attribution) card.appendChild(attribution);
 
   if (phraseMatches.length) {
     phraseMatches.forEach(match => {
@@ -1266,9 +1244,6 @@ function renderTextChapter() {
     .filter(Boolean).join(' · ');
   textsChapterView.append(heading, workTitle);
 
-  const attribution = createTextAttribution(record);
-  if (attribution) textsChapterView.appendChild(attribution);
-
   const chapterText = document.createElement('div');
   chapterText.className = 'texts-chapter-text';
   chapter.paragraphs.forEach((text, paragraphIndex) => {
@@ -1944,6 +1919,18 @@ function setupTextFilterAutocomplete(input, listId, getOptions, isAuthor) {
   if (!input || !list) return;
 
   const renderOptions = () => {
+    if (!isAuthor && !getSelectedTextAuthor()) return;
+    textsAutocomplete.classList.remove('active');
+    document.querySelectorAll('.texts-filter-list').forEach(otherList => {
+      if (otherList !== list) {
+        otherList.hidden = true;
+        const otherToggle = otherList.parentElement?.querySelector('.texts-filter-toggle');
+        if (otherToggle) {
+          otherToggle.textContent = '⌃';
+          otherToggle.setAttribute('aria-expanded', 'false');
+        }
+      }
+    });
     const query = normalizeTextSearch(input.value);
     const options = getOptions().filter(option =>
       !query || normalizeTextSearch(option).includes(query)
@@ -2180,6 +2167,46 @@ function getTextCatalogEntry(reference) {
   };
 }
 
+function getPerseusSourceUrl(reference) {
+  const fileName = reference.path.split('/').pop();
+  const identifiers = fileName.split('.');
+  if (reference.languageGroup === 'lat' && identifiers[0]?.startsWith('phi')) {
+    return `https://github.com/PerseusDL/canonical-latinLit/blob/master/data/${identifiers[0]}/${identifiers[1]}/${fileName}`;
+  }
+  if (reference.languageGroup === 'gr' && identifiers[0]?.startsWith('tlg')) {
+    return `https://github.com/PerseusDL/canonical-greekLit/blob/master/data/${identifiers[0]}/${identifiers[1]}/${fileName}`;
+  }
+  return 'https://www.perseus.tufts.edu/';
+}
+
+function renderAboutTextSources() {
+  const details = document.getElementById('aboutTextSources');
+  if (!details || !textCatalog.length) return;
+
+  const status = details.querySelector('.about-sources-status');
+  const list = document.createElement('ul');
+  list.className = 'about-sources-list';
+  textCatalog
+    .slice()
+    .sort((left, right) =>
+      left.author.localeCompare(right.author, 'ro')
+      || left.title.localeCompare(right.title, 'ro')
+    )
+    .forEach(reference => {
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = getPerseusSourceUrl(reference);
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = `${reference.author} — ${reference.title}`;
+      item.appendChild(link);
+      list.appendChild(item);
+    });
+  status?.remove();
+  details.querySelector('.about-sources-list')?.remove();
+  details.appendChild(list);
+}
+
 async function loadTextCatalog() {
   if (textCatalogLoadPromise) return textCatalogLoadPromise;
   if (textCatalogLoaded) return true;
@@ -2237,6 +2264,7 @@ async function loadTextCatalog() {
       if (!textCatalog.length) throw new Error('Manifestul de texte nu conține documente.');
       textCatalogLoaded = true;
       populateTextSearchFilters();
+      renderAboutTextSources();
       if (window.location.hash === '#texte'
         && !textsSearchInput.value.trim()
         && !showingTextFavoritesPage) {

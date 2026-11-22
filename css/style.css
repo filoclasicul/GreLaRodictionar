@@ -824,8 +824,66 @@ main {
 
 .about-sections {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.about-sections[hidden],
+.about-details[hidden] {
+  display: none;
+}
+
+.about-section-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 1rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-main);
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.about-section-link strong,
+.about-section-link small {
+  display: block;
+}
+
+.about-section-link strong {
+  color: var(--crimson);
+  font: 700 1.05rem var(--font-title);
+}
+
+.about-section-link small {
+  margin-top: 0.2rem;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+
+.about-section-link > span:last-child {
+  color: var(--crimson);
+  font-size: 1.5rem;
+}
+
+.about-section-link:hover {
+  border-color: var(--border-accent);
+  background: var(--gold-light);
+}
+
+.about-details {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.about-back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--crimson);
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .about-card {
@@ -840,6 +898,60 @@ main {
   margin-bottom: 0.65rem;
   color: var(--crimson);
   font: 700 1.15rem var(--font-title);
+}
+
+.about-card h3 {
+  margin: 1.15rem 0 0.45rem;
+  color: var(--text-main);
+  font: 700 0.98rem var(--font-title);
+}
+
+.about-card h3:first-child {
+  margin-top: 0;
+}
+
+.about-card ul {
+  margin: 0.7rem 0 0.7rem 1.2rem;
+}
+
+.about-card p + p {
+  margin-top: 0.65rem;
+}
+
+.about-card a {
+  color: var(--crimson);
+  font-weight: 600;
+}
+
+.about-sources {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.about-sources summary {
+  color: var(--crimson);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.about-sources-list {
+  display: grid;
+  gap: 0.35rem;
+  max-height: 20rem;
+  margin-top: 0.75rem;
+  padding-left: 1.2rem;
+  overflow-y: auto;
+}
+
+.about-sources-list a {
+  overflow-wrap: anywhere;
+}
+
+.about-sources-status {
+  margin-top: 0.65rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }
 
 .about-placeholder {
@@ -3161,6 +3273,36 @@ footer {
   font-size: 0.85rem;
   background: var(--bg-card);
   margin-top: auto;
+}
+
+.footer-links {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  margin-left: 0.75rem;
+  vertical-align: middle;
+}
+
+.footer-icon-link {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  background: var(--bg-page);
+  color: var(--text-main);
+  font-size: 1.05rem;
+  text-decoration: none;
+  transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.footer-icon-link:hover,
+.footer-icon-link:focus-visible {
+  border-color: var(--border-accent);
+  background: var(--gold-light);
+  transform: translateY(-1px);
 }
 
 .dictionary-load-error {

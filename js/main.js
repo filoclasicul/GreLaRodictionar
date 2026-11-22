@@ -200,7 +200,8 @@ let activeTextChapter = null;
 
 function syncSitePageFromLocation() {
   const showingTexts = window.location.hash === '#texte';
-  const showingAbout = window.location.hash === '#despre';
+  const aboutHash = window.location.hash.slice(1);
+  const showingAbout = aboutHash === 'despre' || aboutHash.startsWith('despre-');
   const showingDictionary = !showingTexts && !showingAbout;
   if (!showingTexts) {
     textsSearchResults.hidden = true;
@@ -215,10 +216,28 @@ function syncSitePageFromLocation() {
   textsFooter.hidden = !showingTexts;
   aboutPage.hidden = !showingAbout;
   aboutFooter.hidden = !showingAbout;
+  if (showingAbout) {
+    const route = aboutHash === 'despre' ? '' : aboutHash;
+    const overview = document.getElementById('aboutOverview');
+    const details = document.getElementById('aboutDetails');
+    const sections = [...document.querySelectorAll('[data-about-route]')];
+    const activeSection = sections.find(section => section.dataset.aboutRoute === route);
+    overview.hidden = Boolean(activeSection);
+    details.hidden = !activeSection;
+    sections.forEach(section => {
+      section.hidden = section !== activeSection;
+    });
+    const title = activeSection?.querySelector('h2')?.textContent || 'Despre';
+    document.getElementById('aboutPageTitle').textContent = title;
+    document.title = `${title} — GrecLaRo`;
+    document.querySelector('.about-intro > p:last-child').textContent = activeSection
+      ? ''
+      : 'Informații despre proiect, conținut, licențe și condițiile de utilizare.';
+  }
   pageNavigationLink.href = showingAbout || showingTexts ? '#dictionar' : '#texte';
   pageNavigationLabel.textContent = showingAbout || showingTexts ? 'Dicționar' : 'Texte';
   document.title = showingAbout
-    ? 'Despre — GrecLaRo'
+    ? `${document.getElementById('aboutPageTitle').textContent} — GrecLaRo`
     : showingTexts
       ? 'Texte clasice — GrecLaRo'
       : dictionaryPageTitle;
@@ -235,9 +254,11 @@ function syncSitePageFromLocation() {
         }
       });
     }
+  } else if (showingAbout && !textCatalogLoaded) {
+    loadTextCatalog();
   } else if (showingDictionary && !showingFavoritesPage) {
     requestAnimationFrame(() => {
-      if (window.location.hash !== '#texte' && window.location.hash !== '#despre' && !showingFavoritesPage) {
+      if (!window.location.hash.startsWith('#despre') && window.location.hash !== '#texte' && !showingFavoritesPage) {
         refreshDictionaryHighlights();
       }
     });
@@ -797,6 +818,7 @@ const clickActions = {
     element.textContent = willOpen ? '⌄' : '⌃';
     element.setAttribute('aria-expanded', String(willOpen));
     if (willOpen) {
+      textsAutocomplete.classList.remove('active');
       const input = list.parentElement?.querySelector('input');
       input?.focus();
     }
@@ -906,6 +928,13 @@ textsClearFilters.addEventListener('click', () => {
 });
 
 textsSearchInput.addEventListener('input', () => {
+  document.querySelectorAll('.texts-filter-list').forEach(list => {
+    list.hidden = true;
+  });
+  document.querySelectorAll('.texts-filter-toggle').forEach(toggle => {
+    toggle.textContent = '⌃';
+    toggle.setAttribute('aria-expanded', 'false');
+  });
   if (!textsSearchResults.hidden || activeTextChapter) {
     textsSearchResults.hidden = true;
     textsSearchResults.replaceChildren();
