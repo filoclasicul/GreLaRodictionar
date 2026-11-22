@@ -116,16 +116,24 @@ function validateTextDatabase(data) {
 
   data.forEach((entry, index) => {
     const pathParts = typeof entry?.path === 'string' ? entry.path.split('/') : [];
+    const languageGroup = getTextLanguageGroup(entry?.path);
     if (!entry || typeof entry !== 'object' || Array.isArray(entry)
       || typeof entry.path !== 'string' || !entry.path.trim()
       || !/\.(xml|json)$/i.test(entry.path)
-      || !['gr', 'lat'].includes(pathParts[0])
+      || !languageGroup
       || pathParts.some(part => !part || part === '.' || part === '..')) {
       throw new TypeError(`Documentul de la poziția ${index + 1} nu are formatul așteptat.`);
     }
   });
 
   return data;
+}
+
+function getTextLanguageGroup(path) {
+  const collection = typeof path === 'string' ? path.split('/')[0] : '';
+  if (collection === 'gr' || collection === 'perseus_greaca') return 'gr';
+  if (collection === 'lat' || collection === 'perseus_latina') return 'lat';
+  return '';
 }
 
 function textDocumentUrl(reference) {
@@ -145,8 +153,20 @@ function getTextLanguage(languageCode, languageGroup) {
   return languageCode || (languageGroup === 'lat' ? 'Latină' : 'Greacă veche');
 }
 
+function normalizeTeiXmlEntities(content) {
+  const decoder = document.createElement('textarea');
+  const xmlEntities = new Set(['amp', 'lt', 'gt', 'quot', 'apos']);
+  return content.replace(/&([A-Za-z][A-Za-z0-9]+);/g, (entity, name) => {
+    if (xmlEntities.has(name)) return entity;
+    decoder.innerHTML = entity;
+    const decoded = decoder.value;
+    if (decoded === entity) return entity;
+    return Array.from(decoded, character => `&#${character.codePointAt(0)};`).join('');
+  });
+}
+
 function loadTeiText(reference, content) {
-  const xml = new DOMParser().parseFromString(content, 'application/xml');
+  const xml = new DOMParser().parseFromString(normalizeTeiXmlEntities(content), 'application/xml');
   if (xml.getElementsByTagName('parsererror').length) {
     throw new TypeError(`Fișierul ${reference.path} nu conține XML valid.`);
   }
@@ -209,7 +229,7 @@ function loadTeiText(reference, content) {
     .find(scope => scope.getAttribute('unit') === 'volume');
   const volume = volumeElement?.textContent?.trim() || '1';
   const languageCode = textElement.getAttributeNS('http://www.w3.org/XML/1998/namespace', 'lang');
-  const languageGroup = reference.path.split('/')[0];
+  const languageGroup = getTextLanguageGroup(reference.path);
   const language = getTextLanguage(languageCode, languageGroup);
   const authorProfile = getTextAuthorProfile(reference);
   const bodyDivisions = allElements(body, 'div');
@@ -409,7 +429,7 @@ function parseJsonText(reference, data) {
     throw new TypeError(`Fișierul ${reference.path} trebuie să conțină un obiect JSON.`);
   }
 
-  const languageGroup = reference.path.split('/')[0];
+  const languageGroup = getTextLanguageGroup(reference.path);
   const authorProfile = getTextAuthorProfile(reference);
   const title = typeof data.title === 'string' ? data.title.trim() : '';
   const author = authorProfile?.name || (typeof data.author === 'string' ? data.author.trim() : '');
@@ -2153,7 +2173,7 @@ async function renderTextsSearchResults(query) {
 
 function getTextCatalogEntry(reference) {
   const pathParts = reference.path.split('/');
-  const languageGroup = pathParts[0];
+  const languageGroup = getTextLanguageGroup(reference.path);
   const folderAuthor = pathParts[1] || '';
   const profile = getTextAuthorProfile(reference);
   const author = profile?.name || reference.author || folderAuthor;

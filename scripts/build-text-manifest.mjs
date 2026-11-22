@@ -5,6 +5,9 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const textRoot = path.join(root, 'data', 'texte');
 const manifestPath = path.join(textRoot, 'texte.json');
+const sourceIndexPath = path.join(textRoot, 'index.json');
+const sourceIndex = JSON.parse(await readFile(sourceIndexPath, 'utf8'));
+const indexedMetadata = new Map(sourceIndex.map(entry => [entry.fisier, entry]));
 
 async function findDocuments(directory) {
   const documents = [];
@@ -43,6 +46,8 @@ function extractElementText(source, name) {
 function readTeiMetadata(content) {
   const header = /<teiHeader\b[^>]*>([\s\S]*?)<\/teiHeader\s*>/i.exec(content)?.[1] || '';
   const titleStatement = /<titleStmt\b[^>]*>([\s\S]*?)<\/titleStmt\s*>/i.exec(header)?.[1] || header;
+  const sourceDescription = /<sourceDesc\b[^>]*>([\s\S]*?)<\/sourceDesc\s*>/i.exec(header)?.[1] || '';
+  const sourceMonograph = /<monogr\b[^>]*>([\s\S]*?)<\/monogr\s*>/i.exec(sourceDescription)?.[1] || sourceDescription;
   const textAttributes = /<text\b([^>]*)>/i.exec(content)?.[1] || '';
   const language = /\bxml:lang\s*=\s*(["'])(.*?)\1/i.exec(textAttributes)?.[2] || '';
   const volume = [...header.matchAll(/<biblScope\b([^>]*)>([\s\S]*?)<\/biblScope\s*>/gi)]
@@ -50,7 +55,7 @@ function readTeiMetadata(content) {
 
   return {
     title: extractElementText(titleStatement, 'title'),
-    author: extractElementText(titleStatement, 'author'),
+    author: extractElementText(titleStatement, 'author') || extractElementText(sourceMonograph, 'author'),
     language,
     volume: volume ? decodeXmlText(volume[2]) || '1' : '1'
   };
@@ -58,21 +63,38 @@ function readTeiMetadata(content) {
 
 async function readDocumentMetadata(file) {
   const content = await readFile(file, 'utf8');
+  const relativePath = path.relative(textRoot, file).split(path.sep).join('/');
+  const indexed = indexedMetadata.get(relativePath);
+  const collection = relativePath.split('/')[0];
+  const defaultLanguage = collection === 'perseus_greaca' ? 'grc'
+    : collection === 'perseus_latina' ? 'lat'
+      : '';
+  let metadata;
   if (/\.json$/i.test(file)) {
     const data = JSON.parse(content);
-    return {
+    metadata = {
       title: typeof data.title === 'string' ? data.title.trim() : '',
       author: typeof data.author === 'string' ? data.author.trim() : '',
       language: typeof data.language === 'string' ? data.language.trim() : '',
       volume: data.volume === undefined ? '1' : String(data.volume)
     };
+  } else {
+    metadata = readTeiMetadata(content);
   }
-  return readTeiMetadata(content);
+
+  return {
+    title: metadata.title || indexed?.titlu || '',
+    author: indexed?.autor || metadata.author || '',
+    language: metadata.language || defaultLanguage,
+    volume: metadata.volume || '1'
+  };
 }
 
 const documents = await findDocuments(textRoot);
 const references = await Promise.all(documents
-  .filter(file => path.relative(textRoot, file).split(path.sep).join('/') !== 'texte.json')
+  .filter(file => !['index.json', 'texte.json'].includes(
+    path.relative(textRoot, file).split(path.sep).join('/')
+  ))
   .map(async file => ({
     path: path.relative(textRoot, file).split(path.sep).join('/'),
     ...await readDocumentMetadata(file)
