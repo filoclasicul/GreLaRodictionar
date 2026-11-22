@@ -1084,6 +1084,24 @@ main {
   align-items: end;
   gap: 0.65rem;
   margin-top: 0.75rem;
+  background: var(--gold-light);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-accent);
+}
+
+.texts-search-filters-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.texts-search-filters-label {
+  font: 600 0.85rem var(--font-body);
+  color: var(--text-main);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  opacity: 0.85;
 }
 
 .texts-search-filter {
@@ -1091,25 +1109,33 @@ main {
   flex: 1;
   display: grid;
   gap: 0.35rem;
-  color: var(--text-muted);
-  font: 700 0.78rem var(--font-body);
+  color: var(--text-main);
+  font: 600 0.8rem var(--font-body);
+  letter-spacing: 0.3px;
 }
 
 .texts-search-filter input {
   width: 100%;
   min-height: 2.65rem;
-  padding: 0.55rem 0.75rem;
-  border: 1px solid var(--border-color);
-  border-radius: 9px;
-  background: var(--bg-page);
+  padding: 0.65rem 0.85rem;
+  border: 2px solid var(--bg-card);
+  border-radius: 8px;
+  background: var(--bg-card);
   color: var(--text-main);
   font: 500 0.9rem var(--font-body);
+  transition: all 0.2s ease;
+}
+
+.texts-search-filter input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.65;
 }
 
 .texts-search-filter input:focus {
   border-color: var(--crimson);
   outline: none;
   box-shadow: 0 0 0 3px var(--gold-light);
+  background: var(--bg-page);
 }
 
 .texts-search-filter input:disabled {
@@ -1204,14 +1230,25 @@ main {
 
 .texts-search-filter-clear {
   min-height: 2.65rem;
-  padding: 0.55rem 0.75rem;
-  border: 1px solid var(--border-accent);
-  border-radius: 9px;
-  background: var(--gold-light);
-  color: var(--text-main);
-  font: 700 0.78rem var(--font-body);
+  padding: 0.65rem 1.1rem;
+  border: 2px solid var(--crimson);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--crimson);
+  font: 600 0.85rem var(--font-body);
   cursor: pointer;
   white-space: nowrap;
+  transition: all 0.2s ease;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.texts-search-filter-clear:hover,
+.texts-search-filter-clear:focus-visible {
+  background: var(--crimson);
+  color: var(--bg-page);
+  outline: none;
+  box-shadow: 0 4px 12px rgba(130, 232, 239, 0.3);
 }
 
 .texts-search-input {

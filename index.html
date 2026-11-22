@@ -253,32 +253,35 @@
         <input class="texts-search-input" id="textsSearchInput" name="q" type="search" autocomplete="off" placeholder="Caută după autor, operă sau frază (minimum 4 cuvinte)">
         <button class="texts-search-submit" type="submit">🔎 Caută</button>
       </form>
-      <div class="texts-search-filters" aria-label="Filtrează căutarea">
-        <label class="texts-search-filter">
-          <span>Autor latin</span>
-          <span class="texts-filter-control">
-            <input id="textsLatinAuthorFilter" type="text" autocomplete="off" placeholder="Scrie exact autorul">
-            <button class="texts-filter-toggle" type="button" data-action="toggle-text-filter" data-filter-target="textsLatinAuthors" aria-label="Retrage lista autorilor latini" aria-expanded="false">⌃</button>
-            <div class="texts-filter-list" id="textsLatinAuthors" role="listbox" hidden></div>
-          </span>
-        </label>
-        <label class="texts-search-filter">
-          <span>Autor grec</span>
-          <span class="texts-filter-control">
-            <input id="textsGreekAuthorFilter" type="text" autocomplete="off" placeholder="Scrie exact autorul">
-            <button class="texts-filter-toggle" type="button" data-action="toggle-text-filter" data-filter-target="textsGreekAuthors" aria-label="Retrage lista autorilor greci" aria-expanded="false">⌃</button>
-            <div class="texts-filter-list" id="textsGreekAuthors" role="listbox" hidden></div>
-          </span>
-        </label>
-        <label class="texts-search-filter">
-          <span>Operă</span>
-          <span class="texts-filter-control">
-            <input id="textsWorkFilter" type="text" autocomplete="off" placeholder="Scrie opera dorită">
-            <button class="texts-filter-toggle" type="button" data-action="toggle-text-filter" data-filter-target="textsWorkOptions" aria-label="Retrage lista operelor" aria-expanded="false">⌃</button>
-            <div class="texts-filter-list" id="textsWorkOptions" role="listbox" hidden></div>
-          </span>
-        </label>
-        <button class="texts-search-filter-clear" id="textsClearFilters" type="button">Șterge filtrele</button>
+      <div class="texts-search-filters-wrapper">
+        <div class="texts-search-filters-label">Filtrează după:</div>
+        <div class="texts-search-filters" aria-label="Filtrează căutarea">
+          <label class="texts-search-filter">
+            <span>Autor latin</span>
+            <span class="texts-filter-control">
+              <input id="textsLatinAuthorFilter" type="text" autocomplete="off" placeholder="Scrie exact autorul">
+              <button class="texts-filter-toggle" type="button" data-action="toggle-text-filter" data-filter-target="textsLatinAuthors" aria-label="Retrage lista autorilor latini" aria-expanded="false">⌃</button>
+              <div class="texts-filter-list" id="textsLatinAuthors" role="listbox" hidden></div>
+            </span>
+          </label>
+          <label class="texts-search-filter">
+            <span>Autor grec</span>
+            <span class="texts-filter-control">
+              <input id="textsGreekAuthorFilter" type="text" autocomplete="off" placeholder="Scrie exact autorul">
+              <button class="texts-filter-toggle" type="button" data-action="toggle-text-filter" data-filter-target="textsGreekAuthors" aria-label="Retrage lista autorilor greci" aria-expanded="false">⌃</button>
+              <div class="texts-filter-list" id="textsGreekAuthors" role="listbox" hidden></div>
+            </span>
+          </label>
+          <label class="texts-search-filter">
+            <span>Operă</span>
+            <span class="texts-filter-control">
+              <input id="textsWorkFilter" type="text" autocomplete="off" placeholder="Scrie opera dorită">
+              <button class="texts-filter-toggle" type="button" data-action="toggle-text-filter" data-filter-target="textsWorkOptions" aria-label="Retrage lista operelor" aria-expanded="false">⌃</button>
+              <div class="texts-filter-list" id="textsWorkOptions" role="listbox" hidden></div>
+            </span>
+          </label>
+          <button class="texts-search-filter-clear" id="textsClearFilters" type="button">Șterge filtrele</button>
+        </div>
       </div>
       <div class="texts-autocomplete" id="textsAutocomplete" role="listbox" aria-label="Recomandări în texte">
         <div class="texts-autocomplete-header" id="textsAutocompleteTitle">Recomandări</div>
