@@ -1346,7 +1346,8 @@ function renderTextBrowser() {
       const card = createTextBrowseCard(
         group.label,
         authorCount ? `${authorCount} ${authorCount === 1 ? 'autor' : 'autori'}` : group.description,
-        () => showTextAuthors(group.id)
+        () => showTextAuthors(group.id),
+        { icon: group.icon }
       );
       card.classList.add('texts-collection-card');
       card.classList.add(`texts-collection-card-${group.id}`);

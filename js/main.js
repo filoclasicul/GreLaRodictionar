@@ -77,12 +77,14 @@ const textLanguageGroups = [
   {
     id: 'gr',
     label: 'Autori greci',
+    icon: '🏛️ ',
     description: 'Texte în greacă veche',
     emptyMessage: 'Nu există încă autori greci în colecție.'
   },
   {
     id: 'lat',
     label: 'Autori latini',
+    icon: '📜',
     description: 'Texte în latină',
     emptyMessage: 'Nu există încă autori latini în colecție.'
   }
