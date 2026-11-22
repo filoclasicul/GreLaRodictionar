@@ -3,6 +3,7 @@ const TEXT_BROWSER_HISTORY_KEY = 'grelaroTextBrowser';
 let textNavigationLoadId = 0;
 let textDirectoryRenderId = 0;
 let textNavigationLoading = false;
+let authorNamesMapping = { greek_authors: {}, latin_authors: {} };
 
 async function loadAuthorProfiles() {
   try {
@@ -25,6 +26,28 @@ async function loadAuthorProfiles() {
   } catch (error) {
     console.warn('Nu s-au putut încărca profilurile externe ale autorilor.', error);
   }
+}
+
+async function loadAuthorNamesMapping() {
+  try {
+    const response = await fetch('data/authors/author_names_mapping.json', { cache: 'force-cache' });
+    if (!response.ok) throw new Error(`Răspuns HTTP ${response.status}`);
+    authorNamesMapping = await response.json();
+  } catch (error) {
+    console.warn('Nu s-au putut încărca mapping-ul numelor autorilor.', error);
+  }
+}
+
+function getDisplayName(authorEnglish, language) {
+  if (!authorEnglish) return authorEnglish;
+  
+  if (language === 'grc') {
+    return authorNamesMapping.greek_authors?.[authorEnglish] || authorEnglish;
+  } else if (language === 'lat') {
+    return authorNamesMapping.latin_authors?.[authorEnglish] || authorEnglish;
+  }
+  
+  return authorEnglish;
 }
 
 function completeTextExcerpt(value, preferredLimit = 280, maximumLimit = 420) {
@@ -526,7 +549,8 @@ function createTextResultCard(entry, query, phraseMatches = []) {
   title.textContent = entry.title;
   const meta = document.createElement('p');
   meta.className = 'texts-result-meta';
-  meta.textContent = [entry.author, entry.language].filter(Boolean).join(' · ');
+  const displayAuthor = getDisplayName(entry.author, entry.language);
+  meta.textContent = [displayAuthor, entry.language].filter(Boolean).join(' · ');
   const normalizedText = normalizeTextSearch(entry.text);
   card.append(title, meta);
 
@@ -1163,7 +1187,8 @@ function renderTextBreadcrumbs() {
     : () => showTextAuthors(textNavigation.languageGroup));
 
   if (level === 'authors') return;
-  addTextBreadcrumb(textNavigation.author, level === 'works'
+  const displayAuthor = getDisplayName(textNavigation.author, textNavigation.languageGroup === 'gr' ? 'grc' : 'lat');
+  addTextBreadcrumb(displayAuthor, level === 'works'
     ? null
     : () => showAuthorWorks(textNavigation.author));
 
@@ -1261,7 +1286,8 @@ function renderTextChapter() {
   ));
   const workTitle = document.createElement('p');
   workTitle.className = 'texts-chapter-meta';
-  workTitle.textContent = [record.title, record.author, `Volumul ${record.volume}`]
+  const displayAuthor = getDisplayName(record.author, record.languageGroup === 'grc' ? 'grc' : 'lat');
+  workTitle.textContent = [record.title, displayAuthor, `Volumul ${record.volume}`]
     .filter(Boolean).join(' · ');
   textsChapterView.append(heading, workTitle);
 
@@ -1375,8 +1401,9 @@ function renderTextBrowser() {
           author,
           title: author
         });
+        const displayName = getDisplayName(author, textNavigation.languageGroup === 'gr' ? 'grc' : 'lat');
         const authorCard = createTextBrowseCard(
-          author || 'Autor necunoscut',
+          displayName || 'Autor necunoscut',
           `${workCount} ${workCount === 1 ? 'operă' : 'opere'}`,
           () => showAuthorWorks(author),
           {
@@ -1399,7 +1426,8 @@ function renderTextBrowser() {
   if (textNavigation.level === 'works') {
     const author = textNavigation.author;
     const languageGroup = textNavigation.languageGroup;
-    textsDirectoryTitle.textContent = `Opere — ${textNavigation.author}`;
+    const displayName = getDisplayName(author, languageGroup === 'gr' ? 'grc' : 'lat');
+    textsDirectoryTitle.textContent = `Opere — ${displayName}`;
     const profile = authorProfiles[textNavigation.author === 'Julius Caesar'
       ? 'Caesar'
       : Object.keys(authorProfiles).find(key =>
@@ -1439,7 +1467,7 @@ function renderTextBrowser() {
       const copy = document.createElement('div');
       copy.className = 'texts-author-profile-copy';
       const name = document.createElement('h3');
-      name.textContent = profile.name;
+      name.textContent = displayName || profile.name;
       copy.appendChild(name);
       if (profile.years) {
         const years = document.createElement('p');
@@ -1670,7 +1698,8 @@ function renderTextFavoritesPage() {
       authorSection.className = 'texts-favorites-author-group';
       const authorHeading = document.createElement('h3');
       authorHeading.className = 'texts-favorites-author-title';
-      authorHeading.textContent = authorGroup.author;
+      const displayAuthor = getDisplayName(authorGroup.author, authorGroup.languageGroup === 'gr' ? 'grc' : 'lat');
+      authorHeading.textContent = displayAuthor || authorGroup.author;
       authorSection.appendChild(authorHeading);
 
       const workList = document.createElement('div');
@@ -2247,7 +2276,8 @@ async function loadTextCatalog() {
       const [discoveryResponse, manifestResult] = await Promise.all([
         discoveryPromise,
         manifestPromise,
-        loadAuthorProfiles()
+        loadAuthorProfiles(),
+        loadAuthorNamesMapping()
       ]);
       let references = [];
       if (discoveryResponse?.ok) {
@@ -2438,7 +2468,8 @@ function createTextHighlightCard(languageGroup, selection) {
   const chapterLabel = selection.chapter.heading
     ? ` — ${selection.chapter.heading}`
     : ` — capitolul ${selection.chapter.number}`;
-  const attributionText = [selection.author, selection.title].filter(Boolean).join(' · ');
+  const displayAuthor = getDisplayName(selection.author, languageGroup === 'gr' ? 'grc' : 'lat');
+  const attributionText = [displayAuthor, selection.title].filter(Boolean).join(' · ');
   if (attributionText) {
     const attributionLink = document.createElement('button');
     attributionLink.type = 'button';
